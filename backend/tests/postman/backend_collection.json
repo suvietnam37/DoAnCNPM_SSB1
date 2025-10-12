@@ -1,0 +1,90 @@
+{
+  "info": {
+    "name": "SSB 1.0 Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Routes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/routes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "routes"]
+        }
+      }
+    },
+    {
+      "name": "Get Route by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/routes/T01",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "routes", "T01"]
+        }
+      }
+    },
+    {
+      "name": "Create Route",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\": \"T11\", \"start\": \"Quận 11\", \"end\": \"Trường THPT A\", \"departTime\": \"06:50\", \"stops\": [\"Điểm 1\", \"Điểm 2\"]}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/routes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "routes"]
+        }
+      }
+    },
+    {
+      "name": "Update Route",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"departTime\": \"07:00\"}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/routes/T01",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "routes", "T01"]
+        }
+      }
+    },
+    {
+      "name": "Delete Route",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/routes/T01",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "routes", "T01"]
+        }
+      }
+    }
+  ]
+}
