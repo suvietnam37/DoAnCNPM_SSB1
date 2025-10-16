@@ -1,4 +1,4 @@
-// src/components/Sidebar/Sidebar.jsx
+// src/components/Sidebar/Sidebar.js
 import React from "react";
 import "./Sidebar.css";
 

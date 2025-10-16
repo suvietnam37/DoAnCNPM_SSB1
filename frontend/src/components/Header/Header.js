@@ -1,4 +1,4 @@
-// src/components/Header/Header.jsx
+// src/components/Header/Header.js
 import React from "react";
 import "./Header.css";
 
