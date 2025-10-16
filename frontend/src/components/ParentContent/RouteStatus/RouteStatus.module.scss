@@ -1,0 +1,117 @@
+.route-status {
+    width: fit-content;
+    height: fit-content;
+    background-color: var(--gray);
+    border-radius: 16px;
+    margin-top: 50px;
+
+    .route-status-title {
+        width: 100%;
+        margin: 30px 0 0 30px;
+        height: 50px;
+        color: burlywood;
+        font-size: 22px;
+
+        span {
+            margin-left: 15px;
+            color: black;
+        }
+    }
+
+    .route-status-container {
+        width: 100%;
+        height: 140px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+
+        .route-num-container,
+        .route-location,
+        .route-next-location {
+            background-color: whitesmoke;
+            height: 100px;
+            margin: 20px;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .route-num-container {
+            position: relative;
+            text-align: center;
+
+            .route-num {
+                position: relative;
+                display: flex;
+                justify-content: space-around;
+                gap: 20px;
+                height: 50%;
+                letter-spacing: 1.2px;
+            }
+
+            .active-color {
+                width: 20px;
+                height: 20px;
+                background-color: aquamarine;
+                border-radius: 999px;
+            }
+        }
+
+        .start-end {
+            width: 100%;
+            height: 50%;
+            color: #5b5b5ba9;
+        }
+    }
+    .route-location {
+        display: flex;
+        position: relative;
+        justify-content: space-around;
+        flex-direction: column;
+        padding: 10px;
+
+        .location-title {
+            height: 50%;
+            letter-spacing: 1.2px;
+
+            .location-title-icon {
+                font-size: 20px;
+                color: var(--primary);
+            }
+
+            span {
+                margin-left: 10px;
+            }
+        }
+        .location-name {
+            width: 100%;
+            color: #5b5b5ba9;
+            height: 50%;
+        }
+    }
+
+    .route-next-location {
+        display: flex;
+        position: relative;
+        justify-content: space-around;
+        flex-direction: column;
+        padding: 10px;
+
+        .next-location-title {
+            height: 50%;
+            letter-spacing: 1.2px;
+
+            .next-location-title-icon {
+                font-size: 20px;
+                color: var(--red);
+            }
+
+            span {
+                margin-left: 10px;
+            }
+        }
+        .next-location-name {
+            width: 100%;
+            color: #5b5b5ba9;
+            height: 50%;
+        }
+    }
+}

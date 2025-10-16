@@ -1,0 +1,71 @@
+.student-manage {
+    // height: fit-content;
+    height: 300px;
+    width: 68%;
+    background-color: var(--gray);
+    border-radius: 16px;
+    margin-top: 230px;
+    display: flex;
+    flex-direction: column;
+
+    .student-manage-title {
+        width: 100%;
+        margin: 30px 0 0 30px;
+        height: 50px;
+        color: var(--red);
+        font-size: 22px;
+
+        span {
+            margin-left: 15px;
+            color: black;
+        }
+    }
+
+    .student-manage-table {
+        border-radius: 24px;
+        width: 100%;
+
+        table {
+            margin: 20px 50px;
+            width: 90%;
+            border-collapse: collapse;
+            border-radius: 16px;
+            overflow: hidden;
+            border: none;
+
+            td:last-child {
+                display: flex;
+                justify-content: space-around;
+
+                span {
+                    text-align: start;
+                    width: 60%;
+                }
+
+                button {
+                    width: 80%;
+                    height: 35px;
+                    cursor: pointer;
+                    border-radius: 16px;
+                    border: none;
+                    background-color: rgb(129, 255, 127);
+
+                    &:hover {
+                        background-color: rgb(114, 228, 112);
+                    }
+                }
+            }
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: center;
+            background-color: whitesmoke;
+        }
+
+        th {
+            background-color: var(--primary);
+        }
+    }
+}

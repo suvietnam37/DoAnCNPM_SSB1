@@ -1,0 +1,195 @@
+.notification {
+    height: fit-content;
+    width: 68%;
+    background-color: var(--gray);
+    border-radius: 16px;
+    margin-top: 230px;
+    display: flex;
+    flex-direction: column;
+
+    .notification-title {
+        width: 100%;
+        margin: 30px 0 0 30px;
+        height: 50px;
+        color: #fab23d;
+        font-size: 22px;
+
+        span {
+            margin-left: 15px;
+            color: black;
+        }
+    }
+
+    .notification-realtime {
+        display: flex;
+        align-items: center;
+        margin-left: 35px;
+        letter-spacing: 1.5px;
+        color: #5b5b5ba9;
+
+        .notification-realtime-details {
+            margin-left: 10px;
+            border: none;
+            width: 100px;
+            height: 30px;
+            cursor: pointer;
+            border-radius: 16px;
+            background-color: var(--primary);
+
+            &:hover {
+                transform: scale(1.03);
+            }
+        }
+    }
+    .notification-infor {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+
+        .route-num,
+        .driver-infor,
+        .bus-active {
+            background-color: whitesmoke;
+            height: 100px;
+            margin: 20px;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .route-num {
+            display: flex;
+            position: relative;
+            justify-content: space-around;
+            flex-direction: column;
+            padding: 20px;
+
+            .route-num-title {
+                height: 50%;
+                letter-spacing: 1.2px;
+
+                .route-num-title-icon {
+                    font-size: 20px;
+                    color: var(--red);
+                }
+
+                span {
+                    margin-left: 10px;
+                }
+            }
+            .route-num-name {
+                width: 100%;
+                color: #5b5b5ba9;
+                height: 50%;
+            }
+        }
+
+        .driver-infor {
+            display: flex;
+            position: relative;
+            justify-content: space-around;
+            flex-direction: column;
+            padding: 20px;
+
+            .driver-infor-title {
+                height: 50%;
+                letter-spacing: 1.2px;
+
+                .driver-infor-title-icon {
+                    font-size: 20px;
+                    color: #0d21a1;
+                }
+
+                span {
+                    margin-left: 10px;
+                }
+            }
+            .driver-infor-name {
+                width: 100%;
+                color: #5b5b5ba9;
+                height: 50%;
+            }
+        }
+
+        .bus-active {
+            display: flex;
+            position: relative;
+            justify-content: space-around;
+            flex-direction: column;
+            padding: 20px;
+
+            .bus-active-title {
+                height: 50%;
+                letter-spacing: 1.2px;
+
+                .bus-active-title-icon {
+                    font-size: 20px;
+                    color: rgb(49, 253, 185);
+                }
+
+                span {
+                    margin-left: 10px;
+                }
+            }
+            .bus-active-name {
+                width: 100%;
+                color: #5b5b5ba9;
+                height: 50%;
+            }
+        }
+    }
+
+    .notification-route {
+        background-color: whitesmoke;
+        height: fit-content;
+        margin: 20px;
+        border-radius: 12px;
+        display: grid;
+        grid-template-rows: repeat(3, 1fr);
+
+        .notification-route-title {
+            letter-spacing: 1.2px;
+            padding: 10px;
+
+            .notification-route-title-icon {
+                font-size: 20px;
+                color: rgb(41, 165, 124);
+            }
+
+            span {
+                margin-left: 10px;
+            }
+        }
+        .notification-route-name {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 10px 10px 15px;
+            color: #5b5b5bd9;
+
+            span {
+                // margin-left: 25px;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+        .notification-route-location {
+            display: flex;
+            padding: 10px;
+            .notification-route-title-icon {
+                margin-right: 10px;
+                color: rgb(225, 3, 3);
+            }
+            span {
+                display: flex;
+                align-items: center;
+
+                p {
+                    margin-left: 7px;
+                    color: #5b5b5ba9;
+                }
+            }
+        }
+    }
+}
