@@ -1,0 +1,29 @@
+.map-route {
+    margin-top: 250px;
+    // border: solid 1px;
+    width: 68%;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    .map-route-title {
+        font-size: 25px;
+        border-bottom: solid 2px #5b5b5ba9;
+        width: 40%;
+        text-align: center;
+
+        .map-route-title-icon {
+            margin-right: 10px;
+            color: rgb(41, 165, 124);
+        }
+    }
+
+    .map-route-location {
+        // border: solid 1px;
+        width: 80%;
+        height: 450px;
+        margin: 15px 10px 50px 10px;
+    }
+}

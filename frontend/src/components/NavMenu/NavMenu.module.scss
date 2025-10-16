@@ -1,0 +1,63 @@
+.menu {
+    display: grid;
+    grid-template-columns: 15% 70% 15%;
+    width: 90%;
+    height: fit-content;
+    border-bottom: solid 2px;
+    padding: 30px 0 15px 0;
+    position: fixed;
+    top: 80px;
+    background-color: white;
+    z-index: 10000;
+
+    .menu-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        font-size: 50px;
+
+        span {
+            font-size: 35px;
+        }
+    }
+
+    .menu-nav-list {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        .menu-nav-list-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+
+            .icon-location {
+                font-size: 25px;
+                transition: all 0.3s;
+            }
+
+            &:hover {
+                .icon-location {
+                    color: var(--primary);
+                }
+
+                span {
+                    transform: scale(1.05);
+                }
+            }
+        }
+    }
+    .menu-role {
+        font-size: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: var(--primary);
+        border-radius: 30px;
+        font-weight: 500;
+    }
+}

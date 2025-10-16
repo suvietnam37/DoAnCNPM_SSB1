@@ -1,0 +1,50 @@
+@import 'normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+:root {
+    --primary: #ffc30d;
+    --gray: #00000022;
+    --white: #69696900;
+    --black: #2e2e2e;
+    --red: #b4151b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+html {
+    font-size: 62.5%;
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #919191;
+        border-radius: 4px;
+    }
+}
+
+body {
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    text-rendering: optimizeSpeed;
+}
+
+a {
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+img {
+    width: 100%;
+}
+
+.leaflet-routing-container {
+    display: none !important;
+}
