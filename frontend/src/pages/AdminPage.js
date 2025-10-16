@@ -1,5 +1,7 @@
+import AdminContent from '../components/AdminContent/AdminContent';
+
 function AdminPage() {
-    return <h1>AdminPage</h1>;
+    return <AdminContent></AdminContent>;
 }
 
 export default AdminPage;

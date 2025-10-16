@@ -1,0 +1,60 @@
+:root {
+    --primary: #ffc30d;
+    --gray: #00000022;
+    --white: #69696900;
+    --black: #2e2e2e;
+    --red: #b4151b;
+}
+
+.wrapper {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--gray);
+    display: flex;
+    flex-direction: column;
+    color: var(--black);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Ví dụ header trong admin */
+.header {
+    background-color: var(--primary);
+    color: var(--black);
+    font-size: 20px;
+    font-weight: 600;
+    padding: 16px 24px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar menu */
+.sidebar {
+    width: 240px;
+    background-color: var(--black);
+    color: white;
+    padding: 20px;
+}
+
+.sidebar-item {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sidebar-item:hover {
+    background-color: var(--primary);
+    color: var(--black);
+}
+
+/* Content */
+.content {
+    flex: 1;
+    background-color: white;
+    padding: 24px;
+}
+
+.active {
+    background-color: #ffc30d;
+    color: #2e2e2e;
+}

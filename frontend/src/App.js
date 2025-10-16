@@ -4,58 +4,47 @@ import { Fragment } from 'react/jsx-runtime';
 import MainLayout from './layouts/MainLayout';
 import PrivateRoute from './routes/PrivateRoute';
 function App() {
+    const renderRoutes = (routes, isPrivate = false) =>
+        routes.map((route, index) => {
+            let Layout = MainLayout;
+            const Page = route.component;
+            if (route.layout) {
+                Layout = route.layout;
+            } else if (route.layout === null) {
+                Layout = Fragment;
+            }
+
+            const element = isPrivate ? (
+                <PrivateRoute>
+                    <Layout>
+                        <Page />
+                    </Layout>
+                </PrivateRoute>
+            ) : (
+                <Layout>
+                    <Page />
+                </Layout>
+            );
+
+            if (route.children) {
+                return (
+                    <Route key={index} path={route.path} element={element}>
+                        {route.children.map((child, i) => {
+                            const ChildPage = child.component;
+                            return <Route key={i} path={child.path} element={<ChildPage />} />;
+                        })}
+                    </Route>
+                );
+            }
+
+            return <Route key={index} path={route.path} element={element} />;
+        });
     return (
         <Router>
             <div className="App">
                 <Routes>
-                    {/* PUBLIC ROUTES */}
-                    {publicRoutes.map((route, index) => {
-                        let Layout = MainLayout;
-                        const Page = route.component;
-
-                        if (route.layout) {
-                            Layout = route.layout;
-                        } else if (route.layout === null) {
-                            Layout = Fragment;
-                        }
-
-                        return (
-                            <Route
-                                key={index}
-                                path={route.path}
-                                element={
-                                    <Layout>
-                                        <Page />
-                                    </Layout>
-                                }
-                            />
-                        );
-                    })}
-
-                    {privateRoutes.map((route, index) => {
-                        let Layout = MainLayout;
-                        const Page = route.component;
-
-                        if (route.layout) {
-                            Layout = route.layout;
-                        } else if (route.layout === null) {
-                            Layout = Fragment;
-                        }
-
-                        return (
-                            <Route
-                                key={index}
-                                path={route.path}
-                                element={
-                                    <PrivateRoute>
-                                        <Layout>
-                                            <Page />
-                                        </Layout>
-                                    </PrivateRoute>
-                                }
-                            />
-                        );
-                    })}
+                    {renderRoutes(publicRoutes, false)}
+                    {renderRoutes(privateRoutes, true)}
                 </Routes>
             </div>
         </Router>

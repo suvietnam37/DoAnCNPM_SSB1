@@ -1,0 +1,45 @@
+.wrapper {
+    padding: 20px;
+}
+
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+.content {
+    display: grid;
+    grid-template-columns: 60% 2% 38%;
+    width: 100%;
+    margin-top: 50px;
+    gap: 20px;
+}
+
+.content-notification {
+    width: 100%;
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        li {
+            letter-spacing: 2px;
+            list-style: none;
+            margin-top: 20px;
+        }
+    }
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}

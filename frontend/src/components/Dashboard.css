@@ -1,73 +1,74 @@
 /* D:\Project_CNPM\DoAnCNPM_SSB1\frontend\src\components\Dashboard.css */
 .admin-dashboard {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
 }
 
 .admin-dashboard h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
 }
 
 .error-message {
-  color: red;
-  text-align: center;
-  margin-bottom: 20px;
+    color: red;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .stats-section {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 30px;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
 }
 
 .stat-card {
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  width: 200px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 200px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card h3 {
-  margin-bottom: 10px;
-  color: #555;
+    margin-bottom: 10px;
+    color: #555;
 }
 
 .stat-card p {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffc107;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffc107;
 }
 
 .data-section {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .data-section h3 {
-  margin-bottom: 10px;
-  color: #444;
+    margin-bottom: 10px;
+    color: #444;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
 }
 
 th {
-  background-color: #f2f2f2;
+    background-color: #f2f2f2;
 }
