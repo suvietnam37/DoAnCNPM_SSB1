@@ -17,16 +17,16 @@
 //     return (
 //         <div className={cx('wrapper')}>
 //             <div className={cx('title-container')}>
-//                 <h2 className={cx('title')}>Quản lý tuyến</h2>
+//                 <h2 className={cx('title')}>Quản lý trạm</h2>
 //                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-//                     Thêm tuyến
+//                     Thêm trạm
 //                 </button>
 //             </div>
 //             <table className={cx('table')}>
 //                 <thead>
 //                     <tr>
-//                         <th>Mã tuyến</th>
-//                         <th>Tên tuyến</th>
+//                         <th>Mã trạm</th>
+//                         <th>Tên trạm</th>
 //                         <th>Số trạm</th>
 //                         <th>Hành động</th>
 //                         <th>Chi tiết</th>
@@ -35,7 +35,7 @@
 //                 <tbody>
 //                     <tr>
 //                         <td>R01</td>
-//                         <td>Tuyến A</td>
+//                         <td>trạm A</td>
 //                         <td>10</td>
 //                         <td>
 //                             <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
@@ -62,11 +62,11 @@
 //                                 X
 //                             </button>
 //                         </div>
-//                         <h3>Sửa thông tin tuyến </h3>
+//                         <h3>Sửa thông tin trạm </h3>
 //                         <div className={cx('form')}>
 //                             <div className={cx('form-container')}>
-//                                 <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-//                                 <input type="text" placeholder="Tên tuyến" className={cx('input')} />
+//                                 <input type="text" placeholder="Mã trạm" className={cx('input')} />
+//                                 <input type="text" placeholder="Tên trạm" className={cx('input')} />
 //                             </div>
 //                             <div className={cx('form-container')}>
 //                                 {/* <label>Trạm 1: </label> */}
@@ -107,11 +107,11 @@
 //                                 X
 //                             </button>
 //                         </div>
-//                         <h3>Thêm tuyến </h3>
+//                         <h3>Thêm trạm </h3>
 //                         <div className={cx('form')}>
 //                             <div className={cx('form-container')}>
-//                                 <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-//                                 <input type="text" placeholder="Tên tuyến" className={cx('input')} />
+//                                 <input type="text" placeholder="Mã trạm" className={cx('input')} />
+//                                 <input type="text" placeholder="Tên trạm" className={cx('input')} />
 //                             </div>
 //                             <div className={cx('form-container')}>
 //                                 <label>Trạm 1: </label>
@@ -149,11 +149,11 @@
 //                                 X
 //                             </button>
 //                         </div>
-//                         <h3>Chi tiết tuyến</h3>
+//                         <h3>Chi tiết trạm</h3>
 //                         <div className={cx('form')}>
 //                             <div className={cx('form-container')}>
-//                                 <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-//                                 <input type="text" placeholder="Tên tuyến" className={cx('input')} />
+//                                 <input type="text" placeholder="Mã trạm" className={cx('input')} />
+//                                 <input type="text" placeholder="Tên trạm" className={cx('input')} />
 //                             </div>
 //                             <div className={cx('form-container')}>
 //                                 <table className={cx('table')}>
@@ -183,7 +183,7 @@
 //                                 X
 //                             </button>
 //                         </div>
-//                         <h3>Xác nhận xóa tuyến ?</h3>
+//                         <h3>Xác nhận xóa trạm ?</h3>
 //                         <button className={cx('btn', 'add')} onClick={handleCloseModal}>
 //                             Xác nhận
 //                         </button>
@@ -196,12 +196,12 @@
 
 // export default ManageRoute;
 
-import styles from './ManageRoute.module.scss';
+import styles from './ManageStation.module.scss';
 import classNames from 'classnames/bind';
 import { useState } from 'react';
 const cx = classNames.bind(styles);
 
-function ManageRoute() {
+function ManageStation() {
     const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
 
     const handleOpenModal = (type) => {
@@ -214,16 +214,16 @@ function ManageRoute() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản lý tuyến</h2>
+                <h2 className={cx('title')}>Quản lý trạm</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm tuyến
+                    Thêm trạm
                 </button>
             </div>
             <table className={cx('table')}>
                 <thead>
                     <tr>
-                        <th>Mã tuyến</th>
-                        <th>Tên tuyến</th>
+                        <th>Mã trạm</th>
+                        <th>Tên trạm</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
@@ -257,10 +257,45 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Sửa thông tin tuyến</h3>
+                        <h3>Sửa trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-                            <input type="text" placeholder="Tên tuyến" className={cx('input')} />
+                            <input type="text" placeholder="Mã trạm" className={cx('input')} />
+                            <input type="text" placeholder="Tên trạm" className={cx('input')} />
+                            <div className={cx('table-wrapper')}>
+                                <table className={cx('table')}>
+                                    <thead>
+                                        <tr>
+                                            <th>Mã tuyến</th>
+                                            <th>Tên tuyến</th>
+                                            <th>Chọn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
                                     Cập nhật
@@ -278,10 +313,45 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Thêm tuyến</h3>
+                        <h3>Thêm trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-                            <input type="text" placeholder="Tên tuyến" className={cx('input')} />
+                            <input type="text" placeholder="Mã trạm" className={cx('input')} />
+                            <input type="text" placeholder="Tên trạm" className={cx('input')} />
+                            <div className={cx('table-wrapper')}>
+                                <table className={cx('table')}>
+                                    <thead>
+                                        <tr>
+                                            <th>Mã tuyến</th>
+                                            <th>Tên tuyến</th>
+                                            <th>Chọn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
                                     Thêm
@@ -300,7 +370,7 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa tuyến ?</h3>
+                        <h3>Xác nhận xóa trạm ?</h3>
                         <button className={cx('btn', 'add')} onClick={handleCloseModal}>
                             Xác nhận
                         </button>
@@ -316,45 +386,11 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết tuyến</h3>
+                        <h3>Chi tiết trạm</h3>
                         <div className={cx('form')}>
-                            <div className={cx('form-container')}>
-                                <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-                                <input type="text" placeholder="Tên tuyến" className={cx('input')} />
-                            </div>
-                            <div className={cx('form-container')}>
-                                <table className={cx('table')}>
-                                    <thead>
-                                        <tr>
-                                            <th>Số trạm</th>
-                                            <th>Vị trí</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                        </tr>
-                                        <tr>
-                                            <td>01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                        </tr>
-                                        <tr>
-                                            <td>01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                        </tr>
-                                        <tr>
-                                            <td>01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <input type="text" placeholder="Mã trạm" className={cx('input')} />
+                            <input type="text" placeholder="Tên trạm" className={cx('input')} />
+                            <input type="text" placeholder="Mã tuyến" className={cx('input')} />
                         </div>
                     </div>
                 </div>
@@ -363,4 +399,4 @@ function ManageRoute() {
     );
 }
 
-export default ManageRoute;
+export default ManageStation;

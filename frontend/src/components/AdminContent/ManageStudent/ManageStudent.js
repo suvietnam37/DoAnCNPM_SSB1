@@ -67,7 +67,6 @@ function ManageStudent() {
                             <input type="text" placeholder="Mã học sinh" className={cx('input')} />
                             <input type="text" placeholder="Tên học sinh" className={cx('input')} />
                             <input type="text" placeholder="Lớp" className={cx('input')} />
-                            <input type="text" placeholder="SDT phụ huynh" className={cx('input')} />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
                                     Cập nhật
@@ -90,7 +89,77 @@ function ManageStudent() {
                             <input type="text" placeholder="Mã học sinh" className={cx('input')} />
                             <input type="text" placeholder="Tên học sinh" className={cx('input')} />
                             <input type="text" placeholder="Lớp" className={cx('input')} />
-                            <input type="text" placeholder="SDT phụ huynh" className={cx('input')} />
+                            <div className={cx('form-container')}>
+                                <div className={cx('table-wrapper')}>
+                                    <table className={cx('table')}>
+                                        <thead>
+                                            <tr>
+                                                <th>Mã tuyến</th>
+                                                <th>Tên tuyến</th>
+                                                <th>Chọn</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>R01</td>
+                                                <td>Cầu Ông Lãnh</td>
+                                                <td>
+                                                    <input type="radio" name="route" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>R01</td>
+                                                <td>Cầu Ông Lãnh</td>
+                                                <td>
+                                                    <input type="radio" name="route" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>R01</td>
+                                                <td>Cầu Ông Lãnh</td>
+                                                <td>
+                                                    <input type="radio" name="route" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div className={cx('table-wrapper')}>
+                                    <table className={cx('table')}>
+                                        <thead>
+                                            <tr>
+                                                <th>Mã phụ huynh</th>
+                                                <th>Tên phụ huynh</th>
+                                                <th>Chọn</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>PH01</td>
+                                                <td>Nguyễn Thị Lựu</td>
+                                                <td>
+                                                    <input type="radio" name="parent" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>PH02</td>
+                                                <td>Nguyễn Ánh Lực</td>
+                                                <td>
+                                                    <input type="radio" name="parent" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>PH01</td>
+                                                <td>Nguyễn Thị Lựu</td>
+                                                <td>
+                                                    <input type="radio" name="driver" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
 
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
@@ -114,7 +183,8 @@ function ManageStudent() {
                             <input type="text" placeholder="Mã học sinh" className={cx('input')} />
                             <input type="text" placeholder="Tên học sinh" className={cx('input')} />
                             <input type="text" placeholder="Lớp" className={cx('input')} />
-                            <input type="text" placeholder="SDT phụ huynh" className={cx('input')} />
+                            <input type="text" placeholder="Mã tuyến" className={cx('input')} />
+                            <input type="text" placeholder="Mã phụ huynh" className={cx('input')} />
                         </div>
                     </div>
                 </div>

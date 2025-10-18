@@ -18,18 +18,6 @@ function AdminContent() {
                         Dashboard
                     </NavLink>
                     <NavLink
-                        to="manage-route"
-                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
-                    >
-                        Quản lý tuyến
-                    </NavLink>
-                    <NavLink
-                        to="manage-bus"
-                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
-                    >
-                        Quản lý xe
-                    </NavLink>
-                    <NavLink
                         to="manage-driver"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
@@ -42,16 +30,40 @@ function AdminContent() {
                         Quản lý học sinh
                     </NavLink>
                     <NavLink
-                        to="report"
+                        to="manage-parent"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Báo cáo
+                        Quản lý phụ huynh
+                    </NavLink>
+                    <NavLink
+                        to="manage-station"
+                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
+                    >
+                        Quản lý trạm
+                    </NavLink>
+                    <NavLink
+                        to="manage-route"
+                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
+                    >
+                        Quản lý tuyến
+                    </NavLink>
+                    <NavLink
+                        to="manage-bus"
+                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
+                    >
+                        Quản lý xe
                     </NavLink>
                     <NavLink
                         to="setup-route"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
                         Setup tuyến
+                    </NavLink>
+                    <NavLink
+                        to="report"
+                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
+                    >
+                        Báo cáo
                     </NavLink>
                 </div>
 

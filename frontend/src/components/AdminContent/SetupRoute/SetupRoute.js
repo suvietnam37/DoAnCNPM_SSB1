@@ -232,14 +232,14 @@ function SetupRoute() {
                                                 <td>HS01</td>
                                                 <td>Nguyễn Văn A</td>
                                                 <td>
-                                                    <input type="checkbox" name="bus" />
+                                                    <input type="checkbox" />
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>HS02</td>
                                                 <td>Trần Văn X</td>
                                                 <td>
-                                                    <input type="checkbox" name="bus" />
+                                                    <input type="checkbox" />
                                                 </td>
                                             </tr>
                                         </tbody>
