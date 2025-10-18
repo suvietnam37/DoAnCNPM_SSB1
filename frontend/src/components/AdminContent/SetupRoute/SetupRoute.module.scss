@@ -47,9 +47,7 @@
         }
     }
 
-    .form-container-choose-student {
-        display: grid;
-        grid-template-columns: 65% 35%;
+    .form-container-details {
         width: 100%;
 
         input {
@@ -158,7 +156,7 @@
 
 .modal-content {
     background: #fff;
-    padding: 20px;
+    padding: 30px;
     border-radius: 8px;
     width: fit-content;
     text-align: center;

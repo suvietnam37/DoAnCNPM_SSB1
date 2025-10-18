@@ -178,7 +178,7 @@ function SetupRoute() {
                                 <button className={cx('btn', 'add')}>Thêm</button>
                             </div>
                         </div>
-                        <div className={cx('form')}>
+                        {/* <div className={cx('form')}>
                             <div className={cx('form-container-choose-student')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
@@ -250,7 +250,7 @@ function SetupRoute() {
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')}>Thêm học sinh</button>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             )}
@@ -379,41 +379,6 @@ function SetupRoute() {
                                 <button className={cx('btn', 'change')}>Sửa</button>
                             </div>
                         </div>
-                        <div className={cx('form')}>
-                            <div className={cx('form-container-choose-student', 'edit')}>
-                                <div className={cx('table-wrapper')}>
-                                    <table className={cx('table')}>
-                                        <thead>
-                                            <tr>
-                                                <th>Mã học sinh</th>
-                                                <th>Tên học sinh</th>
-                                                <th>Chọn</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>HS01</td>
-                                                <td>Nguyễn Văn A</td>
-                                                <td>
-                                                    <input type="checkbox" name="bus" />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>HS02</td>
-                                                <td>Trần Văn X</td>
-                                                <td>
-                                                    <input type="checkbox" name="bus" />
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div className={cx('buttons')}>
-                                <button className={cx('btn', 'change')}>Sửa học sinh</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             )}
@@ -428,7 +393,7 @@ function SetupRoute() {
                         <h3>Thông tin chi tiết tuyến</h3>
 
                         <div className={cx('form')}>
-                            <div className={cx('form-container-choose-student')}>
+                            <div className={cx('form-container-details')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
                                         <thead>
@@ -459,6 +424,26 @@ function SetupRoute() {
                                             <tr>
                                                 <td>HS01</td>
                                                 <td>Nguyễn Văn A</td>
+                                            </tr>
+                                            <tr>
+                                                <td>HS02</td>
+                                                <td>Trần Văn X</td>
+                                            </tr>
+                                            <tr>
+                                                <td>HS02</td>
+                                                <td>Trần Văn X</td>
+                                            </tr>
+                                            <tr>
+                                                <td>HS02</td>
+                                                <td>Trần Văn X</td>
+                                            </tr>
+                                            <tr>
+                                                <td>HS02</td>
+                                                <td>Trần Văn X</td>
+                                            </tr>
+                                            <tr>
+                                                <td>HS02</td>
+                                                <td>Trần Văn X</td>
                                             </tr>
                                             <tr>
                                                 <td>HS02</td>
