@@ -54,6 +54,12 @@ function AdminContent() {
                         Quản lý xe
                     </NavLink>
                     <NavLink
+                        to="manage-account"
+                        className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
+                    >
+                        Quản lý tài khoản
+                    </NavLink>
+                    <NavLink
                         to="setup-route"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >

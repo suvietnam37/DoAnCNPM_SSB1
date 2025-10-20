@@ -80,7 +80,6 @@ function ManageRoute() {
                         </div>
                         <h3>Sửa thông tin tuyến</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã tuyến" className={cx('input')} />
                             <input type="text" placeholder="Tên tuyến" className={cx('input')} />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>

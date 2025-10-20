@@ -79,8 +79,7 @@ function ManageDriver() {
                         </div>
                         <h3>Sửa thông tin tài xế</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã tài xế" className={cx('input')} />
-                            <input type="text" placeholder="Tên tài xế" className={cx('input')} />
+                            <label>Tên tài xế</label>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
                                     Cập nhật
@@ -120,7 +119,10 @@ function ManageDriver() {
                         </div>
                         <h3>Chi tiết tài xế</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã tài xế" className={cx('input')} />
+                            <div>
+                                <label></label>
+                                <input type="text" placeholder="Mã tài xế" className={cx('input')} />
+                            </div>
                             <input type="text" placeholder="Tên tài xế" className={cx('input')} />
                         </div>
                     </div>

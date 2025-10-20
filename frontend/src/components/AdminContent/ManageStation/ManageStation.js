@@ -81,7 +81,6 @@ function ManageStation() {
                         </div>
                         <h3>Sửa trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã trạm" className={cx('input')} />
                             <input type="text" placeholder="Tên trạm" className={cx('input')} />
                             <input type="text" placeholder="Địa chỉ" className={cx('input')} />
                             <div className={cx('table-wrapper')}>

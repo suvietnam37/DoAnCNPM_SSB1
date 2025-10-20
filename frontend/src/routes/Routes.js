@@ -4,6 +4,7 @@ import ManageDriver from '../components/AdminContent/ManageDriver/ManageDriver';
 import ManageRoute from '../components/AdminContent/ManageRoute/ManageRoute';
 import ManageStudent from '../components/AdminContent/ManageStudent/ManageStudent';
 import ManageParent from '../components/AdminContent/ManageParent/ManageParent';
+import ManageAccount from '../components/AdminContent/ManageAccount/ManageAccount';
 import ManageStation from '../components/AdminContent/ManageStation/ManageStation';
 import Report from '../components/AdminContent/Report/Report';
 import SetupRoute from '../components/AdminContent/SetupRoute/SetupRoute';
@@ -35,6 +36,7 @@ const privateRoutes = [
             { path: 'manage-route', component: ManageRoute },
             { path: 'manage-student', component: ManageStudent },
             { path: 'manage-parent', component: ManageParent },
+            { path: 'manage-account', component: ManageAccount },
             { path: 'report', component: Report },
             { path: 'setup-route', component: SetupRoute },
         ],

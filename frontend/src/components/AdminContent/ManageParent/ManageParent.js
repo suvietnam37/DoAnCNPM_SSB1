@@ -85,7 +85,6 @@ function ManageParent() {
                         </div>
                         <h3>Sửa thông tin phụ huynh</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã phụ huynh" className={cx('input')} />
                             <input type="text" placeholder="Tên phụ huynh" className={cx('input')} />
                             <input type="text" placeholder="SĐT" className={cx('input')} />
                             <input type="text" placeholder="Email" className={cx('input')} />

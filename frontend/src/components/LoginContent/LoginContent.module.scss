@@ -1,4 +1,3 @@
-
 .container {
     display: flex;
     justify-content: center;
@@ -67,7 +66,6 @@
     }
 }
 
-
 .divider {
     display: flex;
     align-items: center;
@@ -120,7 +118,7 @@
 .radio {
     width: 20px;
     height: 20px;
-    accent-color: var(--black); 
+    accent-color: var(--black);
     cursor: pointer;
 }
 
@@ -131,7 +129,6 @@
 .radio.driver:checked + span {
     color: #00b894;
 }
-
 
 @keyframes fadeIn {
     from {

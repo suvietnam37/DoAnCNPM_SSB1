@@ -20,6 +20,33 @@
     gap: 10px;
     margin-bottom: 20px;
     align-items: center;
+
+    .form-container {
+        display: flex;
+        margin-top: 10px;
+        align-items: center;
+        width: fit-content;
+
+        input {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        table {
+            min-width: 350px;
+        }
+
+        .table-wrapper {
+            max-height: 180px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin: 20px;
+
+            table {
+                width: 100%;
+            }
+        }
+    }
 }
 
 .input {
@@ -48,6 +75,24 @@
     }
 }
 
+.roles {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.role-label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--black);
+}
+
 .btn {
     margin: 0 4px;
     padding: 8px 15px;
@@ -65,6 +110,17 @@
 
     &.add {
         background: #27ae60;
+    }
+
+    &.lock {
+        background: #e74c3c;
+        width: 120px;
+        margin-left: 15px;
+    }
+    &.unlock {
+        background: #27ae60;
+        width: 120px;
+        margin-left: 15px;
     }
 
     &.radius {
@@ -98,8 +154,7 @@
     background: #fff;
     padding: 30px;
     border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
+    width: fit-content;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
@@ -123,7 +178,9 @@
         margin-bottom: 15px;
 
         .input {
-            flex: none; // Không flex ở đây
+            flex: none;
+            max-width: 350px;
+            min-width: 200px;
         }
     }
 
@@ -132,4 +189,19 @@
     //     gap: 10px;
     //     justify-content: center;
     // }
+}
+
+.input-container {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    align-items: center;
+    width: 100%;
+    padding-top: 10px;
+    label {
+        text-align: start;
+    }
+    .input {
+        width: 100%;
+        margin-right: 10px;
+    }
 }
