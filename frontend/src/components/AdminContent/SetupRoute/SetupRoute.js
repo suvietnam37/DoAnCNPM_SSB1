@@ -1,6 +1,7 @@
 import styles from './SetupRoute.module.scss';
 import classNames from 'classnames/bind';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 const cx = classNames.bind(styles);
 
 function SetupRoute() {
@@ -13,6 +14,19 @@ function SetupRoute() {
     const handleCloseModal = () => {
         setIsOpenModalOpen('');
     };
+
+    const [items, setItem] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/route_assignments');
+                setItem(response.data);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        };
+        fetchData();
+    }, []);
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -24,32 +38,34 @@ function SetupRoute() {
             <table className={cx('table')}>
                 <thead>
                     <tr>
-                        <th>Mã tuyến</th>
-                        <th>Mã tài xế</th>
+                        <th>Mã phân công tuyến</th>
                         <th>Thời gian khởi hành</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>R01</td>
-                        <td>TX01</td>
-                        <td>4h</td>
-                        <td>
-                            <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                Sửa
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                Xóa
-                            </button>
-                        </td>
-                        <td>
-                            <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
-                                ...
-                            </button>
-                        </td>
-                    </tr>
+                    {items.map((item) => {
+                        return (
+                            <tr key={item.assignment_id}>
+                                <td>{item.assignment_id}</td>
+                                <td>{item.departure_time.slice(0, 5)}</td>
+                                <td>
+                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
+                                        Sửa
+                                    </button>
+                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
+                                        Xóa
+                                    </button>
+                                </td>
+                                <td>
+                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
 
@@ -64,8 +80,11 @@ function SetupRoute() {
                         <h3>Phân công tuyến</h3>
                         <div className={cx('form')}>
                             <div className={cx('form-container')}>
-                                <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-                                <input type="text" placeholder="Thời gian khởi hành" className={cx('input')} />
+                                {/* <input type="text" placeholder="Thời gian khởi hành" className={cx('input')} /> */}
+                                <label> Ngày khởi hành: </label>
+                                <input type="date" name="date" className={cx('input')} />
+                                <label> Thời gian khởi hành: </label>
+                                <input type="time" name="startTime" className={cx('input')} />
                             </div>
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
@@ -266,7 +285,10 @@ function SetupRoute() {
                         <div className={cx('form')}>
                             <div className={cx('form-container')}>
                                 <input type="text" placeholder="Mã tuyến" className={cx('input')} />
-                                <input type="text" placeholder="Thời gian khởi hành" className={cx('input')} />
+                                <label> Ngày khởi hành: </label>
+                                <input type="date" name="date" className={cx('input')} />
+                                <label> Thời gian khởi hành: </label>
+                                <input type="time" name="startTime" className={cx('input')} />
                             </div>
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
@@ -376,7 +398,7 @@ function SetupRoute() {
                             </div>
 
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'change')}>Sửa</button>
+                                <button className={cx('btn', 'add')}>Cập nhật</button>
                             </div>
                         </div>
                     </div>
@@ -401,6 +423,7 @@ function SetupRoute() {
                                                 <th>Mã tuyến</th>
                                                 <th>Mã tài xế</th>
                                                 <th>Thời gian khởi hành</th>
+                                                <th>Ngày khởi hành</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -408,6 +431,7 @@ function SetupRoute() {
                                                 <td>R01</td>
                                                 <td>TX01</td>
                                                 <td>4h</td>
+                                                <td>{items[0].run_date.slice(0, 10)}</td>
                                             </tr>
                                         </tbody>
                                     </table>

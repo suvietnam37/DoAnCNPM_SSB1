@@ -1,15 +1,17 @@
 // controllers/busController.js
-let buses = require("../../models/Bus.js");
+// let buses = require("../../models/Bus.js");
+const { getAll } = require("../../models/Bus.js");
 
 // 🔹 Lấy danh sách tất cả xe buýt
-exports.getAllBuses = (req, res) => {
-  res.json(buses);
+exports.getAllBuses = async (req, res) => {
+  let results = await getAll();
+  res.json(results);
 };
 
 // 🔹 Lấy thông tin chi tiết 1 xe buýt
 exports.getBusById = (req, res) => {
   const id = parseInt(req.params.id);
-  const bus = buses.find(b => b.id === id);
+  const bus = buses.find((b) => b.id === id);
   if (!bus) return res.status(404).json({ error: "Bus not found" });
   res.json(bus);
 };
@@ -21,8 +23,9 @@ exports.createBus = (req, res) => {
   if (!licensePlate || !driverId)
     return res.status(400).json({ error: "Missing licensePlate or driverId" });
 
-  const exists = buses.find(b => b.licensePlate === licensePlate);
-  if (exists) return res.status(400).json({ error: "License plate already exists" });
+  const exists = buses.find((b) => b.licensePlate === licensePlate);
+  if (exists)
+    return res.status(400).json({ error: "License plate already exists" });
 
   const newBus = {
     id: buses.length ? buses[buses.length - 1].id + 1 : 1,
@@ -39,7 +42,7 @@ exports.updateBus = (req, res) => {
   const id = parseInt(req.params.id);
   const { licensePlate, driverId } = req.body;
 
-  const bus = buses.find(b => b.id === id);
+  const bus = buses.find((b) => b.id === id);
   if (!bus) return res.status(404).json({ error: "Bus not found" });
 
   if (licensePlate) bus.licensePlate = licensePlate;
@@ -51,7 +54,7 @@ exports.updateBus = (req, res) => {
 // 🔹 Xóa xe buýt
 exports.deleteBus = (req, res) => {
   const id = parseInt(req.params.id);
-  const index = buses.findIndex(b => b.id === id);
+  const index = buses.findIndex((b) => b.id === id);
   if (index === -1) return res.status(404).json({ error: "Bus not found" });
 
   buses.splice(index, 1);

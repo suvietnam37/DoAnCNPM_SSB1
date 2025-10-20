@@ -1,8 +1,9 @@
-let students = require("../../models/Student");
+const { getAll } = require("../../models/Student.js");
 
 // Lấy toàn bộ danh sách học sinh
-exports.getAllStudents = (req, res) => {
-  res.status(200).json(students);
+exports.getAllStudents = async (req, res) => {
+  let results = await getAll();
+  res.json(results);
 };
 
 // Lấy học sinh theo ID
@@ -16,9 +17,13 @@ exports.getStudentById = (req, res) => {
 
 // Lấy học sinh theo tuyến xe
 exports.getStudentsByRoute = (req, res) => {
-  const routeStudents = students.filter((s) => s.routeId === req.params.routeId);
+  const routeStudents = students.filter(
+    (s) => s.routeId === req.params.routeId
+  );
   if (routeStudents.length === 0) {
-    return res.status(404).json({ message: "No students found for this route" });
+    return res
+      .status(404)
+      .json({ message: "No students found for this route" });
   }
   res.status(200).json(routeStudents);
 };

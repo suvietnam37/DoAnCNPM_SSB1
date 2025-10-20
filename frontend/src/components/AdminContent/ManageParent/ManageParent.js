@@ -1,6 +1,7 @@
 import styles from './ManageParent.module.scss';
 import classNames from 'classnames/bind';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
@@ -14,6 +15,20 @@ function ManageParent() {
     const handleCloseModal = () => {
         setIsOpenModalOpen('');
     };
+
+    const [items, setItem] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/parents');
+                setItem(response.data);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        };
+        fetchData();
+    }, []);
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -34,25 +49,29 @@ function ManageParent() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>PH01</td>
-                        <td>Nguyễn Văn Nam</td>
-                        <td>0353221672</td>
-                        <td>abc@gmail.com</td>
-                        <td>
-                            <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                Sửa
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                Xóa
-                            </button>
-                        </td>
-                        <td>
-                            <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
-                                ...
-                            </button>
-                        </td>
-                    </tr>
+                    {items.map((item) => {
+                        return (
+                            <tr key={item.parent_id}>
+                                <td>{item.parent_id}</td>
+                                <td>{item.parent_name}</td>
+                                <td>{item.phone}</td>
+                                <td>{item.email}</td>
+                                <td>
+                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
+                                        Sửa
+                                    </button>
+                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
+                                        Xóa
+                                    </button>
+                                </td>
+                                <td>
+                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
 
@@ -89,7 +108,6 @@ function ManageParent() {
                         </div>
                         <h3>Thêm phụ huynh</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã phụ huynh" className={cx('input')} />
                             <input type="text" placeholder="Tên phụ huynh" className={cx('input')} />
                             <input type="text" placeholder="SĐT" className={cx('input')} />
                             <input type="text" placeholder="Email" className={cx('input')} />

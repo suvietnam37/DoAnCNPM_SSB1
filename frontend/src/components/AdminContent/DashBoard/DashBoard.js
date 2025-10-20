@@ -3,6 +3,9 @@ import classNames from 'classnames/bind';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import axios from 'axios';
+
+import { useState, useEffect } from 'react';
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +16,34 @@ const busIcon = L.icon({
 // L.Marker.prototype.options.icon = busIcon;
 
 function DashBoard() {
+    const [numStudents, setNumStudents] = useState([]);
+    const [numDrivers, setNumDrivers] = useState([]);
+    const [numBuses, setNumBuses] = useState([]);
+    const [numRoutes, setNumRoutes] = useState([]);
+    const [message, setMessage] = useState('');
+
+    // Lấy dữ liệu từ API
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [studentsResp, driversResp, busesResp, routesResp] = await Promise.all([
+                    axios.get('http://localhost:5000/api/students'),
+                    axios.get('http://localhost:5000/api/drivers'),
+                    axios.get('http://localhost:5000/api/buses'),
+                    axios.get('http://localhost:5000/api/routes'),
+                ]);
+                setNumStudents(studentsResp.data);
+                setNumDrivers(driversResp.data);
+                setNumBuses(busesResp.data);
+                setNumRoutes(routesResp.data);
+            } catch (error) {
+                setMessage('Lỗi khi tải dữ liệu dashboard!');
+                console.error('Fetch error:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
     const waypoints = [
         { lat: 21.028511, lng: 105.804817 }, // Hà Nội
         { lat: 20.8411, lng: 106.6881 }, // Hải Phòng
@@ -22,10 +53,10 @@ function DashBoard() {
         <div className={cx('wrapper')}>
             <h2 className={cx('title')}>Tổng quan hệ thống</h2>
             <div className={cx('stats')}>
-                <div className={cx('card')}>Tuyến xe: 5</div>
-                <div className={cx('card')}>Xe bus: 12</div>
-                <div className={cx('card')}>Tài xế: 10</div>
-                <div className={cx('card')}>Học sinh: 230</div>
+                <div className={cx('card')}>Tuyến xe: {numRoutes.length}</div>
+                <div className={cx('card')}>Xe bus: {numBuses.length}</div>
+                <div className={cx('card')}>Tài xế: {numDrivers.length}</div>
+                <div className={cx('card')}>Học sinh: {numStudents.length}</div>
             </div>
             <div className={cx('content')}>
                 <div className={cx('content-map')}>

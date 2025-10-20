@@ -1,6 +1,7 @@
 import styles from './ManageBus.module.scss';
 import classNames from 'classnames/bind';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 const cx = classNames.bind(styles);
 
 function ManageBus() {
@@ -13,6 +14,20 @@ function ManageBus() {
     const handleCloseModal = () => {
         setIsOpenModalOpen('');
     };
+
+    const [items, setItem] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/buses');
+                setItem(response.data);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -30,18 +45,22 @@ function ManageBus() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>01</td>
-                        <td>59A-123456</td>
-                        <td>
-                            <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                Sửa
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                Xóa
-                            </button>
-                        </td>
-                    </tr>
+                    {items.map((item) => {
+                        return (
+                            <tr key={item.bus_id}>
+                                <td>{item.bus_id}</td>
+                                <td>{item.license_plate}</td>
+                                <td>
+                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
+                                        Sửa
+                                    </button>
+                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
+                                        Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
 
@@ -77,7 +96,6 @@ function ManageBus() {
                         <h3>Thêm xe</h3>
                         <div className={cx('form')}>
                             <input type="text" placeholder="Biển số xe" className={cx('input')} />
-                            <input type="text" placeholder="Số xe" className={cx('input')} />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
                                     Thêm

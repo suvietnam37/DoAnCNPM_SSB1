@@ -1,6 +1,7 @@
 import styles from './ManageDriver.module.scss';
 import classNames from 'classnames/bind';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 const cx = classNames.bind(styles);
 
 function ManageDriver() {
@@ -13,6 +14,19 @@ function ManageDriver() {
     const handleCloseModal = () => {
         setIsOpenModalOpen('');
     };
+
+    const [items, setItem] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/drivers');
+                setItem(response.data);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        };
+        fetchData();
+    }, []);
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -31,23 +45,27 @@ function ManageDriver() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>TX01</td>
-                        <td>Nguyễn Văn A</td>
-                        <td>
-                            <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                Sửa
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                Xóa
-                            </button>
-                        </td>
-                        <td>
-                            <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
-                                ...
-                            </button>
-                        </td>
-                    </tr>
+                    {items.map((item) => {
+                        return (
+                            <tr>
+                                <td>{item.driver_id}</td>
+                                <td>{item.driver_name}</td>
+                                <td>
+                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
+                                        Sửa
+                                    </button>
+                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
+                                        Xóa
+                                    </button>
+                                </td>
+                                <td>
+                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
 
@@ -82,10 +100,7 @@ function ManageDriver() {
                         </div>
                         <h3>Thêm tài xế</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã tài xế" className={cx('input')} />
                             <input type="text" placeholder="Tên tài xế" className={cx('input')} />
-                            <input type="text" placeholder="Tên tài khoản" className={cx('input')} />
-                            <input type="text" placeholder="Mật khẩu" className={cx('input')} />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
                                     Thêm
@@ -107,8 +122,6 @@ function ManageDriver() {
                         <div className={cx('form')}>
                             <input type="text" placeholder="Mã tài xế" className={cx('input')} />
                             <input type="text" placeholder="Tên tài xế" className={cx('input')} />
-                            <input type="text" placeholder="Tên tài khoản" className={cx('input')} />
-                            <input type="text" placeholder="Mật khẩu" className={cx('input')} />
                         </div>
                     </div>
                 </div>

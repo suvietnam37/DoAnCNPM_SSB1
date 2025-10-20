@@ -1,6 +1,7 @@
 import styles from './ManageStudent.module.scss';
 import classNames from 'classnames/bind';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
@@ -14,6 +15,19 @@ function ManageStudent() {
     const handleCloseModal = () => {
         setIsOpenModalOpen('');
     };
+
+    const [items, setItem] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/students');
+                setItem(response.data);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        };
+        fetchData();
+    }, []);
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -33,24 +47,28 @@ function ManageStudent() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>HS01</td>
-                        <td> Nguyễn Văn A</td>
-                        <td>10A5</td>
-                        <td>
-                            <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                Sửa
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                Xóa
-                            </button>
-                        </td>
-                        <td>
-                            <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
-                                ...
-                            </button>
-                        </td>
-                    </tr>
+                    {items.map((item) => {
+                        return (
+                            <tr>
+                                <td>{item.student_id}</td>
+                                <td>{item.student_name}</td>
+                                <td>{item.class_name}</td>
+                                <td>
+                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
+                                        Sửa
+                                    </button>
+                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
+                                        Xóa
+                                    </button>
+                                </td>
+                                <td>
+                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
 
@@ -86,7 +104,6 @@ function ManageStudent() {
                         </div>
                         <h3>Thêm học sinh</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã học sinh" className={cx('input')} />
                             <input type="text" placeholder="Tên học sinh" className={cx('input')} />
                             <input type="text" placeholder="Lớp" className={cx('input')} />
                             <div className={cx('form-container')}>
