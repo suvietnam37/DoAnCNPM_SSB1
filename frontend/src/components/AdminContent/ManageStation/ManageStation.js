@@ -1,32 +1,108 @@
+// src/pages/ManageStation/ManageStation.js
 import styles from './ManageStation.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
 const cx = classNames.bind(styles);
 
 function ManageStation() {
-    const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
+    const [stops, setStops] = useState([]);
+    const [isOpenModal, setIsOpenModal] = useState('');
+    const [selectedStop, setSelectedStop] = useState(null);
+    const [stopName, setStopName] = useState('');
+    const [address, setAddress] = useState('');
+    const [routeId, setRouteId] = useState('');
 
-    const handleOpenModal = (type) => {
-        setIsOpenModalOpen(type);
+    // Giả sử có danh sách routes để chọn, nhưng để đơn giản, dùng input text
+
+    // Lấy danh sách trạm từ API
+    const fetchStops = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/stops');
+            setStops(response.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
     };
 
-    const handleCloseModal = () => {
-        setIsOpenModalOpen('');
-    };
-
-    const [items, setItem] = useState([]);
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/stops');
-                setItem(response.data);
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        };
-        fetchData();
+        fetchStops();
     }, []);
+
+    // Mở modal
+    const handleOpenModal = (type, stop = null) => {
+        setIsOpenModal(type);
+        setSelectedStop(stop);
+        setStopName(stop ? stop.stop_name : '');
+        setAddress(stop ? stop.address : ''); // Giả sử có address
+        setRouteId(stop ? stop.route_id : '');
+    };
+
+    // Đóng modal
+    const handleCloseModal = () => {
+        setIsOpenModal('');
+        setSelectedStop(null);
+        setStopName('');
+        setAddress('');
+        setRouteId('');
+    };
+
+    // Thêm trạm
+    const handleAddStop = async () => {
+        if (!stopName.trim() || !address.trim() || !routeId.trim()) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+        try {
+            await axios.post('http://localhost:5000/api/stops', {
+                stop_name: stopName,
+                address: address,
+                route_id: routeId,
+            });
+            alert('Thêm trạm thành công!');
+            handleCloseModal();
+            fetchStops();
+        } catch (error) {
+            console.error('Add stop error:', error);
+            alert('Lỗi khi thêm trạm.');
+        }
+    };
+
+    // Sửa trạm
+    const handleEditStop = async () => {
+        if (!stopName.trim() || !address.trim() || !routeId.trim()) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+        try {
+            await axios.put(`http://localhost:5000/api/stops/${selectedStop.stop_id}`, {
+                stop_name: stopName,
+                address: address,
+                route_id: routeId,
+            });
+            alert('Cập nhật trạm thành công!');
+            handleCloseModal();
+            fetchStops();
+        } catch (error) {
+            console.error('Edit stop error:', error);
+            alert('Lỗi khi sửa trạm.');
+        }
+    };
+
+    // Xóa trạm
+    const handleDeleteStop = async () => {
+        try {
+            await axios.delete(`http://localhost:5000/api/stops/${selectedStop.stop_id}`);
+            alert('Xóa trạm thành công!');
+            handleCloseModal();
+            fetchStops();
+        } catch (error) {
+            console.error('Delete stop error:', error);
+            alert('Lỗi khi xóa trạm.');
+        }
+    };
+
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -41,85 +117,70 @@ function ManageStation() {
                         <th>Mã trạm</th>
                         <th>Tên trạm</th>
                         <th>Địa chỉ</th>
+                        <th>Mã tuyến</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {items.map((item) => {
-                        return (
-                            <tr key={item.stop_id}>
-                                <td>{item.stop_id}</td>
-                                <td>{item.stop_name}</td>
-                                <td>{item.address}</td>
-                                <td>
-                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                        Sửa
-                                    </button>
-                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                        Xóa
-                                    </button>
-                                </td>
-                                <td>
-                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
-                                        ...
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
+                    {stops.map((stop) => (
+                        <tr key={stop.stop_id}>
+                            <td>{stop.stop_id}</td>
+                            <td>{stop.stop_name}</td>
+                            <td>{stop.address}</td>
+                            <td>{stop.route_id}</td>
+                            <td>
+                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', stop)}>
+                                    Sửa
+                                </button>
+                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', stop)}>
+                                    Xóa
+                                </button>
+                            </td>
+                            <td>
+                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', stop)}>
+                                    ...
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
-            {isOpenModalOpen === 'edit' && (
+            {/* Modal Sửa */}
+            {isOpenModal === 'edit' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Sửa trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Tên trạm" className={cx('input')} />
-                            <input type="text" placeholder="Địa chỉ" className={cx('input')} />
-                            <div className={cx('table-wrapper')}>
-                                <table className={cx('table')}>
-                                    <thead>
-                                        <tr>
-                                            <th>Mã tuyến</th>
-                                            <th>Tên tuyến</th>
-                                            <th>Chọn</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
+                            <input
+                                type="text"
+                                placeholder="Tên trạm"
+                                className={cx('input')}
+                                value={stopName}
+                                onChange={(e) => setStopName(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Địa chỉ"
+                                className={cx('input')}
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Mã tuyến"
+                                className={cx('input')}
+                                value={routeId}
+                                onChange={(e) => setRouteId(e.target.value)}
+                            />
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleEditStop}>
                                     Cập nhật
                                 </button>
                             </div>
@@ -127,55 +188,41 @@ function ManageStation() {
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'add' && (
+
+            {/* Modal Thêm */}
+            {isOpenModal === 'add' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Thêm trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Tên trạm" className={cx('input')} />
-                            <input type="text" placeholder="Địa chỉ" className={cx('input')} />
-                            <div className={cx('table-wrapper')}>
-                                <table className={cx('table')}>
-                                    <thead>
-                                        <tr>
-                                            <th>Mã tuyến</th>
-                                            <th>Tên tuyến</th>
-                                            <th>Chọn</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
+                            <input
+                                type="text"
+                                placeholder="Tên trạm"
+                                className={cx('input')}
+                                value={stopName}
+                                onChange={(e) => setStopName(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Địa chỉ"
+                                className={cx('input')}
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Mã tuyến"
+                                className={cx('input')}
+                                value={routeId}
+                                onChange={(e) => setRouteId(e.target.value)}
+                            />
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleAddStop}>
                                     Thêm
                                 </button>
                             </div>
@@ -184,37 +231,39 @@ function ManageStation() {
                 </div>
             )}
 
-            {isOpenModalOpen === 'delete' && (
+            {/* Modal Chi tiết */}
+            {isOpenModal === 'details' && selectedStop && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
-                                X
-                            </button>
-                        </div>
-                        <h3>Xác nhận xóa trạm ?</h3>
-                        <button className={cx('btn', 'add')} onClick={handleCloseModal}>
-                            Xác nhận
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {isOpenModalOpen === 'details' && (
-                <div className={cx('modal-overlay')}>
-                    <div className={cx('modal-content')}>
-                        <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Chi tiết trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Mã trạm" className={cx('input')} />
-                            <input type="text" placeholder="Tên trạm" className={cx('input')} />
-                            <input type="text" placeholder="Địa chỉ" className={cx('input')} />
-                            <input type="text" placeholder="Mã tuyến" className={cx('input')} />
+                            <input type="text" value={selectedStop.stop_id} readOnly className={cx('input')} />
+                            <input type="text" value={selectedStop.stop_name} readOnly className={cx('input')} />
+                            <input type="text" value={selectedStop.address} readOnly className={cx('input')} />
+                            <input type="text" value={selectedStop.route_id} readOnly className={cx('input')} />
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Xóa */}
+            {isOpenModal === 'delete' && (
+                <div className={cx('modal-overlay')}>
+                    <div className={cx('modal-content')}>
+                        <div className={cx('modal-overlay-close')}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
+                                X
+                            </button>
+                        </div>
+                        <h3>Xác nhận xóa trạm?</h3>
+                        <button className={cx('btn', 'add')} onClick={handleDeleteStop}>
+                            Xác nhận
+                        </button>
                     </div>
                 </div>
             )}

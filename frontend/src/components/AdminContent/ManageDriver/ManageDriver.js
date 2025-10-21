@@ -1,32 +1,101 @@
+// src/pages/ManageDriver/ManageDriver.js
 import styles from './ManageDriver.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
 const cx = classNames.bind(styles);
 
 function ManageDriver() {
-    const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
+    const [drivers, setDrivers] = useState([]);
+    const [isOpenModal, setIsOpenModal] = useState('');
+    const [selectedDriver, setSelectedDriver] = useState(null);
+    const [driverName, setDriverName] = useState('');
+    const [accountId, setAccountId] = useState('');
 
-    const handleOpenModal = (type) => {
-        setIsOpenModalOpen(type);
+    // Lấy danh sách tài xế từ API
+    const fetchDrivers = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/drivers');
+            setDrivers(response.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
     };
 
-    const handleCloseModal = () => {
-        setIsOpenModalOpen('');
-    };
-
-    const [items, setItem] = useState([]);
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/drivers');
-                setItem(response.data);
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        };
-        fetchData();
+        fetchDrivers();
     }, []);
+
+    // Mở modal
+    const handleOpenModal = (type, driver = null) => {
+        setIsOpenModal(type);
+        setSelectedDriver(driver);
+        setDriverName(driver ? driver.driver_name : '');
+        setAccountId(driver ? driver.account_id : '');
+    };
+
+    // Đóng modal
+    const handleCloseModal = () => {
+        setIsOpenModal('');
+        setSelectedDriver(null);
+        setDriverName('');
+        setAccountId('');
+    };
+
+    // Thêm tài xế
+    const handleAddDriver = async () => {
+        if (!driverName.trim() || !accountId.trim()) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+        try {
+            await axios.post('http://localhost:5000/api/drivers', {
+                driver_name: driverName,
+                account_id: accountId,
+            });
+            alert('Thêm tài xế thành công!');
+            handleCloseModal();
+            fetchDrivers();
+        } catch (error) {
+            console.error('Add driver error:', error);
+            alert('Lỗi khi thêm tài xế.');
+        }
+    };
+
+    // Sửa tài xế
+    const handleEditDriver = async () => {
+        if (!driverName.trim() || !accountId.trim()) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+        try {
+            await axios.put(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`, {
+                driver_name: driverName,
+                account_id: accountId,
+            });
+            alert('Cập nhật tài xế thành công!');
+            handleCloseModal();
+            fetchDrivers();
+        } catch (error) {
+            console.error('Edit driver error:', error);
+            alert('Lỗi khi sửa tài xế.');
+        }
+    };
+
+    // Xóa tài xế
+    const handleDeleteDriver = async () => {
+        try {
+            await axios.delete(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`);
+            alert('Xóa tài xế thành công!');
+            handleCloseModal();
+            fetchDrivers();
+        } catch (error) {
+            console.error('Delete driver error:', error);
+            alert('Lỗi khi xóa tài xế.');
+        }
+    };
+
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
@@ -40,48 +109,62 @@ function ManageDriver() {
                     <tr>
                         <th>Mã tài xế</th>
                         <th>Tên tài xế</th>
+                        <th>Mã tài khoản</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {items.map((item) => {
-                        return (
-                            <tr>
-                                <td>{item.driver_id}</td>
-                                <td>{item.driver_name}</td>
-                                <td>
-                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                        Sửa
-                                    </button>
-                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                        Xóa
-                                    </button>
-                                </td>
-                                <td>
-                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
-                                        ...
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
+                    {drivers.map((driver) => (
+                        <tr key={driver.driver_id}>
+                            <td>{driver.driver_id}</td>
+                            <td>{driver.driver_name}</td>
+                            <td>{driver.account_id}</td>
+                            <td>
+                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', driver)}>
+                                    Sửa
+                                </button>
+                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', driver)}>
+                                    Xóa
+                                </button>
+                            </td>
+                            <td>
+                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', driver)}>
+                                    ...
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
-            {isOpenModalOpen === 'edit' && (
+            {/* Modal Sửa */}
+            {isOpenModal === 'edit' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
-                        <h3>Sửa thông tin tài xế</h3>
+                        <h3>Sửa tài xế</h3>
                         <div className={cx('form')}>
-                            <label>Tên tài xế</label>
+                            <input
+                                type="text"
+                                placeholder="Tên tài xế"
+                                className={cx('input')}
+                                value={driverName}
+                                onChange={(e) => setDriverName(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Mã tài khoản"
+                                className={cx('input')}
+                                value={accountId}
+                                onChange={(e) => setAccountId(e.target.value)}
+                            />
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleEditDriver}>
                                     Cập nhật
                                 </button>
                             </div>
@@ -89,19 +172,34 @@ function ManageDriver() {
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'add' && (
+
+            {/* Modal Thêm */}
+            {isOpenModal === 'add' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Thêm tài xế</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Tên tài xế" className={cx('input')} />
+                            <input
+                                type="text"
+                                placeholder="Tên tài xế"
+                                className={cx('input')}
+                                value={driverName}
+                                onChange={(e) => setDriverName(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Mã tài khoản"
+                                className={cx('input')}
+                                value={accountId}
+                                onChange={(e) => setAccountId(e.target.value)}
+                            />
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleAddDriver}>
                                     Thêm
                                 </button>
                             </div>
@@ -109,35 +207,37 @@ function ManageDriver() {
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'details' && (
+
+            {/* Modal Chi tiết */}
+            {isOpenModal === 'details' && selectedDriver && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Chi tiết tài xế</h3>
                         <div className={cx('form')}>
-                            <div>
-                                <label></label>
-                                <input type="text" placeholder="Mã tài xế" className={cx('input')} />
-                            </div>
-                            <input type="text" placeholder="Tên tài xế" className={cx('input')} />
+                            <input type="text" value={selectedDriver.driver_id} readOnly className={cx('input')} />
+                            <input type="text" value={selectedDriver.driver_name} readOnly className={cx('input')} />
+                            <input type="text" value={selectedDriver.account_id} readOnly className={cx('input')} />
                         </div>
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'delete' && (
+
+            {/* Modal Xóa */}
+            {isOpenModal === 'delete' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa tài xế ?</h3>
-                        <button className={cx('btn', 'add')} onClick={handleCloseModal}>
+                        <h3>Xác nhận xóa tài xế?</h3>
+                        <button className={cx('btn', 'add')} onClick={handleDeleteDriver}>
                             Xác nhận
                         </button>
                     </div>
