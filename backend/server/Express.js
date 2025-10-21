@@ -1,21 +1,11 @@
-/*const express = require('express');
-const app = express();
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send('Server Express.js đang chạy tại port 5000!');
-});
-
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server đang chạy tại: http://localhost:${PORT}`);
-});*/
 // backend/server/Express.js
 const express = require("express");
 const app = express();
 const cors = require("./middleware/corsConfig");
 const errorHandler = require("./middleware/errorHandler");
+
+// Import kết nối MySQL
+const connection = require("../config/db");
 
 // Import routes
 const busRoutes = require("./routes/busRoutes");
@@ -37,6 +27,17 @@ app.use("/api/students", studentRoutes);
 app.use("/api/parents", parentRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/route_assignments", route_assignmentsRoutes);
+
+// Route kiểm tra kết nối DB
+app.get("/test-db", async (req, res) => {
+  try {
+    const [rows] = await connection.query("SELECT 1 + 1 AS result");
+    res.json({ message: "Kết nối DB hoạt động!", result: rows[0].result });
+  } catch (error) {
+    console.error("Lỗi kiểm tra DB:", error);
+    res.status(500).json({ error: "Không thể kết nối đến cơ sở dữ liệu" });
+  }
+});
 
 app.get("/", (req, res) => {
   res.send("Server Express.js đang chạy tại port 5000!");
