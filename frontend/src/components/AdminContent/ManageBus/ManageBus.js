@@ -2,31 +2,93 @@ import styles from './ManageBus.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
 const cx = classNames.bind(styles);
 
 function ManageBus() {
-    const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
+    const [buses, setBuses] = useState([]);
+    const [isOpenModal, setIsOpenModal] = useState('');
+    const [selectedBus, setSelectedBus] = useState(null);
+    const [licensePlate, setLicensePlate] = useState('');
 
-    const handleOpenModal = (type) => {
-        setIsOpenModalOpen(type);
+    // Lấy danh sách xe từ API
+    const fetchBuses = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/buses');
+            setBuses(response.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
     };
 
-    const handleCloseModal = () => {
-        setIsOpenModalOpen('');
-    };
-
-    const [items, setItem] = useState([]);
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/buses');
-                setItem(response.data);
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        };
-        fetchData();
+        fetchBuses();
     }, []);
+
+    // Mở modal
+    const handleOpenModal = (type, bus = null) => {
+        setIsOpenModal(type);
+        setSelectedBus(bus);
+        setLicensePlate(bus ? bus.license_plate : '');
+    };
+
+    // Đóng modal
+    const handleCloseModal = () => {
+        setIsOpenModal('');
+        setSelectedBus(null);
+        setLicensePlate('');
+    };
+
+    // Thêm xe
+    const handleAddBus = async () => {
+        if (!licensePlate.trim()) {
+            alert('Vui lòng nhập biển số xe!');
+            return;
+        }
+        try {
+            await axios.post('http://localhost:5000/api/buses', {
+                license_plate: licensePlate,
+            });
+            alert('Thêm xe thành công!');
+            handleCloseModal();
+            fetchBuses();
+        } catch (error) {
+            console.error('Add bus error:', error);
+            alert('Lỗi khi thêm xe.');
+        }
+    };
+
+    // Sửa xe
+    const handleEditBus = async () => {
+        if (!licensePlate.trim()) {
+            alert('Vui lòng nhập biển số xe!');
+            return;
+        }
+        try {
+            await axios.put(`http://localhost:5000/api/buses/${selectedBus.bus_id}`, {
+                license_plate: licensePlate,
+            });
+            alert('Cập nhật xe thành công!');
+            handleCloseModal();
+            fetchBuses();
+        } catch (error) {
+            console.error('Edit bus error:', error);
+            alert('Lỗi khi sửa xe.');
+        }
+    };
+
+    // Xóa xe
+    const handleDeleteBus = async () => {
+        try {
+            await axios.delete(`http://localhost:5000/api/buses/${selectedBus.bus_id}`);
+            alert('Xóa xe thành công!');
+            handleCloseModal();
+            fetchBuses();
+        } catch (error) {
+            console.error('Delete bus error:', error);
+            alert('Lỗi khi xóa xe.');
+        }
+    };
 
     return (
         <div className={cx('wrapper')}>
@@ -36,6 +98,8 @@ function ManageBus() {
                     Thêm xe
                 </button>
             </div>
+
+            {/* Bảng danh sách xe */}
             <table className={cx('table')}>
                 <thead>
                     <tr>
@@ -45,39 +109,49 @@ function ManageBus() {
                     </tr>
                 </thead>
                 <tbody>
-                    {items.map((item) => {
-                        return (
-                            <tr key={item.bus_id}>
-                                <td>{item.bus_id}</td>
-                                <td>{item.license_plate}</td>
-                                <td>
-                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
-                                        Sửa
-                                    </button>
-                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
-                                        Xóa
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
+                    {buses.map((bus) => (
+                        <tr key={bus.bus_id}>
+                            <td>{bus.bus_id}</td>
+                            <td>{bus.license_plate}</td>
+                            <td>
+                                <button
+                                    className={cx('btn', 'change')}
+                                    onClick={() => handleOpenModal('edit', bus)}
+                                >
+                                    Sửa
+                                </button>
+                                <button
+                                    className={cx('btn', 'danger')}
+                                    onClick={() => handleOpenModal('delete', bus)}
+                                >
+                                    Xóa
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
-            {isOpenModalOpen === 'edit' && (
+            {/* Modal Sửa */}
+            {isOpenModal === 'edit' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Sửa thông tin xe</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Biển số xe" className={cx('input')} />
-                            <input type="text" placeholder="Số xe" className={cx('input')} />
+                            <input
+                                type="text"
+                                placeholder="Biển số xe"
+                                className={cx('input')}
+                                value={licensePlate}
+                                onChange={(e) => setLicensePlate(e.target.value)}
+                            />
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleEditBus}>
                                     Cập nhật
                                 </button>
                             </div>
@@ -85,19 +159,27 @@ function ManageBus() {
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'add' && (
+
+            {/* Modal Thêm */}
+            {isOpenModal === 'add' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
                         <h3>Thêm xe</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Biển số xe" className={cx('input')} />
+                            <input
+                                type="text"
+                                placeholder="Biển số xe"
+                                className={cx('input')}
+                                value={licensePlate}
+                                onChange={(e) => setLicensePlate(e.target.value)}
+                            />
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleAddBus}>
                                     Thêm
                                 </button>
                             </div>
@@ -105,32 +187,18 @@ function ManageBus() {
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'details' && (
+
+            {/* Modal Xóa */}
+            {isOpenModal === 'delete' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết xe</h3>
-                        <div className={cx('form')}>
-                            <input type="text" placeholder="Biển số xe" className={cx('input')} />
-                            <input type="text" placeholder="Số xe" className={cx('input')} />
-                        </div>
-                    </div>
-                </div>
-            )}
-            {isOpenModalOpen === 'delete' && (
-                <div className={cx('modal-overlay')}>
-                    <div className={cx('modal-content')}>
-                        <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
-                                X
-                            </button>
-                        </div>
-                        <h3>Xác nhận xóa xe ?</h3>
-                        <button className={cx('btn', 'add')} onClick={handleCloseModal}>
+                        <h3>Xác nhận xóa xe?</h3>
+                        <button className={cx('btn', 'add')} onClick={handleDeleteBus}>
                             Xác nhận
                         </button>
                     </div>

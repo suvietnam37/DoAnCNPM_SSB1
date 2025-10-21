@@ -1,62 +1,61 @@
 // controllers/busController.js
-// let buses = require("../../models/Bus.js");
-const { getAll } = require("../../models/Bus.js");
+const Bus = require("../../models/Bus");
 
-// 🔹 Lấy danh sách tất cả xe buýt
+// Lấy danh sách tất cả xe buýt
 exports.getAllBuses = async (req, res) => {
-  let results = await getAll();
-  res.json(results);
+  try {
+    const results = await Bus.getAll();
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy danh sách bus" });
+  }
 };
 
-// 🔹 Lấy thông tin chi tiết 1 xe buýt
-exports.getBusById = (req, res) => {
-  const id = parseInt(req.params.id);
-  const bus = buses.find((b) => b.id === id);
-  if (!bus) return res.status(404).json({ error: "Bus not found" });
-  res.json(bus);
+// Lấy thông tin chi tiết 1 xe buýt
+exports.getBusById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const bus = await Bus.getById(id);
+    if (!bus) return res.status(404).json({ error: "Bus not found" });
+    res.json(bus);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy bus" });
+  }
 };
 
-// 🔹 Thêm xe buýt mới
-exports.createBus = (req, res) => {
-  const { licensePlate, driverId } = req.body;
-
-  if (!licensePlate || !driverId)
-    return res.status(400).json({ error: "Missing licensePlate or driverId" });
-
-  const exists = buses.find((b) => b.licensePlate === licensePlate);
-  if (exists)
-    return res.status(400).json({ error: "License plate already exists" });
-
-  const newBus = {
-    id: buses.length ? buses[buses.length - 1].id + 1 : 1,
-    licensePlate,
-    driverId,
-  };
-
-  buses.push(newBus);
-  res.status(201).json({ message: "Bus created successfully", bus: newBus });
+// Thêm xe buýt mới
+exports.createBus = async (req, res) => {
+  try {
+    const newBus = await Bus.create(req.body);
+    res.status(201).json(newBus);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi thêm bus" });
+  }
 };
 
-// 🔹 Cập nhật thông tin xe buýt
-exports.updateBus = (req, res) => {
-  const id = parseInt(req.params.id);
-  const { licensePlate, driverId } = req.body;
-
-  const bus = buses.find((b) => b.id === id);
-  if (!bus) return res.status(404).json({ error: "Bus not found" });
-
-  if (licensePlate) bus.licensePlate = licensePlate;
-  if (driverId) bus.driverId = driverId;
-
-  res.json({ message: "Bus updated successfully", bus });
+// Cập nhật xe buýt
+exports.updateBus = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedBus = await Bus.update(id, req.body);
+    res.json(updatedBus);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi cập nhật bus" });
+  }
 };
 
-// 🔹 Xóa xe buýt
-exports.deleteBus = (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = buses.findIndex((b) => b.id === id);
-  if (index === -1) return res.status(404).json({ error: "Bus not found" });
-
-  buses.splice(index, 1);
-  res.json({ message: "Bus deleted successfully" });
+// Xóa xe buýt
+exports.deleteBus = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await Bus.remove(id);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi xóa bus" });
+  }
 };
