@@ -57,7 +57,14 @@ function SetupRoute() {
 
     // Thêm phân công tuyến
     const handleAddAssignment = async () => {
-        if (!routeId.trim() || !driverId.trim() || !busId.trim() || !runDate.trim() || !status.trim() || !departureTime.trim()) {
+        if (
+            !routeId.trim() ||
+            !driverId.trim() ||
+            !busId.trim() ||
+            !runDate.trim() ||
+            !status.trim() ||
+            !departureTime.trim()
+        ) {
             alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
@@ -81,7 +88,14 @@ function SetupRoute() {
 
     // Sửa phân công tuyến
     const handleEditAssignment = async () => {
-        if (!routeId.trim() || !driverId.trim() || !busId.trim() || !runDate.trim() || !status.trim() || !departureTime.trim()) {
+        if (
+            !routeId.trim() ||
+            !driverId.trim() ||
+            !busId.trim() ||
+            !runDate.trim() ||
+            !status.trim() ||
+            !departureTime.trim()
+        ) {
             alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
@@ -139,15 +153,24 @@ function SetupRoute() {
                             <td>{assignment.assignment_id}</td>
                             <td>{assignment.departure_time}</td>
                             <td>
-                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', assignment)}>
+                                <button
+                                    className={cx('btn', 'change')}
+                                    onClick={() => handleOpenModal('edit', assignment)}
+                                >
                                     Sửa
                                 </button>
-                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', assignment)}>
+                                <button
+                                    className={cx('btn', 'danger')}
+                                    onClick={() => handleOpenModal('delete', assignment)}
+                                >
                                     Xóa
                                 </button>
                             </td>
                             <td>
-                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', assignment)}>
+                                <button
+                                    className={cx('btn', 'details')}
+                                    onClick={() => handleOpenModal('details', assignment)}
+                                >
                                     ...
                                 </button>
                             </td>
@@ -293,13 +316,23 @@ function SetupRoute() {
                         </div>
                         <h3>Chi tiết phân công tuyến</h3>
                         <div className={cx('form')}>
-                            <input type="text" value={selectedAssignment.assignment_id} readOnly className={cx('input')} />
+                            <input
+                                type="text"
+                                value={selectedAssignment.assignment_id}
+                                readOnly
+                                className={cx('input')}
+                            />
                             <input type="text" value={selectedAssignment.route_id} readOnly className={cx('input')} />
                             <input type="text" value={selectedAssignment.driver_id} readOnly className={cx('input')} />
                             <input type="text" value={selectedAssignment.bus_id} readOnly className={cx('input')} />
                             <input type="text" value={selectedAssignment.run_date} readOnly className={cx('input')} />
                             <input type="text" value={selectedAssignment.status} readOnly className={cx('input')} />
-                            <input type="text" value={selectedAssignment.departure_time} readOnly className={cx('input')} />
+                            <input
+                                type="text"
+                                value={selectedAssignment.departure_time}
+                                readOnly
+                                className={cx('input')}
+                            />
                         </div>
                     </div>
                 </div>

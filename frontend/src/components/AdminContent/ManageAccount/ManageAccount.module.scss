@@ -205,3 +205,12 @@
         margin-right: 10px;
     }
 }
+.status-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    p {
+        width: 100px;
+    }
+}

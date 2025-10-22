@@ -9,7 +9,9 @@ async function getAll() {
 
 // Lấy driver theo ID
 async function getById(id) {
-  const [rows] = await db.query("SELECT * FROM driver WHERE driver_id = ?", [id]);
+  const [rows] = await db.query("SELECT * FROM driver WHERE driver_id = ?", [
+    id,
+  ]);
   return rows[0];
 }
 
@@ -39,4 +41,12 @@ async function remove(id) {
   return { message: "Driver deleted successfully" };
 }
 
-module.exports = { getAll, getById, create, update, remove };
+async function assignAccount(driver_id, account_id) {
+  const [result] = await db.query(
+    `UPDATE driver SET account_id = ? WHERE driver_id = ?`,
+    [account_id, driver_id]
+  );
+  return result.affectedRows;
+}
+
+module.exports = { getAll, getById, create, update, remove, assignAccount };

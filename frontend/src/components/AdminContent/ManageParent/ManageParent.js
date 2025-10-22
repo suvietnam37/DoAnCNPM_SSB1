@@ -138,12 +138,18 @@ function ManageParent() {
                                 <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', parent)}>
                                     Sửa
                                 </button>
-                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', parent)}>
+                                <button
+                                    className={cx('btn', 'danger')}
+                                    onClick={() => handleOpenModal('delete', parent)}
+                                >
                                     Xóa
                                 </button>
                             </td>
                             <td>
-                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', parent)}>
+                                <button
+                                    className={cx('btn', 'details')}
+                                    onClick={() => handleOpenModal('details', parent)}
+                                >
                                     ...
                                 </button>
                             </td>

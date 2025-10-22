@@ -5,8 +5,7 @@ const Account = {
     const [rows] = await db.query(
       `SELECT a.*, r.role_name 
        FROM account a 
-       JOIN role r ON a.role_id = r.role_id
-       WHERE a.deleted = 0`
+       LEFT JOIN role r ON a.role_id = r.role_id`
     );
     return rows;
   },
@@ -15,18 +14,19 @@ const Account = {
     const [rows] = await db.query(
       `SELECT a.*, r.role_name 
        FROM account a 
-       JOIN role r ON a.role_id = r.role_id 
-       WHERE a.account_id = ? AND a.deleted = 0`,
+       LEFT JOIN role r ON a.role_id = r.role_id 
+       WHERE a.account_id = ?`,
       [id]
     );
     return rows[0];
   },
 
+  // Account.js (Model)
   async create(data) {
     const { username, password, role_id } = data;
     const [result] = await db.query(
       `INSERT INTO account (username, password, role_id, status)
-       VALUES (?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?)`,
       [username, password, role_id, "Active"]
     );
     return result.insertId;
@@ -37,8 +37,8 @@ const Account = {
     const [result] = await db.query(
       `UPDATE account 
        SET username = ?, password = ?, role_id = ?, status = ?
-       WHERE account_id = ? AND deleted = 0`,
-      [username, password, role_id, status, id]
+       WHERE account_id = ?`,
+      [username, password, role_id || null, status, id]
     );
     return result.affectedRows;
   },
@@ -51,19 +51,11 @@ const Account = {
     return result.affectedRows;
   },
 
-  async softDelete(id) {
-    const [result] = await db.query(
-      `UPDATE account SET deleted = 1 WHERE account_id = ?`,
-      [id]
-    );
-    return result.affectedRows;
-  },
-
   async findByUsername(username) {
     const [rows] = await db.query(
       `SELECT a.*, r.role_name 
        FROM account a 
-       JOIN role r ON a.role_id = r.role_id 
+       LEFT JOIN role r ON a.role_id = r.role_id 
        WHERE a.username = ?`,
       [username]
     );
