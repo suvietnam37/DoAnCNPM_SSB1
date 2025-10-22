@@ -26,10 +26,10 @@ async function create(bus) {
 // Cập nhật bus
 async function update(id, bus) {
   const { license_plate, capacity } = bus;
-  await db.query(
-    "UPDATE bus SET license_plate = ? WHERE bus_id = ?",
-    [license_plate, id]
-  );
+  await db.query("UPDATE bus SET license_plate = ? WHERE bus_id = ?", [
+    license_plate,
+    id,
+  ]);
   return { id, ...bus };
 }
 

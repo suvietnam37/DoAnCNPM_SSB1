@@ -114,16 +114,10 @@ function ManageBus() {
                             <td>{bus.bus_id}</td>
                             <td>{bus.license_plate}</td>
                             <td>
-                                <button
-                                    className={cx('btn', 'change')}
-                                    onClick={() => handleOpenModal('edit', bus)}
-                                >
+                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', bus)}>
                                     Sửa
                                 </button>
-                                <button
-                                    className={cx('btn', 'danger')}
-                                    onClick={() => handleOpenModal('delete', bus)}
-                                >
+                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', bus)}>
                                     Xóa
                                 </button>
                             </td>
