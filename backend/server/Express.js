@@ -7,6 +7,10 @@ const errorHandler = require("./middleware/errorHandler");
 // Import kết nối MySQL
 const connection = require("../config/db");
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors);
+
 // Import routes
 const busRoutes = require("./routes/busRoutes");
 const driverRoutes = require("./routes/driverRoutes");
@@ -15,9 +19,7 @@ const studentRoutes = require("./routes/studentRoutes");
 const parentRoutes = require("./routes/parentRoutes");
 const routeRoutes = require("./routes/routeRoutes");
 const route_assignmentsRoutes = require("./routes/route_assignmentsRoutes");
-
-app.use(express.json());
-app.use(cors);
+const accountRoutes = require("./routes/accountRoutes");
 
 // Mount routes
 app.use("/api/buses", busRoutes);
@@ -26,6 +28,7 @@ app.use("/api/stops", stopRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/parents", parentRoutes);
 app.use("/api/routes", routeRoutes);
+app.use("/api/accounts", accountRoutes);
 app.use("/api/route_assignments", route_assignmentsRoutes);
 
 // Route kiểm tra kết nối DB
