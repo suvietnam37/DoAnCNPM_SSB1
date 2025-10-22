@@ -124,12 +124,18 @@ function ManageDriver() {
                                 <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', driver)}>
                                     Sửa
                                 </button>
-                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', driver)}>
+                                <button
+                                    className={cx('btn', 'danger')}
+                                    onClick={() => handleOpenModal('delete', driver)}
+                                >
                                     Xóa
                                 </button>
                             </td>
                             <td>
-                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', driver)}>
+                                <button
+                                    className={cx('btn', 'details')}
+                                    onClick={() => handleOpenModal('details', driver)}
+                                >
                                     ...
                                 </button>
                             </td>
