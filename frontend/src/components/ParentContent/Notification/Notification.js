@@ -12,61 +12,28 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 const cx = classNames.bind(styles);
 
-function Notification() {
+function Notification({ notifications }) {
     return (
         <div className={cx('notification')} id="notification">
             <div className={cx('notification-title')}>
                 <FontAwesomeIcon icon={faBell} />
                 <span>Thông Báo Hệ Thống</span>
-            </div>
-            <div className={cx('notification-realtime')}>
-                <p>Xe Đã Khởi Hành Từ Cầu Thị Nghè Lúc 7:00 AM</p>
-                <button className={cx('notification-realtime-details')}>Xem chi tiết</button>
-            </div>
-            <div className={cx('notification-infor')}>
-                <div className={cx('route-num')}>
-                    <div className={cx('route-num-title')}>
-                        <FontAwesomeIcon icon={faBus} className={cx('route-num-title-icon')} />
-                        <span>Tuyến xe </span>
+                </div>
+            {/* Thay thế phần tĩnh bằng dữ liệu động */}
+            {notifications.length > 0 ? (
+                notifications.map(notif => (
+                    <div key={notif.notification_id} className={cx('notification-item')}>
+                        <h4>{notif.title} ({notif.type})</h4>
+                        <p>{notif.content}</p>
+                        <small>{new Date(notif.created_at).toLocaleString('vi-VN')}</small>
                     </div>
-                    <div className={cx('route-num-name')}>Tuyến 01</div>
-                </div>
-                <div className={cx('driver-infor')}>
-                    <div className={cx('driver-infor-title')}>
-                        <FontAwesomeIcon icon={faIdCard} className={cx('driver-infor-title-icon')} />
-                        <span>Tài xế </span>
-                    </div>
-                    <div className={cx('driver-infor-name')}>Nguyễn Văn Lựu</div>
-                </div>
-                <div className={cx('bus-active')}>
-                    <div className={cx('bus-active-title')}>
-                        <FontAwesomeIcon icon={faSignal} className={cx('bus-active-title-icon')} />
-                        <span>Trạng thái </span>
-                    </div>
-                    <div className={cx('bus-active-name')}>Đang hoạt động</div>
-                </div>
-            </div>
-            <div className={cx('notification-route')}>
-                <div className={cx('notification-route-title')}>
-                    <FontAwesomeIcon icon={faMapLocationDot} className={cx('notification-route-title-icon')} />
-                    <span>Tuyến đường </span>
-                </div>
-                <div className={cx('notification-route-name')}>
-                    <span>Q8</span>
-                    <FontAwesomeIcon icon={faRightLong} />
-                    <span>Cầu Thị Nghè</span>
-                    <FontAwesomeIcon icon={faRightLong} />
-                    <span>Cầu Chữ Y</span>
-                    <FontAwesomeIcon icon={faRightLong} />
-                    <span>THPT Nguyễn Thị Lựu</span>
-                </div>
-                <div className={cx('notification-route-location')}>
-                    <FontAwesomeIcon icon={faMapPin} className={cx('notification-route-title-icon')} />
-                    <span>
-                        Vị trí hiện tại / đã qua : <p>Q8</p>
-                    </span>
-                </div>
-            </div>
+                ))
+            ) : (
+                <p>Không có thông báo mới.</p>
+            )}
+            
+            {/* Phần thông tin chi tiết về tuyến xe bên dưới có thể xóa hoặc ẩn đi,
+               vì đã có component RouteStatus đảm nhiệm */}
         </div>
     );
 }

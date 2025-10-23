@@ -39,4 +39,27 @@ async function remove(id) {
   return { message: "Student deleted successfully" };
 }
 
-module.exports = { getAll, getById, create, update, remove };
+// Lấy học sinh theo parent_id và join để lấy route_id
+async function getByParentId(parentId) {
+    const [rows] = await db.query(
+      `SELECT s.*, st.route_id 
+       FROM student s
+       JOIN stop st ON s.stop_id = st.stop_id
+       WHERE s.parent_id = ?`,
+      [parentId]
+    );
+    return rows;
+}
+
+// Lấy học sinh theo route_id
+async function getByRouteId(routeId) {
+    const [rows] = await db.query(
+      `SELECT s.* FROM student s
+       JOIN stop st ON s.stop_id = st.stop_id
+       WHERE st.route_id = ?`,
+      [routeId]
+    );
+    return rows;
+}
+
+module.exports = { getAll, getById, create, update, remove, getByParentId, getByRouteId };

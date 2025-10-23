@@ -13,7 +13,6 @@ function ManageParent() {
     const [parentName, setParentName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
-    const [accountId, setAccountId] = useState('');
 
     // Lấy danh sách phụ huynh từ API
     const fetchParents = async () => {
@@ -36,7 +35,6 @@ function ManageParent() {
         setParentName(parent ? parent.parent_name : '');
         setPhone(parent ? parent.phone : '');
         setEmail(parent ? parent.email : '');
-        setAccountId(parent ? parent.account_id : '');
     };
 
     // Đóng modal
@@ -46,12 +44,11 @@ function ManageParent() {
         setParentName('');
         setPhone('');
         setEmail('');
-        setAccountId('');
     };
 
     // Thêm phụ huynh
     const handleAddParent = async () => {
-        if (!parentName.trim() || !phone.trim() || !email.trim() || !accountId.trim()) {
+        if (!parentName.trim() || !phone.trim() || !email.trim()) {
             alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
@@ -60,7 +57,6 @@ function ManageParent() {
                 parent_name: parentName,
                 phone: phone,
                 email: email,
-                account_id: accountId,
             });
             alert('Thêm phụ huynh thành công!');
             handleCloseModal();
@@ -73,7 +69,7 @@ function ManageParent() {
 
     // Sửa phụ huynh
     const handleEditParent = async () => {
-        if (!parentName.trim() || !phone.trim() || !email.trim() || !accountId.trim()) {
+        if (!parentName.trim() || !phone.trim() || !email.trim()) {
             alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
@@ -82,7 +78,6 @@ function ManageParent() {
                 parent_name: parentName,
                 phone: phone,
                 email: email,
-                account_id: accountId,
             });
             alert('Cập nhật phụ huynh thành công!');
             handleCloseModal();
@@ -121,7 +116,6 @@ function ManageParent() {
                         <th>Tên phụ huynh</th>
                         <th>SĐT</th>
                         <th>Email</th>
-                        <th>Mã tài khoản</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
@@ -133,7 +127,6 @@ function ManageParent() {
                             <td>{parent.parent_name}</td>
                             <td>{parent.phone}</td>
                             <td>{parent.email}</td>
-                            <td>{parent.account_id}</td>
                             <td>
                                 <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', parent)}>
                                     Sửa
@@ -184,13 +177,6 @@ function ManageParent() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
-                            <input
-                                type="text"
-                                placeholder="Mã tài khoản"
-                                className={cx('input')}
-                                value={accountId}
-                                onChange={(e) => setAccountId(e.target.value)}
-                            />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditParent}>
                                     Cập nhật
@@ -233,13 +219,6 @@ function ManageParent() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
-                            <input
-                                type="text"
-                                placeholder="Mã tài khoản"
-                                className={cx('input')}
-                                value={accountId}
-                                onChange={(e) => setAccountId(e.target.value)}
-                            />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddParent}>
                                     Thêm
@@ -265,7 +244,6 @@ function ManageParent() {
                             <input type="text" value={selectedParent.parent_name} readOnly className={cx('input')} />
                             <input type="text" value={selectedParent.phone} readOnly className={cx('input')} />
                             <input type="text" value={selectedParent.email} readOnly className={cx('input')} />
-                            <input type="text" value={selectedParent.account_id} readOnly className={cx('input')} />
                         </div>
                     </div>
                 </div>

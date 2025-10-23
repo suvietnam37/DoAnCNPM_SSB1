@@ -3,7 +3,15 @@ const Student = require("../../models/Student");
 // Lấy danh sách tất cả học sinh
 exports.getAllStudents = async (req, res) => {
   try {
-    const results = await Student.getAll();
+    const { parent_id } = req.query;
+    let results;
+    
+    if (parent_id) {
+        results = await Student.getByParentId(parent_id);
+    } else {
+        results = await Student.getAll();
+    }
+
     res.json(results);
   } catch (err) {
     console.error(err);
@@ -21,26 +29,6 @@ exports.getStudentById = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Lỗi khi lấy học sinh" });
-  }
-};
-
-// Lấy học sinh theo tuyến xe
-exports.getStudentsByRoute = async (req, res) => {
-  try {
-    const routeId = req.params.routeId;
-    const [results] = await Student.query(
-      `SELECT s.* FROM student s
-       JOIN stop st ON s.stop_id = st.stop_id
-       WHERE st.route_id = ?`,
-      [routeId]
-    );
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Không tìm thấy học sinh nào cho tuyến này" });
-    }
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Lỗi khi lấy danh sách học sinh theo tuyến" });
   }
 };
 
@@ -84,5 +72,20 @@ exports.deleteStudent = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Lỗi khi xóa học sinh" });
+  }
+};
+
+// Lấy học sinh theo route_id
+exports.getStudentsByRoute = async (req, res) => {
+  try {
+    const { routeId } = req.params;
+    const students = await Student.getByRouteId(routeId); // Dùng model
+    if (students.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy học sinh nào cho tuyến này" });
+    }
+    res.json(students);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy danh sách học sinh theo tuyến" });
   }
 };
