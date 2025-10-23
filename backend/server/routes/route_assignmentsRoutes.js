@@ -8,5 +8,6 @@ router.get("/:id", routeAssignmentController.getRouteAssignmentById); // GET /ap
 router.post("/", routeAssignmentController.createRouteAssignment);     // POST /api/route_assignments
 router.put("/:id", routeAssignmentController.updateRouteAssignment);   // PUT /api/route_assignments/:id
 router.delete("/:id", routeAssignmentController.deleteRouteAssignment); // DELETE /api/route_assignments/:id
+router.get("/current", routeAssignmentController.getCurrentAssignment); // GET /api/route_assignments/current?driver_id=1
 
 module.exports = router;

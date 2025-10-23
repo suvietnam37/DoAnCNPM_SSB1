@@ -1,12 +1,19 @@
 @import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Quicksand:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary: #ffc30d;
-    --gray: #00000022;
-    --white: #69696900;
+    /* Màu sắc chủ đạo */
+    --primary: #ffca28;        /* vàng dịu hơn, dễ nhìn */
+    --primary-hover: #ffb300;  /* vàng đậm khi hover */
+    --gray: #f3f3f3;
+    --white: #ffffff;
     --black: #2e2e2e;
-    --red: #b4151b;
+    --text-gray: #555555;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-strong: 0 4px 14px rgba(0, 0, 0, 0.15);
+    --transition: all 0.25s ease-in-out;
+    --red: #e53935;
 }
 
 * {
@@ -18,33 +25,103 @@
 
 html {
     font-size: 62.5%;
+    scroll-behavior: smooth;
+
     &::-webkit-scrollbar {
-        width: 5px;
+        width: 6px;
     }
+
     &::-webkit-scrollbar-thumb {
-        background-color: #919191;
-        border-radius: 4px;
+        background-color: #bdbdbd;
+        border-radius: 3px;
     }
 }
 
 body {
     font-family: 'Quicksand', sans-serif !important;
     font-size: 1.6rem;
-    line-height: 1.5;
+    line-height: 1.6;
+    color: var(--text-gray);
+    background-color: #fafafa;
     text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* Liên kết */
 a {
     width: 100%;
     text-decoration: none;
     color: inherit;
     display: block;
+    transition: var(--transition);
+
+    &:hover {
+        color: var(--primary-hover);
+    }
 }
 
+/* Ảnh */
 img {
     width: 100%;
+    height: auto;
+    object-fit: cover;
 }
 
+/* Card tổng quát */
+.card {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.6rem;
+    transition: var(--transition);
+
+    &:hover {
+        box-shadow: var(--shadow-strong);
+        transform: translateY(-2px);
+    }
+}
+
+/* Nút tổng quát */
+.btn {
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+
+    &:hover {
+        background-color: var(--primary-hover);
+        box-shadow: var(--shadow);
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+}
+
+/* Input & Form */
+input, select, textarea {
+    font-family: inherit;
+    font-size: 1.5rem;
+    padding: 0.8rem 1.2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    outline: none;
+    transition: var(--transition);
+    background-color: #fff;
+
+    &:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 4px rgba(255, 195, 13, 0.3);
+    }
+}
+
+/* Ẩn bảng chỉ đường của Leaflet */
 .leaflet-routing-container {
     display: none !important;
 }

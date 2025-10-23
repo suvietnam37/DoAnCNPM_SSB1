@@ -14,45 +14,45 @@ import {
     faExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 const cx = classNames.bind(styles);
-function RouteManage() {
+function RouteManage({ assignments, onStartRoute }) {
     return (
         <div className={cx('route-manage')} id="route-manage">
             <div className={cx('route-manage-title')}>
                 <FontAwesomeIcon icon={faRoute} />
                 <span>Danh Sách Tuyến Xe</span>
-            </div>
+                </div>
             <div className={cx('route-manage-table')}>
                 <table>
                     <thead>
                         <tr>
-                            <th>STT</th>
-                            <th>Xuất Phát</th>
-                            <th>Bắt Đầu</th>
-                            <th>Trạm 1</th>
-                            <th>Trạm 2</th>
-                            <th>Trạm 3</th>
-                            <th>Kết Thúc</th>
+                            <th>Mã tuyến</th>
+                            <th>Ngày chạy</th>
+                            <th>Giờ khởi hành</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>4h</td>
-                            <td>Trường THPT ABC</td>
-                            <td>Cầu Thị Nghè</td>
-                            <td>Ngã tư Hàng Xanh</td>
-                            <td>Bến xe Miền Đông</td>
-                            <td>Trường Tiểu học XYZ</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>17h</td>
-                            <td>Trường Tiểu học XYZ</td>
-                            <td>Bến xe Miền Đông</td>
-                            <td>Ngã tư Hàng Xanh</td>
-                            <td>Cầu Thị Nghè</td>
-                            <td>Trường THPT ABC</td>
-                        </tr>
+                        {/* Dùng map để render dữ liệu động */}
+                        {assignments.map((asm) => (
+                            <tr key={asm.assignment_id}>
+                                <td>{asm.route_id}</td>
+                                <td>{new Date(asm.run_date).toLocaleDateString('vi-VN')}</td>
+                                <td>{asm.departure_time}</td>
+                                <td>{asm.status}</td>
+                                <td>
+                                    {/* Chỉ hiển thị nút Bắt đầu nếu tuyến chưa bắt đầu */}
+                                    {asm.status === 'Not Started' && (
+                                        <button 
+                                            onClick={() => onStartRoute(asm.assignment_id, asm.route_id)}
+                                            className={cx('start-button')}
+                                        >
+                                            Bắt đầu
+                                        </button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

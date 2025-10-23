@@ -3,7 +3,15 @@ const RouteAssignment = require("../../models/Route_assignment");
 // Lấy danh sách tất cả phân công tuyến
 exports.getAllRouteAssignments = async (req, res) => {
   try {
-    const results = await RouteAssignment.getAll();
+    const { driver_id } = req.query; // Lấy driver_id từ query parameter
+    let results;
+
+    if (driver_id) {
+        results = await RouteAssignment.getByDriverId(driver_id);
+    } else {
+        results = await RouteAssignment.getAll();
+    }
+    
     res.json(results);
   } catch (err) {
     console.error(err);
@@ -65,4 +73,25 @@ exports.deleteRouteAssignment = async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Lỗi khi xóa phân công tuyến" });
   }
+};
+
+// Lấy tuyến đang chạy
+exports.getCurrentAssignment = async (req, res) => {
+    try {
+        const { driver_id, route_id } = req.query; // Có thể nhận 1 trong 2
+        let assignment;
+
+        if (driver_id) {
+            assignment = await RouteAssignment.getCurrentByDriverId(driver_id);
+        } else if (route_id) {
+            assignment = await RouteAssignment.getCurrentByRouteId(route_id);
+        } else {
+            return res.status(400).json({ error: "Cần cung cấp driver_id hoặc route_id" });
+        }
+
+        res.json(assignment);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Lỗi khi lấy phân công hiện tại" });
+    }
 };

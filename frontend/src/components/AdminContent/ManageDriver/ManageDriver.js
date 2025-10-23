@@ -11,7 +11,6 @@ function ManageDriver() {
     const [isOpenModal, setIsOpenModal] = useState('');
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [driverName, setDriverName] = useState('');
-    const [accountId, setAccountId] = useState('');
 
     // Lấy danh sách tài xế từ API
     const fetchDrivers = async () => {
@@ -32,7 +31,6 @@ function ManageDriver() {
         setIsOpenModal(type);
         setSelectedDriver(driver);
         setDriverName(driver ? driver.driver_name : '');
-        setAccountId(driver ? driver.account_id : '');
     };
 
     // Đóng modal
@@ -40,19 +38,17 @@ function ManageDriver() {
         setIsOpenModal('');
         setSelectedDriver(null);
         setDriverName('');
-        setAccountId('');
     };
 
     // Thêm tài xế
     const handleAddDriver = async () => {
-        if (!driverName.trim() || !accountId.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+        if (!driverName.trim()) {
+            alert('Vui lòng nhập tên tài xế!');
             return;
         }
         try {
             await axios.post('http://localhost:5000/api/drivers', {
                 driver_name: driverName,
-                account_id: accountId,
             });
             alert('Thêm tài xế thành công!');
             handleCloseModal();
@@ -65,14 +61,13 @@ function ManageDriver() {
 
     // Sửa tài xế
     const handleEditDriver = async () => {
-        if (!driverName.trim() || !accountId.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+        if (!driverName.trim()) {
+            alert('Vui lòng nhập tên tài xế!');
             return;
         }
         try {
             await axios.put(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`, {
                 driver_name: driverName,
-                account_id: accountId,
             });
             alert('Cập nhật tài xế thành công!');
             handleCloseModal();
@@ -109,7 +104,6 @@ function ManageDriver() {
                     <tr>
                         <th>Mã tài xế</th>
                         <th>Tên tài xế</th>
-                        <th>Mã tài khoản</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
@@ -119,7 +113,6 @@ function ManageDriver() {
                         <tr key={driver.driver_id}>
                             <td>{driver.driver_id}</td>
                             <td>{driver.driver_name}</td>
-                            <td>{driver.account_id}</td>
                             <td>
                                 <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', driver)}>
                                     Sửa
@@ -162,13 +155,6 @@ function ManageDriver() {
                                 value={driverName}
                                 onChange={(e) => setDriverName(e.target.value)}
                             />
-                            <input
-                                type="text"
-                                placeholder="Mã tài khoản"
-                                className={cx('input')}
-                                value={accountId}
-                                onChange={(e) => setAccountId(e.target.value)}
-                            />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditDriver}>
                                     Cập nhật
@@ -197,13 +183,6 @@ function ManageDriver() {
                                 value={driverName}
                                 onChange={(e) => setDriverName(e.target.value)}
                             />
-                            <input
-                                type="text"
-                                placeholder="Mã tài khoản"
-                                className={cx('input')}
-                                value={accountId}
-                                onChange={(e) => setAccountId(e.target.value)}
-                            />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddDriver}>
                                     Thêm
@@ -227,7 +206,6 @@ function ManageDriver() {
                         <div className={cx('form')}>
                             <input type="text" value={selectedDriver.driver_id} readOnly className={cx('input')} />
                             <input type="text" value={selectedDriver.driver_name} readOnly className={cx('input')} />
-                            <input type="text" value={selectedDriver.account_id} readOnly className={cx('input')} />
                         </div>
                     </div>
                 </div>

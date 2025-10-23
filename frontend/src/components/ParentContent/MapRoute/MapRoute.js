@@ -17,21 +17,26 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 const cx = classNames.bind(styles);
 
-function MapRoute() {
+function MapRoute({ routeStatus }) {
     return (
         <div className={cx('map-route')} id="map-route">
             <div className={cx('map-route-title')}>
                 <FontAwesomeIcon icon={faMap} className={cx('map-route-title-icon')} />
                 <span>Bản Đồ Theo Dõi Lộ Trình Xe</span>
-            </div>
-            <div className={cx('map-route-location')}>
-                <MapContainer center={[21.0285, 105.8542]} zoom={13} style={{ height: '450px', width: '100%' }}>
-                    <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    />
-                </MapContainer>
-            </div>
+                </div>
+            {routeStatus ? (
+                 <div className={cx('map-route-location')}>
+                    <MapContainer center={[10.762622, 106.682214]} zoom={13} style={{ height: '450px', width: '100%' }}>
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        />
+                        {/* Marker vị trí xe sẽ được thêm ở đây trong Tuần 6 */}
+                    </MapContainer>
+                </div>
+            ) : (
+                <p>Bản đồ sẽ hiển thị khi tuyến xe bắt đầu hoạt động.</p>
+            )}
         </div>
     );
 }

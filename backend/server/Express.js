@@ -20,6 +20,7 @@ const parentRoutes = require("./routes/parentRoutes");
 const routeRoutes = require("./routes/routeRoutes");
 const route_assignmentsRoutes = require("./routes/route_assignmentsRoutes");
 const accountRoutes = require("./routes/accountRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 // Mount routes
 app.use("/api/buses", busRoutes);
@@ -30,6 +31,7 @@ app.use("/api/parents", parentRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/route_assignments", route_assignmentsRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Route kiểm tra kết nối DB
 app.get("/test-db", async (req, res) => {

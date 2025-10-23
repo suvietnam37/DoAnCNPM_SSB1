@@ -134,9 +134,6 @@ function SetupRoute() {
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
                 <h2 className={cx('title')}>Quản Lý Phân Tuyến</h2>
-                <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Phân tuyến
-                </button>
             </div>
             <table className={cx('table')}>
                 <thead>
@@ -235,69 +232,6 @@ function SetupRoute() {
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditAssignment}>
                                     Cập nhật
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal Thêm */}
-            {isOpenModal === 'add' && (
-                <div className={cx('modal-overlay')}>
-                    <div className={cx('modal-content')}>
-                        <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
-                            </button>
-                        </div>
-                        <h3>Phân công tuyến</h3>
-                        <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Mã tuyến"
-                                className={cx('input')}
-                                value={routeId}
-                                onChange={(e) => setRouteId(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mã tài xế"
-                                className={cx('input')}
-                                value={driverId}
-                                onChange={(e) => setDriverId(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mã xe"
-                                className={cx('input')}
-                                value={busId}
-                                onChange={(e) => setBusId(e.target.value)}
-                            />
-                            <input
-                                type="date"
-                                placeholder="Ngày chạy"
-                                className={cx('input')}
-                                value={runDate}
-                                onChange={(e) => setRunDate(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Trạng thái"
-                                className={cx('input')}
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                            />
-                            <input
-                                type="time"
-                                placeholder="Thời gian khởi hành"
-                                className={cx('input')}
-                                value={departureTime}
-                                onChange={(e) => setDepartureTime(e.target.value)}
-                            />
-                            <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={handleAddAssignment}>
-                                    Thêm
                                 </button>
                             </div>
                         </div>
