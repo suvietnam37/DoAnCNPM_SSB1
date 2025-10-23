@@ -8,14 +8,17 @@ const cx = classNames.bind(styles);
 
 function ManageAccount() {
     const [accounts, setAccounts] = useState([]);
+    const [accountEdit, setAccountEdit] = useState([]);
     const [drivers, setDrivers] = useState([]);
     const [parents, setParents] = useState([]);
     const [selectedRole, setSelectedRole] = useState(''); // '' | 'Parent' | 'Driver' | 'Admin'
     const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [selectedParentId, setSelectedParentId] = useState(null);
     const [selectedDriverId, setSelectedDriverId] = useState(null);
+    const [selectedAccount, setSelectedAccount] = useState(null);
 
     const handleOpenModal = (type) => {
         setIsOpenModalOpen(type);
@@ -87,6 +90,8 @@ function ManageAccount() {
             });
             showToast('Thêm tài khoản thành công');
             fetchAccounts(); // reload danh sách
+            fetchDrivers();
+            fetchDrivers();
             handleCloseModal();
 
             // reset state
@@ -100,6 +105,109 @@ function ManageAccount() {
             showToast('Lỗi khi tạo tài khoản', false);
         }
     };
+
+    const handleToggleStatus = async (account) => {
+        try {
+            console.log(account);
+            const newStatus = account.status === 'Active' ? 'Locked' : 'Active';
+
+            await axios.put(`http://localhost:5000/api/accounts/${account.account_id}/status`, {
+                status: newStatus,
+            });
+
+            showToast(newStatus === 'Locked' ? 'Tài khoản đã bị khóa' : 'Tài khoản đã được mở khóa', true);
+
+            fetchAccounts(); // Cập nhật lại danh sách
+        } catch (error) {
+            showToast('Không thể cập nhật trạng thái', false);
+        } finally {
+            handleCloseModal();
+        }
+    };
+
+    const handleSoftDelete = async (account) => {
+        try {
+            console.log(account);
+            await axios.delete(`http://localhost:5000/api/accounts/${account.account_id}`);
+
+            showToast('Xóa tài khoản thành công');
+
+            fetchAccounts();
+        } catch (error) {
+            showToast('Không thể cập nhật trạng thái', false);
+        } finally {
+            handleCloseModal();
+        }
+    };
+
+    const handleUpdateAccount = async () => {
+        try {
+            if (!selectedAccount) return;
+
+            let role_id;
+            let relatedId = null;
+
+            if (selectedRole === 'Driver') {
+                role_id = 2;
+                relatedId = selectedDriverId;
+            } else if (selectedRole === 'Parent') {
+                role_id = 3;
+                relatedId = selectedParentId;
+            } else {
+                role_id = 1;
+            }
+
+            await axios.put(`http://localhost:5000/api/accounts/${selectedAccount.account_id}`, {
+                username: username || selectedAccount.username,
+                oldPassword: password,
+                newPassword: newPassword,
+                roleid: role_id,
+                related_id: relatedId,
+            });
+
+            showToast('Cập nhật tài khoản thành công', true);
+            fetchAccounts();
+            handleCloseModal();
+
+            setUsername('');
+            setPassword('');
+            setNewPassword('');
+            setSelectedRole('');
+            setSelectedParentId(null);
+            setSelectedDriverId(null);
+        } catch (error) {
+            console.error(error);
+            showToast('Lỗi khi cập nhật tài khoản', false);
+        }
+    };
+
+    const fetchDriverByAccId = async (account) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/drivers/by-account/${account.account_id}`);
+            setAccountEdit(response.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+
+    const fetchParentByAccId = async (account) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/parents/by-account/${account.account_id}`);
+            setAccountEdit(response.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpenModalOpen === 'edit' && selectedAccount) {
+            if (selectedAccount.role_name === 'Parent') {
+                fetchParentByAccId(selectedAccount);
+            } else if (selectedAccount.role_name === 'Driver') {
+                fetchDriverByAccId(selectedAccount);
+            }
+        }
+    }, [isOpenModalOpen, selectedAccount]);
 
     return (
         <div className={cx('wrapper')}>
@@ -133,7 +241,10 @@ function ManageAccount() {
                                             <p>Hoạt động</p>
                                             <button
                                                 className={cx('btn', 'lock')}
-                                                onClick={() => handleOpenModal('lock')}
+                                                onClick={() => {
+                                                    setSelectedAccount(acc);
+                                                    handleOpenModal('lock');
+                                                }}
                                             >
                                                 Khóa
                                             </button>
@@ -143,7 +254,10 @@ function ManageAccount() {
                                             <p>Đã khóa</p>
                                             <button
                                                 className={cx('btn', 'unlock')}
-                                                onClick={() => handleOpenModal('unlock')}
+                                                onClick={() => {
+                                                    setSelectedAccount(acc);
+                                                    handleOpenModal('lock');
+                                                }}
                                             >
                                                 Mở khóa
                                             </button>
@@ -151,15 +265,35 @@ function ManageAccount() {
                                     )}
                                 </td>
                                 <td>
-                                    <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit')}>
+                                    <button
+                                        className={cx('btn', 'change')}
+                                        onClick={() => {
+                                            setSelectedAccount(acc);
+                                            setSelectedRole(acc.role_name);
+                                            setUsername(acc.username);
+                                            handleOpenModal('edit');
+                                        }}
+                                    >
                                         Sửa
                                     </button>
-                                    <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete')}>
+                                    <button
+                                        className={cx('btn', 'danger')}
+                                        onClick={() => {
+                                            setSelectedAccount(acc);
+                                            handleOpenModal('delete');
+                                        }}
+                                    >
                                         Xóa
                                     </button>
                                 </td>
                                 <td>
-                                    <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details')}>
+                                    <button
+                                        className={cx('btn', 'details')}
+                                        onClick={() => {
+                                            setSelectedAccount(acc);
+                                            handleOpenModal('details');
+                                        }}
+                                    >
                                         ...
                                     </button>
                                 </td>
@@ -177,21 +311,65 @@ function ManageAccount() {
                                 X
                             </button>
                         </div>
-                        <h3>Sửa thông tin tài khoản</h3>
+                        <h3>Sửa tài khoản</h3>
                         <div className={cx('form')}>
-                            <input type="text" placeholder="Tên tài khoản" className={cx('input')} />
-                            <input type="text" placeholder="Mật khẩu" className={cx('input')} />
+                            <input
+                                type="text"
+                                placeholder="Tên tài khoản"
+                                className={cx('input')}
+                                value={selectedAccount.username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+
+                            <input
+                                type="text"
+                                placeholder="Mật khẩu cũ"
+                                className={cx('input')}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Mật khẩu mới"
+                                className={cx('input')}
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+
                             <div className={cx('roles')}>
                                 <label className={cx('role-label')}>
-                                    <input type="radio" name="role" className={cx('radio')} />
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        className={cx('radio')}
+                                        value="Parent"
+                                        checked={selectedRole === 'Parent'}
+                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                    />
                                     <span>Parent</span>
                                 </label>
+
                                 <label className={cx('role-label')}>
-                                    <input type="radio" name="role" className={cx('radio')} />
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        className={cx('radio')}
+                                        value="Driver"
+                                        checked={selectedRole === 'Driver'}
+                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                    />
                                     <span>Driver</span>
                                 </label>
+
                                 <label className={cx('role-label')}>
-                                    <input type="radio" name="role" className={cx('radio')} />
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        className={cx('radio')}
+                                        value="Admin"
+                                        checked={selectedRole === 'Admin'}
+                                        onChange={(e) => setSelectedRole(e.target.value)}
+                                    />
                                     <span>Admin</span>
                                 </label>
                             </div>
@@ -199,41 +377,87 @@ function ManageAccount() {
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
-                                        <thead>
-                                            <tr>
-                                                <th>Mã phụ huynh</th>
-                                                <th>Tên phụ huynh</th>
-                                                <th>Chọn</th>
-                                            </tr>
-                                        </thead>
+                                        {selectedRole === 'Admin' ? (
+                                            ''
+                                        ) : (
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Mã{' '}
+                                                        {selectedRole === 'Parent'
+                                                            ? 'Phụ huynh'
+                                                            : selectedRole === 'Driver'
+                                                            ? 'Tài xế'
+                                                            : ''}
+                                                    </th>
+                                                    <th>
+                                                        Tên{' '}
+                                                        {selectedRole === 'Parent'
+                                                            ? 'Phụ huynh'
+                                                            : selectedRole === 'Driver'
+                                                            ? 'Tài xế'
+                                                            : ''}
+                                                    </th>
+                                                    <th>Chọn</th>
+                                                </tr>
+                                            </thead>
+                                        )}
                                         <tbody>
-                                            <tr>
-                                                <td>PH01</td>
-                                                <td>Nguyễn Thị Lựu</td>
-                                                <td>
-                                                    <input type="radio" name="parent" />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>PH02</td>
-                                                <td>Nguyễn Ánh Lực</td>
-                                                <td>
-                                                    <input type="radio" name="parent" />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>PH01</td>
-                                                <td>Nguyễn Thị Lựu</td>
-                                                <td>
-                                                    <input type="radio" name="driver" />
-                                                </td>
-                                            </tr>
+                                            {selectedRole === 'Parent' &&
+                                                parents.map((parent) => {
+                                                    if (parent.account_id == selectedAccount.account_id)
+                                                        return (
+                                                            <tr key={parent.parent_id}>
+                                                                <td>{parent.parent_id}</td>
+                                                                <td>{parent.parent_name}</td>
+                                                                <td>
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="parent"
+                                                                        value={parent.parent_id}
+                                                                        onChange={(e) =>
+                                                                            setSelectedParentId(e.target.value)
+                                                                        }
+                                                                        checked={
+                                                                            accountEdit.account_id ==
+                                                                            selectedAccount.account_id
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                })}
+
+                                            {selectedRole === 'Driver' &&
+                                                drivers.map((driver) => {
+                                                    if (driver.account_id == selectedAccount.account_id)
+                                                        return (
+                                                            <tr key={driver.driver_id}>
+                                                                <td>{driver.driver_id}</td>
+                                                                <td>{driver.driver_name}</td>
+                                                                <td>
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="driver"
+                                                                        value={driver.driver_id}
+                                                                        onChange={(e) =>
+                                                                            setSelectedDriverId(e.target.value)
+                                                                        }
+                                                                        checked={
+                                                                            accountEdit.account_id ==
+                                                                            selectedAccount.account_id
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                })}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={() => handleCloseModal()}>
+                                <button className={cx('btn', 'add')} onClick={handleUpdateAccount}>
                                     Cập nhật
                                 </button>
                             </div>
@@ -308,27 +532,31 @@ function ManageAccount() {
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Mã{' '}
-                                                    {selectedRole === 'Parent'
-                                                        ? 'Phụ huynh'
-                                                        : selectedRole === 'Driver'
-                                                        ? 'Tài xế'
-                                                        : ''}
-                                                </th>
-                                                <th>
-                                                    Tên{' '}
-                                                    {selectedRole === 'Parent'
-                                                        ? 'Phụ huynh'
-                                                        : selectedRole === 'Driver'
-                                                        ? 'Tài xế'
-                                                        : ''}
-                                                </th>
-                                                <th>Chọn</th>
-                                            </tr>
-                                        </thead>
+                                        {selectedRole === 'Admin' ? (
+                                            ''
+                                        ) : (
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Mã{' '}
+                                                        {selectedRole === 'Parent'
+                                                            ? 'Phụ huynh'
+                                                            : selectedRole === 'Driver'
+                                                            ? 'Tài xế'
+                                                            : ''}
+                                                    </th>
+                                                    <th>
+                                                        Tên{' '}
+                                                        {selectedRole === 'Parent'
+                                                            ? 'Phụ huynh'
+                                                            : selectedRole === 'Driver'
+                                                            ? 'Tài xế'
+                                                            : ''}
+                                                    </th>
+                                                    <th>Chọn</th>
+                                                </tr>
+                                            </thead>
+                                        )}
                                         <tbody>
                                             {selectedRole === 'Parent' &&
                                                 parents.map((parent) => {
@@ -396,25 +624,50 @@ function ManageAccount() {
                         <div className={cx('form')}>
                             <div className={cx('input-container')}>
                                 <label>Mã tài khoản: </label>
-                                <input type="text" placeholder="Mã tài khoản" className={cx('input')} />
+                                <input
+                                    type="text"
+                                    placeholder="Mã tài khoản"
+                                    className={cx('input')}
+                                    value={selectedAccount.account_id}
+                                />
                             </div>
                             <div className={cx('input-container')}>
                                 <label>Tên tài khoản: </label>
-                                <input type="text" placeholder="Tên tài khoản" className={cx('input')} />
+                                <input
+                                    type="text"
+                                    placeholder="Tên tài khoản"
+                                    className={cx('input')}
+                                    value={selectedAccount.username}
+                                />
                             </div>
 
                             <div className={cx('input-container')}>
                                 <label>Mật khẩu: </label>
-                                <input type="text" placeholder="Mật khẩu" className={cx('input')} />
+                                <input
+                                    type="text"
+                                    placeholder="Mật khẩu"
+                                    className={cx('input')}
+                                    value={selectedAccount.password}
+                                />
                             </div>
 
                             <div className={cx('input-container')}>
                                 <label>Vai trò: </label>
-                                <input type="text" placeholder="Vai trò" className={cx('input')} />
+                                <input
+                                    type="text"
+                                    placeholder="Vai trò"
+                                    className={cx('input')}
+                                    value={selectedAccount.role_name}
+                                />
                             </div>
                             <div className={cx('input-container')}>
                                 <label>Trạng thái: </label>
-                                <input type="text" placeholder="Trạng thái" className={cx('input')} />
+                                <input
+                                    type="text"
+                                    placeholder="Trạng thái"
+                                    className={cx('input')}
+                                    value={selectedAccount.status}
+                                />
                             </div>
                         </div>
                     </div>
@@ -429,13 +682,13 @@ function ManageAccount() {
                             </button>
                         </div>
                         <h3>Xác nhận xóa tài khoản ?</h3>
-                        <button className={cx('btn', 'add')} onClick={handleCloseModal}>
+                        <button className={cx('btn', 'add')} onClick={() => handleSoftDelete(selectedAccount)}>
                             Xác nhận
                         </button>
                     </div>
                 </div>
             )}
-            {isOpenModalOpen === 'lock' && (
+            {isOpenModalOpen === 'lock' && selectedAccount && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
@@ -443,8 +696,12 @@ function ManageAccount() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận khóa tài khoản ?</h3>
-                        <button className={cx('btn', 'add')} onClick={handleCloseModal}>
+                        <h3>
+                            {selectedAccount.status === 'Active'
+                                ? 'Xác nhận khóa tài khoản này?'
+                                : 'Xác nhận mở khóa tài khoản này?'}
+                        </h3>
+                        <button className={cx('btn', 'add')} onClick={() => handleToggleStatus(selectedAccount)}>
                             Xác nhận
                         </button>
                     </div>

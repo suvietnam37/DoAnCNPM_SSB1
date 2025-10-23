@@ -16,7 +16,21 @@ exports.getParentById = async (req, res) => {
   try {
     const id = req.params.id;
     const parent = await Parent.getById(id);
-    if (!parent) return res.status(404).json({ error: "Phụ huynh không tồn tại" });
+    if (!parent)
+      return res.status(404).json({ error: "Phụ huynh không tồn tại" });
+    res.json(parent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy phụ huynh" });
+  }
+};
+
+exports.getParentByAccId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const parent = await Parent.getById(id);
+    if (!parent)
+      return res.status(404).json({ error: "Phụ huynh không tồn tại" });
     res.json(parent);
   } catch (err) {
     console.error(err);
@@ -29,9 +43,16 @@ exports.createParent = async (req, res) => {
   try {
     const { parent_name, phone, email, account_id } = req.body;
     if (!parent_name || !phone || !email || !account_id) {
-      return res.status(400).json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+      return res
+        .status(400)
+        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
     }
-    const newParent = await Parent.create({ parent_name, phone, email, account_id });
+    const newParent = await Parent.create({
+      parent_name,
+      phone,
+      email,
+      account_id,
+    });
     res.status(201).json(newParent);
   } catch (err) {
     console.error(err);
@@ -45,9 +66,16 @@ exports.updateParent = async (req, res) => {
     const id = req.params.id;
     const { parent_name, phone, email, account_id } = req.body;
     if (!parent_name || !phone || !email || !account_id) {
-      return res.status(400).json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+      return res
+        .status(400)
+        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
     }
-    const updatedParent = await Parent.update(id, { parent_name, phone, email, account_id });
+    const updatedParent = await Parent.update(id, {
+      parent_name,
+      phone,
+      email,
+      account_id,
+    });
     res.json(updatedParent);
   } catch (err) {
     console.error(err);

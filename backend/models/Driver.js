@@ -15,6 +15,12 @@ async function getById(id) {
   return rows[0];
 }
 
+async function getByAccId(id) {
+  const [rows] = await db.query("SELECT * FROM driver WHERE account_id = ?", [
+    id,
+  ]);
+  return rows[0];
+}
 // Thêm driver mới
 async function create(driver) {
   const { driver_name, account_id } = driver;
@@ -49,4 +55,12 @@ async function assignAccount(driver_id, account_id) {
   return result.affectedRows;
 }
 
-module.exports = { getAll, getById, create, update, remove, assignAccount };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  remove,
+  assignAccount,
+  getByAccId,
+};

@@ -21,6 +21,6 @@ router.put("/:id", accountController.updateAccount);
 router.delete("/:id", accountController.deleteAccount);
 
 // Khóa / Mở khóa tài khoản
-router.patch("/:id/status", accountController.updateStatusAccount);
+router.put("/:id/status", accountController.updateStatusAccount);
 
 module.exports = router;

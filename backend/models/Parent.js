@@ -15,6 +15,13 @@ async function getById(id) {
   return rows[0];
 }
 
+async function getByAccId(id) {
+  const [rows] = await db.query("SELECT * FROM parent WHERE account_id = ?", [
+    id,
+  ]);
+  return rows[0];
+}
+
 // Thêm parent mới
 async function create(parent) {
   const { parent_name, phone, email, account_id } = parent;
@@ -49,4 +56,12 @@ async function assignAccount(parent_id, account_id) {
   return result.affectedRows;
 }
 
-module.exports = { getAll, getById, create, update, remove, assignAccount };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  remove,
+  assignAccount,
+  getByAccId,
+};
