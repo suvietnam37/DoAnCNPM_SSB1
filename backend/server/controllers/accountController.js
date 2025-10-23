@@ -7,8 +7,8 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const handleLogin = async (req, res) => {
-  const { username, password } = req.body;
-  const data = await loginService(username, password);
+  const { username, newPassword } = req.body;
+  const data = await loginService(username, newPassword);
   return res.json(data);
 };
 
@@ -68,20 +68,52 @@ const getAccountById = async (req, res) => {
 const updateAccount = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, password, role_id, status } = req.body;
-    let hashPassword = password;
-    if (password) {
-      hashPassword = await bcrypt.hash(password, saltRounds);
+    const { username, oldPassword, newPassword, roleid, related_id } = req.body;
+
+    console.log("req : ", req.body);
+    const oldAccount = await Account.getById(id);
+    console.log("oldAccount : ", oldAccount);
+
+    if (!oldAccount) {
+      return res.status(404).json({ error: "Tài khoản không tồn tại" });
     }
-    const affected = await Account.update(id, {
-      username,
-      password: hashPassword,
-      role_id,
-      status,
+
+    const isMatch = await bcrypt.compare(oldPassword, oldAccount.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Mật khẩu cũ không đúng" });
+    }
+
+    let hashPassword = oldAccount.password;
+    if (newPassword) {
+      hashPassword = await bcrypt.hash(newPassword, saltRounds);
+    }
+
+    // ✅ cập nhật bảng account
+    const affected = await Account.update(id, username, hashPassword, roleid);
+
+    // Xóa liên kết cũ
+    if (oldAccount.role_id === 2) {
+      const oldDriver = await Driver.getByAccId(oldAccount.account_id);
+      console.log("oldDriver : ", oldDriver);
+      await Driver.assignAccount(oldDriver.driver_id, null);
+    } else if (oldAccount.role_id === 3) {
+      const oldParent = await Parent.getByAccId(oldAccount.account_id);
+      await Parent.assignAccount(oldParent.parent_id, null);
+    }
+
+    // Gán lại account_id mới
+    if (roleid === 2 && related_id) {
+      await Driver.assignAccount(related_id, id);
+    } else if (roleid === 3 && related_id) {
+      await Parent.assignAccount(related_id, id);
+    }
+
+    res.json({
+      message: "Cập nhật tài khoản thành công",
+      affectedRows: affected,
     });
-    res.json({ affectedRows: affected });
   } catch (error) {
-    console.error(error);
+    console.error("Lỗi updateAccount:", error);
     res.status(500).json({ error: "Lỗi khi cập nhật tài khoản" });
   }
 };

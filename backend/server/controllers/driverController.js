@@ -26,7 +26,7 @@ exports.getDriverById = async (req, res) => {
 
 exports.getDriverByAccId = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.params.accountId;
     const driver = await Driver.getByAccId(id);
     if (!driver) return res.status(404).json({ error: "Tài xế không tồn tại" });
     res.json(driver);

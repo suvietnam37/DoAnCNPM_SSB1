@@ -8,7 +8,7 @@ const cx = classNames.bind(styles);
 
 function ManageAccount() {
     const [accounts, setAccounts] = useState([]);
-    const [accountEdit, setAccountEdit] = useState([]);
+    const [accountEdit, setAccountEdit] = useState({});
     const [drivers, setDrivers] = useState([]);
     const [parents, setParents] = useState([]);
     const [selectedRole, setSelectedRole] = useState(''); // '' | 'Parent' | 'Driver' | 'Admin'
@@ -91,7 +91,7 @@ function ManageAccount() {
             showToast('Thêm tài khoản thành công');
             fetchAccounts(); // reload danh sách
             fetchDrivers();
-            fetchDrivers();
+            fetchParents();
             handleCloseModal();
 
             // reset state
@@ -108,7 +108,6 @@ function ManageAccount() {
 
     const handleToggleStatus = async (account) => {
         try {
-            console.log(account);
             const newStatus = account.status === 'Active' ? 'Locked' : 'Active';
 
             await axios.put(`http://localhost:5000/api/accounts/${account.account_id}/status`, {
@@ -127,7 +126,6 @@ function ManageAccount() {
 
     const handleSoftDelete = async (account) => {
         try {
-            console.log(account);
             await axios.delete(`http://localhost:5000/api/accounts/${account.account_id}`);
 
             showToast('Xóa tài khoản thành công');
@@ -156,6 +154,14 @@ function ManageAccount() {
             } else {
                 role_id = 1;
             }
+
+            console.log({
+                username: username || selectedAccount.username,
+                oldPassword: password,
+                newPassword: newPassword,
+                roleid: role_id,
+                related_id: relatedId,
+            });
 
             await axios.put(`http://localhost:5000/api/accounts/${selectedAccount.account_id}`, {
                 username: username || selectedAccount.username,
@@ -198,6 +204,15 @@ function ManageAccount() {
             console.error('Fetch error:', error);
         }
     };
+
+    useEffect(() => {
+        if (isOpenModalOpen === 'edit' && selectedAccount && selectedRole === 'Driver') {
+            const driver = drivers.find((d) => d.account_id === selectedAccount.account_id);
+            if (driver) {
+                setSelectedDriverId(driver.driver_id);
+            }
+        }
+    }, [isOpenModalOpen, selectedAccount, selectedRole, drivers]);
 
     useEffect(() => {
         if (isOpenModalOpen === 'edit' && selectedAccount) {
@@ -317,7 +332,7 @@ function ManageAccount() {
                                 type="text"
                                 placeholder="Tên tài khoản"
                                 className={cx('input')}
-                                value={selectedAccount.username}
+                                value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                             />
 
@@ -405,7 +420,10 @@ function ManageAccount() {
                                         <tbody>
                                             {selectedRole === 'Parent' &&
                                                 parents.map((parent) => {
-                                                    if (parent.account_id == selectedAccount.account_id)
+                                                    if (
+                                                        parent.account_id == selectedAccount.account_id ||
+                                                        parent.account_id == null
+                                                    )
                                                         return (
                                                             <tr key={parent.parent_id}>
                                                                 <td>{parent.parent_id}</td>
@@ -430,7 +448,10 @@ function ManageAccount() {
 
                                             {selectedRole === 'Driver' &&
                                                 drivers.map((driver) => {
-                                                    if (driver.account_id == selectedAccount.account_id)
+                                                    if (
+                                                        driver.account_id == selectedAccount.account_id ||
+                                                        driver.account_id == null
+                                                    )
                                                         return (
                                                             <tr key={driver.driver_id}>
                                                                 <td>{driver.driver_id}</td>
@@ -440,13 +461,10 @@ function ManageAccount() {
                                                                         type="radio"
                                                                         name="driver"
                                                                         value={driver.driver_id}
-                                                                        onChange={(e) =>
-                                                                            setSelectedDriverId(e.target.value)
-                                                                        }
-                                                                        checked={
-                                                                            accountEdit.account_id ==
-                                                                            selectedAccount.account_id
-                                                                        }
+                                                                        onChange={(e) => {
+                                                                            setSelectedDriverId(e.target.value);
+                                                                        }}
+                                                                        checked={selectedDriverId == driver.driver_id}
                                                                     />
                                                                 </td>
                                                             </tr>

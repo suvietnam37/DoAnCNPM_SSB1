@@ -27,8 +27,8 @@ exports.getParentById = async (req, res) => {
 
 exports.getParentByAccId = async (req, res) => {
   try {
-    const id = req.params.id;
-    const parent = await Parent.getById(id);
+    const id = req.params.accountId;
+    const parent = await Parent.getByAccId(id);
     if (!parent)
       return res.status(404).json({ error: "Phụ huynh không tồn tại" });
     res.json(parent);

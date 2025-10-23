@@ -48,6 +48,7 @@ async function remove(id) {
 }
 
 async function assignAccount(driver_id, account_id) {
+  console.log(driver_id, account_id);
   const [result] = await db.query(
     `UPDATE driver SET account_id = ? WHERE driver_id = ?`,
     [account_id, driver_id]

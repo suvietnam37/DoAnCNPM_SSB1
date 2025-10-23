@@ -32,13 +32,12 @@ const Account = {
     return result.insertId;
   },
 
-  async update(id, data) {
-    const { username, password, role_id, status } = data;
+  async update(id, username, password, roleid) {
     const [result] = await db.query(
       `UPDATE account 
-       SET username = ?, password = ?, role_id = ?, status = ?
+       SET username = ?, password = ?, role_id = ?
        WHERE account_id = ? AND is_deleted = 0`,
-      [username, password, role_id || null, status, id]
+      [username, password, roleid, id]
     );
     return result.affectedRows;
   },
