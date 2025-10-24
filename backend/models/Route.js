@@ -1,42 +1,66 @@
 // models/Route.js
 const db = require("../config/db");
 
-// Lấy tất cả route
+// Lấy tất cả tuyến đường
 async function getAll() {
-  const [rows] = await db.query("SELECT * FROM route");
+  const [rows] = await db.query(
+    "SELECT * FROM route WHERE is_deleted = 0 ORDER BY route_name ASC"
+  );
   return rows;
 }
 
-// Lấy route theo ID
+// Lấy tuyến đường theo ID
 async function getById(id) {
-  const [rows] = await db.query("SELECT * FROM route WHERE route_id = ?", [id]);
-  return rows[0];
+  const [rows] = await db.query(
+    "SELECT * FROM route WHERE route_id = ? AND is_deleted = 0",
+    [id]
+  );
+  return rows[0] || null;
 }
 
-// Thêm route mới
+// Thêm tuyến đường mới
 async function create(route) {
   const { route_name } = route;
   const [result] = await db.query(
     "INSERT INTO route (route_name) VALUES (?)",
     [route_name]
   );
-  return { id: result.insertId, ...route };
+  return { route_id: result.insertId, route_name };
 }
 
-// Cập nhật route
+// Cập nhật tuyến đường
 async function update(id, route) {
   const { route_name } = route;
-  await db.query(
-    "UPDATE route SET route_name = ? WHERE route_id = ?",
+  const [result] = await db.query(
+    "UPDATE route SET route_name = ? WHERE route_id = ? AND is_deleted = 0",
     [route_name, id]
   );
-  return { id, ...route };
+
+  if (result.affectedRows === 0) {
+    throw new Error("Route not found or already deleted");
+  }
+
+  return { route_id: id, route_name };
 }
 
-// Xóa route
-async function remove(id) {
-  await db.query("DELETE FROM route WHERE route_id = ?", [id]);
-  return { message: "Route deleted successfully" };
+// Xóa mềm tuyến đường
+async function softDelete(id) {
+  const [result] = await db.query(
+    "UPDATE route SET is_deleted = 1 WHERE route_id = ? AND is_deleted = 0",
+    [id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Route not found or already deleted");
+  }
+
+  return { message: "Route soft deleted successfully" };
 }
 
-module.exports = { getAll, getById, create, update, remove };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  softDelete,
+};

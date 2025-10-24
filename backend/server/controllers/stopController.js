@@ -59,7 +59,7 @@ exports.updateStop = async (req, res) => {
 exports.deleteStop = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await Stop.remove(id);
+    const result = await Stop.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

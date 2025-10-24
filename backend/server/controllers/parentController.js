@@ -87,7 +87,7 @@ exports.updateParent = async (req, res) => {
 exports.deleteParent = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await Parent.remove(id);
+    const result = await Parent.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

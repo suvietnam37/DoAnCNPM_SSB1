@@ -1,42 +1,120 @@
 // models/Stop.js
 const db = require("../config/db");
 
-// Lấy tất cả stop
+/**
+ * Lấy tất cả điểm dừng
+ * @returns {Array}
+ */
 async function getAll() {
-  const [rows] = await db.query("SELECT * FROM stop");
+  const [rows] = await db.query(`
+    SELECT s.*, r.route_name 
+    FROM stop s
+    JOIN route r ON s.route_id = r.route_id AND r.is_deleted = 0
+    WHERE s.is_deleted = 0
+    ORDER BY r.route_name, s.stop_name
+  `);
   return rows;
 }
 
-// Lấy stop theo ID
+/**
+ * Lấy điểm dừng theo ID
+ * @param {number} id
+ * @returns {Object|null}
+ */
 async function getById(id) {
-  const [rows] = await db.query("SELECT * FROM stop WHERE stop_id = ?", [id]);
-  return rows[0];
+  const [rows] = await db.query(
+    `SELECT s.*, r.route_name 
+     FROM stop s
+     JOIN route r ON s.route_id = r.route_id AND r.is_deleted = 0
+     WHERE s.stop_id = ? AND s.is_deleted = 0`,
+    [id]
+  );
+  return rows[0] || null;
 }
 
-// Thêm stop mới
+/**
+ * Lấy tất cả điểm dừng theo route_id
+ * @param {number} routeId
+ * @returns {Array}
+ */
+async function getByRouteId(routeId) {
+  const [rows] = await db.query(
+    `SELECT s.*, r.route_name 
+     FROM stop s
+     JOIN route r ON s.route_id = r.route_id AND r.is_deleted = 0
+     WHERE s.route_id = ? AND s.is_deleted = 0
+     ORDER BY s.stop_name`,
+    [routeId]
+  );
+  return rows;
+}
+
+/**
+ * Thêm điểm dừng mới
+ * @param {Object} stop
+ * @returns {Object}
+ */
 async function create(stop) {
-  const { route_id, stop_name } = stop; // Assuming fields from truncated SQL, adjust if more fields exist
+  const { route_id, stop_name, latitude, longitude } = stop;
   const [result] = await db.query(
-    "INSERT INTO stop (route_id, stop_name) VALUES (?, ?)",
-    [route_id, stop_name]
+    `INSERT INTO stop (route_id, stop_name, latitude, longitude) 
+     VALUES (?, ?, ?, ?)`,
+    [route_id, stop_name, latitude || null, longitude || null]
   );
-  return { id: result.insertId, ...stop };
+  return {
+    stop_id: result.insertId,
+    route_id,
+    stop_name,
+    latitude: latitude || null,
+    longitude: longitude || null,
+  };
 }
 
-// Cập nhật stop
+/**
+ * Cập nhật điểm dừng
+ * @param {number} id
+ * @param {Object} stop
+ * @returns {Object}
+ */
 async function update(id, stop) {
-  const { route_id, stop_name } = stop; // Assuming fields from truncated SQL, adjust if more fields exist
-  await db.query(
-    "UPDATE stop SET route_id = ?, stop_name = ? WHERE stop_id = ?",
-    [route_id, stop_name, id]
+  const { route_id, stop_name, latitude, longitude } = stop;
+  const [result] = await db.query(
+    `UPDATE stop 
+     SET route_id = ?, stop_name = ?, latitude = ?, longitude = ? 
+     WHERE stop_id = ? AND is_deleted = 0`,
+    [route_id, stop_name, latitude || null, longitude || null, id]
   );
-  return { id, ...stop };
+
+  if (result.affectedRows === 0) {
+    throw new Error("Stop not found or already deleted");
+  }
+
+  return { stop_id: id, route_id, stop_name, latitude, longitude };
 }
 
-// Xóa stop
-async function remove(id) {
-  await db.query("DELETE FROM stop WHERE stop_id = ?", [id]);
-  return { message: "Stop deleted successfully" };
+/**
+ * Xóa mềm điểm dừng
+ * @param {number} id
+ * @returns {Object}
+ */
+async function softDelete(id) {
+  const [result] = await db.query(
+    `UPDATE stop SET is_deleted = 1 WHERE stop_id = ? AND is_deleted = 0`,
+    [id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Stop not found or already deleted");
+  }
+
+  return { message: "Stop soft deleted successfully" };
 }
 
-module.exports = { getAll, getById, create, update, remove };
+module.exports = {
+  getAll,
+  getById,
+  getByRouteId,
+  create,
+  update,
+  softDelete,
+};

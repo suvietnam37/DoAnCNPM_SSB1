@@ -67,7 +67,7 @@ exports.updateRouteAssignment = async (req, res) => {
 exports.deleteRouteAssignment = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await RouteAssignment.remove(id);
+    const result = await RouteAssignment.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

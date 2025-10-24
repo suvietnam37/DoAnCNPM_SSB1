@@ -52,7 +52,7 @@ exports.updateBus = async (req, res) => {
 exports.deleteBus = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await Bus.remove(id);
+    const result = await Bus.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

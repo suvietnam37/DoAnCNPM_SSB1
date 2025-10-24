@@ -75,7 +75,7 @@ exports.updateDriver = async (req, res) => {
 exports.deleteDriver = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await Driver.remove(id);
+    const result = await Driver.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

@@ -67,7 +67,7 @@ exports.updateStudent = async (req, res) => {
 exports.deleteStudent = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await Student.remove(id);
+    const result = await Student.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

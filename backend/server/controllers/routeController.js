@@ -59,7 +59,7 @@ exports.updateRoute = async (req, res) => {
 exports.deleteRoute = async (req, res) => {
   try {
     const id = req.params.id;
-    const result = await Route.remove(id);
+    const result = await Route.softDelete(id);
     res.json(result);
   } catch (err) {
     console.error(err);

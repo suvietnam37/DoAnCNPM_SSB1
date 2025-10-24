@@ -1,82 +1,123 @@
 // models/Route_assignment.js
 const db = require("../config/db");
 
-// Lấy tất cả route assignment
+// Lấy tất cả phân công
 async function getAll() {
-  const [rows] = await db.query("SELECT * FROM route_assignment");
+  const [rows] = await db.query(
+    "SELECT * FROM route_assignment WHERE is_deleted = 0 ORDER BY run_date DESC, departure_time DESC"
+  );
   return rows;
 }
 
-// Lấy route assignment theo ID
+// Lấy phân công theo ID
 async function getById(id) {
-  const [rows] = await db.query("SELECT * FROM route_assignment WHERE assignment_id = ?", [id]);
-  return rows[0];
+  const [rows] = await db.query(
+    "SELECT * FROM route_assignment WHERE assignment_id = ? AND is_deleted = 0",
+    [id]
+  );
+  return rows[0] || null;
 }
 
-// Thêm route assignment mới
+// Thêm phân công mới
 async function create(routeAssignment) {
   const { route_id, driver_id, bus_id, run_date, status, departure_time } = routeAssignment;
   const [result] = await db.query(
-    "INSERT INTO route_assignment (route_id, driver_id, bus_id, run_date, status, departure_time) VALUES (?, ?, ?, ?, ?, ?)",
+    `INSERT INTO route_assignment 
+     (route_id, driver_id, bus_id, run_date, status, departure_time) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
     [route_id, driver_id, bus_id, run_date, status, departure_time]
   );
-  return { id: result.insertId, ...routeAssignment };
+  return { assignment_id: result.insertId, ...routeAssignment };
 }
 
-// Cập nhật route assignment
+// Cập nhật phân công
 async function update(id, routeAssignment) {
   const { route_id, driver_id, bus_id, run_date, status, departure_time } = routeAssignment;
-  await db.query(
-    "UPDATE route_assignment SET route_id = ?, driver_id = ?, bus_id = ?, run_date = ?, status = ?, departure_time = ? WHERE assignment_id = ?",
+  const [result] = await db.query(
+    `UPDATE route_assignment 
+     SET route_id = ?, driver_id = ?, bus_id = ?, run_date = ?, status = ?, departure_time = ? 
+     WHERE assignment_id = ? AND is_deleted = 0`,
     [route_id, driver_id, bus_id, run_date, status, departure_time, id]
   );
-  return { id, ...routeAssignment };
+
+  if (result.affectedRows === 0) {
+    throw new Error("Route assignment not found or already deleted");
+  }
+
+  return { assignment_id: id, ...routeAssignment };
 }
 
-// Xóa route assignment
-async function remove(id) {
-  await db.query("DELETE FROM route_assignment WHERE assignment_id = ?", [id]);
-  return { message: "Route assignment deleted successfully" };
+// Xóa mềm (soft delete)
+async function softDelete(id) {
+  const [result] = await db.query(
+    "UPDATE route_assignment SET is_deleted = 1 WHERE assignment_id = ? AND is_deleted = 0",
+    [id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Route assignment not found or already deleted");
+  }
+
+  return { message: "Route assignment soft deleted successfully" };
 }
 
-// Lấy tất cả các phân công của một tài xế
+// Lấy tất cả phân công của một tài xế
 async function getByDriverId(driverId) {
-    const [rows] = await db.query("SELECT * FROM route_assignment WHERE driver_id = ?", [driverId]);
-    return rows;
+  const [rows] = await db.query(
+    `SELECT ra.* 
+     FROM route_assignment ra
+     WHERE ra.driver_id = ? AND ra.is_deleted = 0
+     ORDER BY ra.run_date DESC, ra.departure_time DESC`,
+    [driverId]
+  );
+  return rows;
 }
 
-// Lấy phân công ĐANG CHẠY của một tài xế (chỉ có 1 hoặc 0). Chúng ta join các bảng để lấy tên thay vì chỉ ID, rất tiện cho frontend
+// Lấy phân công ĐANG CHẠY của một tài xế (chỉ 1 hoặc 0)
 async function getCurrentByDriverId(driverId) {
-    const [rows] = await db.query(`
-        SELECT 
-            ra.*, 
-            r.route_name, 
-            d.driver_name, 
-            b.license_plate
-        FROM route_assignment ra
-        JOIN route r ON ra.route_id = r.route_id
-        JOIN driver d ON ra.driver_id = d.driver_id
-        JOIN bus b ON ra.bus_id = b.bus_id
-        WHERE ra.driver_id = ? AND ra.status = 'Running'
-    `, [driverId]);
-    return rows[0]; // Chỉ trả về 1 object, vì mỗi lúc chỉ chạy 1 tuyến
+  const [rows] = await db.query(`
+    SELECT 
+        ra.*, 
+        r.route_name, 
+        d.driver_name, 
+        b.license_plate
+    FROM route_assignment ra
+    JOIN route r ON ra.route_id = r.route_id AND r.is_deleted = 0
+    JOIN driver d ON ra.driver_id = d.driver_id AND d.is_deleted = 0
+    JOIN bus b ON ra.bus_id = b.bus_id AND b.is_deleted = 0
+    WHERE ra.driver_id = ? 
+      AND ra.status = 'Running' 
+      AND ra.is_deleted = 0
+  `, [driverId]);
+  return rows[0] || null;
 }
 
-// Lấy phân công ĐANG CHẠY của một tuyến (chỉ có 1 hoặc 0). Chúng ta join các bảng để lấy tên thay vì chỉ ID, rất tiện cho frontend
+// Lấy phân công ĐANG CHẠY của một tuyến (chỉ 1 hoặc 0)
 async function getCurrentByRouteId(routeId) {
-    const [rows] = await db.query(`
-        SELECT 
-            ra.*, 
-            r.route_name, 
-            d.driver_name, 
-            b.license_plate
-        FROM route_assignment ra
-        JOIN route r ON ra.route_id = r.route_id
-        JOIN driver d ON ra.driver_id = d.driver_id
-        JOIN bus b ON ra.bus_id = b.bus_id
-        WHERE ra.route_id = ? AND ra.status = 'Running'
-    `, [routeId]);
-    return rows[0];
+  const [rows] = await db.query(`
+    SELECT 
+        ra.*, 
+        r.route_name, 
+        d.driver_name, 
+        b.license_plate
+    FROM route_assignment ra
+    JOIN route r ON ra.route_id = r.route_id AND r.is_deleted = 0
+    JOIN driver d ON ra.driver_id = d.driver_id AND d.is_deleted = 0
+    JOIN bus b ON ra.bus_id = b.bus_id AND b.is_deleted = 0
+    WHERE ra.route_id = ? 
+      AND ra.status = 'Running' 
+      AND ra.is_deleted = 0
+  `, [routeId]);
+  return rows[0] || null;
 }
 
-module.exports = { getAll, getById, create, update, remove, getByDriverId, getCurrentByDriverId, getCurrentByRouteId };
+module.exports = {
+  getAll,
+  getById,
+  create,
+  update,
+  softDelete,
+  getByDriverId,
+  getCurrentByDriverId,
+  getCurrentByRouteId,
+};
