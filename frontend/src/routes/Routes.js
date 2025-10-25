@@ -19,7 +19,6 @@ const publicRoutes = [
     { path: '/', component: LoginPage, layout: null },
     { path: '/parent', component: ParentPage },
     { path: '/driver', component: DriverPage },
-
     { path: '/admin', component: LoginAdminPage, layout: null },
 ];
 

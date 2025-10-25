@@ -43,7 +43,7 @@ function App() {
         <Router>
             <div className="App">
                 <Routes>
-                    {renderRoutes(publicRoutes, false)}
+                    {renderRoutes(publicRoutes, true)}
                     {renderRoutes(privateRoutes, true)}
                 </Routes>
             </div>

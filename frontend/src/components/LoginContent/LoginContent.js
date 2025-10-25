@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './LoginContent.module.scss';
@@ -10,6 +10,12 @@ function LoginContent() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Khi vào trang login => luôn xóa token cũ
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('role');
+    }, []);
 
     const onLogin = async (e) => {
         e.preventDefault();
@@ -37,7 +43,8 @@ function LoginContent() {
             }
 
             // Login thành công
-            localStorage.setItem('access_token', data.access_token);
+            sessionStorage.setItem('access_token', data.access_token);
+            sessionStorage.setItem('role', data.account.role);
             showToast('Đăng nhập thành công');
 
             // Điều hướng theo role

@@ -1,12 +1,17 @@
 import { Navigate } from 'react-router-dom';
 
 function PrivateRoute({ children }) {
-    const token = true; // token của admin
-    // const token = localStorage.getItem('adminToken'); // token của admin
+    // const token = true;
+    const token = sessionStorage.getItem('access_token');
+    // const role = sessionStorage.getItem('role');
+    const segment = window.location.pathname; // "admin"
 
-    // Nếu chưa đăng nhập → quay lại trang /admin (login)
     if (!token) {
-        return <Navigate to="/admin" />;
+        if (segment === '/admin/dashboard') {
+            return <Navigate to="/admin" />;
+        } else if (segment === '/parent' || segment === '/driver') {
+            return <Navigate to="/" />;
+        }
     }
 
     return children;

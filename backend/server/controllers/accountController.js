@@ -7,8 +7,8 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const handleLogin = async (req, res) => {
-  const { username, newPassword } = req.body;
-  const data = await loginService(username, newPassword);
+  const { username, password } = req.body;
+  const data = await loginService(username, password);
   return res.json(data);
 };
 
@@ -70,9 +70,7 @@ const updateAccount = async (req, res) => {
     const { id } = req.params;
     const { username, oldPassword, newPassword, roleid, related_id } = req.body;
 
-    console.log("req : ", req.body);
     const oldAccount = await Account.getById(id);
-    console.log("oldAccount : ", oldAccount);
 
     if (!oldAccount) {
       return res.status(404).json({ error: "Tài khoản không tồn tại" });
@@ -94,7 +92,6 @@ const updateAccount = async (req, res) => {
     // Xóa liên kết cũ
     if (oldAccount.role_id === 2) {
       const oldDriver = await Driver.getByAccId(oldAccount.account_id);
-      console.log("oldDriver : ", oldDriver);
       await Driver.assignAccount(oldDriver.driver_id, null);
     } else if (oldAccount.role_id === 3) {
       const oldParent = await Parent.getByAccId(oldAccount.account_id);

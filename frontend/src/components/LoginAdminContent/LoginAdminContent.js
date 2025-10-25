@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './LoginAdminContent.module.scss';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,12 @@ function LoginAdminContent() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Khi vào trang login => luôn xóa token cũ
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('role');
+    }, []);
 
     const onLogin = async (e) => {
         e.preventDefault(); // Ngăn reload trang
@@ -31,7 +37,8 @@ function LoginAdminContent() {
                 showToast('Đăng nhập thất bại', false);
                 return;
             }
-            localStorage.setItem('access_token', data.access_token);
+            sessionStorage.setItem('access_token', data.access_token);
+            sessionStorage.setItem('role', data.account.role);
             showToast('Đăng nhập thành công');
             // console.log('Login successful:', data);
             navigate('/admin/dashboard');
