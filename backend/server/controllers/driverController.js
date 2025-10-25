@@ -39,13 +39,22 @@ exports.getDriverByAccId = async (req, res) => {
 // Thêm tài xế mới
 exports.createDriver = async (req, res) => {
   try {
-    const { driver_name, account_id } = req.body;
-    if (!driver_name || !account_id) {
-      return res
-        .status(400)
-        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+    // 1. Chỉ lấy 'driver_name' từ body request.
+    const { driver_name } = req.body;
+
+    // 2. Kiểm tra xem 'driver_name' có tồn tại không.
+    if (!driver_name) {
+      return res.status(400).json({ error: "Tên tài xế là bắt buộc" });
     }
-    const newDriver = await Driver.create({ driver_name, account_id });
+
+    // 3. Tạo một object driver mới, gán `account_id` là null.
+    //    Model Driver.create sẽ nhận object này.
+    const newDriverData = {
+      driver_name: driver_name,
+      account_id: null,
+    };
+    
+    const newDriver = await Driver.create(newDriverData);
     res.status(201).json(newDriver);
   } catch (err) {
     console.error(err);
@@ -57,13 +66,27 @@ exports.createDriver = async (req, res) => {
 exports.updateDriver = async (req, res) => {
   try {
     const id = req.params.id;
-    const { driver_name, account_id } = req.body;
-    if (!driver_name || !account_id) {
-      return res
-        .status(400)
-        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+    // 1. Chỉ lấy 'driver_name' từ body.
+    const { driver_name } = req.body;
+
+    // 2. Validation
+    if (!driver_name) {
+      return res.status(400).json({ error: "Tên tài xế là bắt buộc" });
     }
-    const updatedDriver = await Driver.update(id, { driver_name, account_id });
+
+    // 3. Lấy thông tin tài xế hiện tại để không làm mất account_id đã liên kết.
+    const existingDriver = await Driver.getById(id);
+    if (!existingDriver) {
+      return res.status(404).json({ error: "Tài xế không tồn tại" });
+    }
+
+    // 4. Tạo object cập nhật: tên mới và account_id cũ.
+    const updatedDriverData = {
+      driver_name: driver_name,
+      account_id: existingDriver.account_id, // Giữ lại account_id hiện có
+    };
+
+    const updatedDriver = await Driver.update(id, updatedDriverData);
     res.json(updatedDriver);
   } catch (err) {
     console.error(err);

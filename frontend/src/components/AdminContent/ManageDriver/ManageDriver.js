@@ -1,8 +1,9 @@
-// src/pages/ManageDriver/ManageDriver.js
+// src/components/AdminContent/ManageDriver/ManageDriver.js
 import styles from './ManageDriver.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +20,7 @@ function ManageDriver() {
             setDrivers(response.data);
         } catch (error) {
             console.error('Fetch error:', error);
+            showToast('Không thể tải danh sách tài xế.', false);
         }
     };
 
@@ -47,15 +49,16 @@ function ManageDriver() {
             return;
         }
         try {
+            // Chỉ gửi `driver_name`, không gửi `account_id`
             await axios.post('http://localhost:5000/api/drivers', {
                 driver_name: driverName,
             });
-            alert('Thêm tài xế thành công!');
+            showToast('Thêm tài xế thành công!', true);
             handleCloseModal();
-            fetchDrivers();
+            fetchDrivers(); // Tải lại danh sách
         } catch (error) {
             console.error('Add driver error:', error);
-            alert('Lỗi khi thêm tài xế.');
+            showToast('Lỗi khi thêm tài xế.', false);
         }
     };
 
@@ -66,28 +69,30 @@ function ManageDriver() {
             return;
         }
         try {
+            // Chỉ gửi `driver_name`, không gửi `account_id`
             await axios.put(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`, {
                 driver_name: driverName,
             });
-            alert('Cập nhật tài xế thành công!');
+            showToast('Cập nhật tài xế thành công!', true);
             handleCloseModal();
-            fetchDrivers();
+            fetchDrivers(); // Tải lại danh sách
         } catch (error) {
             console.error('Edit driver error:', error);
-            alert('Lỗi khi sửa tài xế.');
+            showToast('Lỗi khi sửa tài xế.', false);
         }
     };
 
     // Xóa tài xế
     const handleDeleteDriver = async () => {
         try {
+            // Gọi đến API xóa mềm
             await axios.delete(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`);
-            alert('Xóa tài xế thành công!');
+            showToast('Xóa tài xế thành công!', true);
             handleCloseModal();
-            fetchDrivers();
+            fetchDrivers(); // Tải lại danh sách
         } catch (error) {
             console.error('Delete driver error:', error);
-            alert('Lỗi khi xóa tài xế.');
+            showToast('Lỗi khi xóa tài xế.', false);
         }
     };
 

@@ -1,8 +1,9 @@
-// src/pages/ManageParent/ManageParent.js
+// src/components/AdminContent/ManageParent/ManageParent.js
 import styles from './ManageParent.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -20,7 +21,8 @@ function ManageParent() {
             const response = await axios.get('http://localhost:5000/api/parents');
             setParents(response.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            console.error('Lỗi khi tải danh sách phụ huynh:', error);
+            showToast('Không thể tải danh sách phụ huynh.', false);
         }
     };
 
@@ -28,76 +30,88 @@ function ManageParent() {
         fetchParents();
     }, []);
 
-    // Mở modal
-    const handleOpenModal = (type, parent = null) => {
-        setIsOpenModal(type);
-        setSelectedParent(parent);
-        setParentName(parent ? parent.parent_name : '');
-        setPhone(parent ? parent.phone : '');
-        setEmail(parent ? parent.email : '');
-    };
-
-    // Đóng modal
-    const handleCloseModal = () => {
-        setIsOpenModal('');
-        setSelectedParent(null);
+    // Hàm reset state của form
+    const resetFormState = () => {
         setParentName('');
         setPhone('');
         setEmail('');
+        setSelectedParent(null);
     };
 
-    // Thêm phụ huynh
+    // Hàm mở modal
+    const handleOpenModal = (type, parent = null) => {
+        resetFormState();
+        if (parent) {
+            setSelectedParent(parent);
+            setParentName(parent.parent_name);
+            setPhone(parent.phone);
+            setEmail(parent.email);
+        }
+        setIsOpenModal(type);
+    };
+
+    // Hàm đóng modal
+    const handleCloseModal = () => {
+        setIsOpenModal('');
+        resetFormState();
+    };
+
+    // Hàm xử lý thêm phụ huynh mới
     const handleAddParent = async () => {
         if (!parentName.trim() || !phone.trim() || !email.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+            showToast('Vui lòng nhập đầy đủ thông tin!', false);
             return;
         }
         try {
-            await axios.post('http://localhost:5000/api/parents', {
+            // Payload chỉ chứa thông tin của phụ huynh, không có account_id
+            const payload = {
                 parent_name: parentName,
                 phone: phone,
                 email: email,
-            });
-            alert('Thêm phụ huynh thành công!');
+            };
+            await axios.post('http://localhost:5000/api/parents', payload);
+            showToast('Thêm phụ huynh thành công!', true);
             handleCloseModal();
-            fetchParents();
+            fetchParents(); // Tải lại danh sách để cập nhật
         } catch (error) {
-            console.error('Add parent error:', error);
-            alert('Lỗi khi thêm phụ huynh.');
+            console.error('Lỗi khi thêm phụ huynh:', error);
+            showToast('Lỗi khi thêm phụ huynh.', false);
         }
     };
 
-    // Sửa phụ huynh
+    // Hàm xử lý sửa thông tin phụ huynh
     const handleEditParent = async () => {
         if (!parentName.trim() || !phone.trim() || !email.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+            showToast('Vui lòng nhập đầy đủ thông tin!', false);
             return;
         }
         try {
-            await axios.put(`http://localhost:5000/api/parents/${selectedParent.parent_id}`, {
+             // Payload chỉ chứa thông tin cần cập nhật của phụ huynh
+            const payload = {
                 parent_name: parentName,
                 phone: phone,
                 email: email,
-            });
-            alert('Cập nhật phụ huynh thành công!');
+            };
+            await axios.put(`http://localhost:5000/api/parents/${selectedParent.parent_id}`, payload);
+            showToast('Cập nhật phụ huynh thành công!', true);
             handleCloseModal();
-            fetchParents();
+            fetchParents(); // Tải lại danh sách
         } catch (error) {
-            console.error('Edit parent error:', error);
-            alert('Lỗi khi sửa phụ huynh.');
+            console.error('Lỗi khi sửa phụ huynh:', error);
+            showToast('Lỗi khi sửa phụ huynh.', false);
         }
     };
 
-    // Xóa phụ huynh
+    // Hàm xử lý xóa (mềm) phụ huynh
     const handleDeleteParent = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/parents/${selectedParent.parent_id}`);
-            alert('Xóa phụ huynh thành công!');
+            showToast('Xóa phụ huynh thành công!', true);
             handleCloseModal();
-            fetchParents();
+            fetchParents(); // Tải lại danh sách
         } catch (error) {
-            console.error('Delete parent error:', error);
-            alert('Lỗi khi xóa phụ huynh.');
+            console.error('Lỗi khi xóa phụ huynh:', error);
+            showToast('Lỗi khi xóa phụ huynh.', false);
         }
     };
 

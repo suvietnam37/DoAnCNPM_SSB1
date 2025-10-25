@@ -32,7 +32,6 @@ async function create(parent) {
     "INSERT INTO parent (parent_name, phone, email, account_id) VALUES (?, ?, ?, ?)",
     [parent_name, phone, email, account_id]
   );
-  returnwszy
   return { parent_id: result.insertId, parent_name, phone, email, account_id };
 }
 

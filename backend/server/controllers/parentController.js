@@ -41,18 +41,25 @@ exports.getParentByAccId = async (req, res) => {
 // Thêm phụ huynh mới
 exports.createParent = async (req, res) => {
   try {
-    const { parent_name, phone, email, account_id } = req.body;
-    if (!parent_name || !phone || !email || !account_id) {
+    // 1. Chỉ lấy các thông tin của phụ huynh từ body.
+    const { parent_name, phone, email } = req.body;
+
+    // 2. Validation.
+    if (!parent_name || !phone || !email) {
       return res
         .status(400)
-        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+        .json({ error: "Vui lòng nhập đầy đủ Tên, SĐT và Email." });
     }
-    const newParent = await Parent.create({
+
+    // 3. Tạo object mới với account_id là null.
+    const newParentData = {
       parent_name,
       phone,
       email,
-      account_id,
-    });
+      account_id: null,
+    };
+
+    const newParent = await Parent.create(newParentData);
     res.status(201).json(newParent);
   } catch (err) {
     console.error(err);
@@ -64,18 +71,31 @@ exports.createParent = async (req, res) => {
 exports.updateParent = async (req, res) => {
   try {
     const id = req.params.id;
-    const { parent_name, phone, email, account_id } = req.body;
-    if (!parent_name || !phone || !email || !account_id) {
+    // 1. Chỉ lấy các thông tin cần sửa từ body.
+    const { parent_name, phone, email } = req.body;
+
+    // 2. Validation.
+    if (!parent_name || !phone || !email) {
       return res
         .status(400)
-        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+        .json({ error: "Vui lòng nhập đầy đủ Tên, SĐT và Email." });
     }
-    const updatedParent = await Parent.update(id, {
+
+    // 3. Lấy thông tin phụ huynh hiện tại để không làm mất account_id đã liên kết.
+    const existingParent = await Parent.getById(id);
+    if (!existingParent) {
+        return res.status(404).json({ error: "Phụ huynh không tồn tại" });
+    }
+    
+    // 4. Tạo object cập nhật với thông tin mới và account_id cũ.
+    const updatedParentData = {
       parent_name,
       phone,
       email,
-      account_id,
-    });
+      account_id: existingParent.account_id, // Giữ lại account_id hiện có
+    };
+
+    const updatedParent = await Parent.update(id, updatedParentData);
     res.json(updatedParent);
   } catch (err) {
     console.error(err);
