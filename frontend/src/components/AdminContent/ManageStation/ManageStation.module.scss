@@ -48,6 +48,7 @@
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    width: 30%;
 }
 
 .table {
@@ -132,7 +133,7 @@
     padding: 30px;
     border-radius: 8px;
     width: 90%;
-    max-width: 400px;
+    // max-width: 400px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
@@ -165,4 +166,11 @@
     //     gap: 10px;
     //     justify-content: center;
     // }
+}
+
+.select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }

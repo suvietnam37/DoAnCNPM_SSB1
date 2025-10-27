@@ -4,6 +4,19 @@ import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+import LocationPicker from './LocationPicker';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 const cx = classNames.bind(styles);
 
 function ManageStation() {
@@ -13,8 +26,7 @@ function ManageStation() {
     const [stopName, setStopName] = useState('');
     const [address, setAddress] = useState('');
     const [routeId, setRouteId] = useState('');
-
-    // Giả sử có danh sách routes để chọn, nhưng để đơn giản, dùng input text
+    const [position, setPosition] = useState([10.762622, 106.660172]); // mặc định HCM
 
     // Lấy danh sách trạm từ API
     const fetchStops = async () => {
@@ -37,6 +49,9 @@ function ManageStation() {
         setStopName(stop ? stop.stop_name : '');
         setAddress(stop ? stop.address : ''); // Giả sử có address
         setRouteId(stop ? stop.route_id : '');
+        setPosition(
+            stop && stop.latitude && stop.longitude ? [stop.latitude, stop.longitude] : [10.762622, 106.660172],
+        );
     };
 
     // Đóng modal
@@ -57,8 +72,10 @@ function ManageStation() {
         try {
             await axios.post('http://localhost:5000/api/stops', {
                 stop_name: stopName,
-                address: address,
+                address,
                 route_id: routeId,
+                latitude: position[0],
+                longitude: position[1],
             });
             alert('Thêm trạm thành công!');
             handleCloseModal();
@@ -78,8 +95,10 @@ function ManageStation() {
         try {
             await axios.put(`http://localhost:5000/api/stops/${selectedStop.stop_id}`, {
                 stop_name: stopName,
-                address: address,
+                address,
                 route_id: routeId,
+                latitude: position[0],
+                longitude: position[1],
             });
             alert('Cập nhật trạm thành công!');
             handleCloseModal();
@@ -138,7 +157,10 @@ function ManageStation() {
                                 </button>
                             </td>
                             <td>
-                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', stop)}>
+                                <button
+                                    className={cx('btn', 'details')}
+                                    onClick={() => handleOpenModal('details', stop)}
+                                >
                                     ...
                                 </button>
                             </td>
@@ -172,13 +194,64 @@ function ManageStation() {
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
                             />
-                            <input
+                            {/* <input
                                 type="text"
                                 placeholder="Mã tuyến"
                                 className={cx('input')}
                                 value={routeId}
                                 onChange={(e) => setRouteId(e.target.value)}
-                            />
+                            /> */}
+
+                            <div className={cx('table-wrapper')}>
+                                <table className={cx('table')}>
+                                    <thead>
+                                        <tr>
+                                            <th>Mã tuyến</th>
+                                            <th>Tên tuyến</th>
+                                            <th>Chọn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style={{ height: '240px', width: '80%' }}>
+                                <MapContainer
+                                    key={address} // remount mỗi khi address thay đổi, đảm bảo reset popup
+                                    center={position}
+                                    zoom={13}
+                                    style={{ height: '240px', width: '80%' }}
+                                >
+                                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    <LocationPicker
+                                        position={position}
+                                        setPosition={setPosition}
+                                        address={address}
+                                        setAddress={setAddress}
+                                    />
+                                </MapContainer>
+                            </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditStop}>
                                     Cập nhật
@@ -213,14 +286,61 @@ function ManageStation() {
                                 className={cx('input')}
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
+                                readOnly
                             />
-                            <input
+                            {/* <input
                                 type="text"
                                 placeholder="Mã tuyến"
                                 className={cx('input')}
                                 value={routeId}
                                 onChange={(e) => setRouteId(e.target.value)}
-                            />
+                            /> */}
+
+                            <div className={cx('table-wrapper')}>
+                                <table className={cx('table')}>
+                                    <thead>
+                                        <tr>
+                                            <th>Mã tuyến</th>
+                                            <th>Tên tuyến</th>
+                                            <th>Chọn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R01</td>
+                                            <td>Cầu Ông Lãnh</td>
+                                            <td>
+                                                <input type="radio" name="route" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style={{ height: '240px', width: '80%' }}>
+                                <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
+                                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    <LocationPicker
+                                        position={position}
+                                        setPosition={setPosition}
+                                        address={address}
+                                        setAddress={setAddress}
+                                    />
+                                </MapContainer>
+                            </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddStop}>
                                     Thêm
