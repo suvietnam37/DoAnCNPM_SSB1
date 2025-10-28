@@ -27,6 +27,9 @@ async function getById(id) {
 
 // Lấy tất cả điểm dừng theo route_id
 async function getByRouteId(routeId) {
+  if (!routeId) {
+    throw new Error("routeId is required");
+  }
   const [rows] = await db.query(
     `SELECT s.*, r.route_name 
      FROM stop s
@@ -35,6 +38,7 @@ async function getByRouteId(routeId) {
      ORDER BY s.stop_name`,
     [routeId]
   );
+  console.log(`[Stop] getByRouteId(${routeId}) -> ${rows.length} results`);
   return rows;
 }
 
