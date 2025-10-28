@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client'; // 🆕 Thêm socket.io-client
 import NavMenu from '../NavMenu/NavMenu';
 import classNames from 'classnames/bind';
 import styles from './ParentContent.module.scss';
@@ -13,6 +14,9 @@ const cx = classNames.bind(styles);
 // Giả định ID của phụ huynh và tài khoản
 const LOGGED_IN_PARENT_ID = 1;
 const LOGGED_IN_PARENT_ACCOUNT_ID = 3;
+
+// 🆕 Tạo kết nối socket (chỉ cần tạo 1 lần)
+const socket = io('http://localhost:5000'); // Đổi URL theo backend của bạn nếu khác
 
 function ParentContent() {
     // State quản lý dữ liệu
@@ -37,16 +41,14 @@ function ParentContent() {
 
                 // Bước 2: Dựa vào thông tin con, tìm tuyến xe đang chạy
                 if (studentList.length > 0) {
-                    // Lấy route_id từ người con đầu tiên (giả định các con đi cùng tuyến)
                     const routeId = studentList[0].route_id;
-                    
-                    // Bước 3: Gọi API để lấy thông tin tuyến đang chạy
+
                     try {
                         const routeStatusRes = await axios.get(`http://localhost:5000/api/route_assignments/current?route_id=${routeId}`);
-                        setRouteStatus(routeStatusRes.data); // Sẽ là null nếu tuyến không chạy
+                        setRouteStatus(routeStatusRes.data);
                     } catch (routeError) {
-                         console.log('Tuyến xe của con hiện không hoạt động.');
-                         setRouteStatus(null);
+                        console.log('Tuyến xe của con hiện không hoạt động.');
+                        setRouteStatus(null);
                     }
                 }
             } catch (error) {
@@ -58,6 +60,25 @@ function ParentContent() {
 
         fetchParentData();
     }, []);
+
+    // 🆕 useEffect cho socket.io: nhận dữ liệu thời gian thực
+    useEffect(() => {
+        socket.on('busLocationUpdate', (data) => {
+            console.log('Nhận vị trí xe buýt mới:', data);
+            // Nếu tuyến hiện tại trùng với route_id của dữ liệu gửi đến → cập nhật giao diện
+            if (routeStatus && data.route_id === routeStatus.route_id) {
+                setRouteStatus((prev) => ({
+                    ...prev,
+                    current_location: data.location,
+                }));
+            }
+        });
+
+        // Cleanup khi component unmount
+        return () => {
+            socket.off('busLocationUpdate');
+        };
+    }, [routeStatus]);
 
     const menus = [
         { name: 'Trạng Thái Tuyến Xe', id: 'route-status', offset: -300 },
@@ -74,7 +95,6 @@ function ParentContent() {
         <div className={cx('header-position')}>
             <NavMenu menus={menus} role={'Parent'} />
             <div className={cx('content-position')}>
-                {/* Truyền dữ liệu xuống các component con */}
                 <RouteStatus routeStatus={routeStatus} />
                 <StudentManage students={students} />
                 <Notification notifications={notifications} />
