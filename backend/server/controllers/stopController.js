@@ -3,7 +3,15 @@ const Stop = require("../../models/Stop");
 // Lấy danh sách tất cả điểm dừng
 exports.getAllStops = async (req, res) => {
   try {
-    const results = await Stop.getAll();
+    const { route_id } = req.query; // Lấy route_id từ query
+    let results;
+
+    if (route_id) {
+        results = await Stop.getByRouteId(route_id);
+    } else {
+        results = await Stop.getAll();
+    }
+    
     res.json(results);
   } catch (err) {
     console.error(err);

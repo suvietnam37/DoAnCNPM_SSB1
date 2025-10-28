@@ -1,10 +1,7 @@
 // models/Stop.js
 const db = require("../config/db");
 
-/**
- * Lấy tất cả điểm dừng
- * @returns {Array}
- */
+// Lấy tất cả điểm dừng
 async function getAll() {
   const [rows] = await db.query(`
     SELECT s.*, r.route_name 
@@ -16,11 +13,7 @@ async function getAll() {
   return rows;
 }
 
-/**
- * Lấy điểm dừng theo ID
- * @param {number} id
- * @returns {Object|null}
- */
+// Lấy điểm dừng theo ID
 async function getById(id) {
   const [rows] = await db.query(
     `SELECT s.*, r.route_name 
@@ -32,11 +25,7 @@ async function getById(id) {
   return rows[0] || null;
 }
 
-/**
- * Lấy tất cả điểm dừng theo route_id
- * @param {number} routeId
- * @returns {Array}
- */
+// Lấy tất cả điểm dừng theo route_id
 async function getByRouteId(routeId) {
   const [rows] = await db.query(
     `SELECT s.*, r.route_name 
@@ -49,11 +38,7 @@ async function getByRouteId(routeId) {
   return rows;
 }
 
-/**
- * Thêm điểm dừng mới
- * @param {Object} stop
- * @returns {Object}
- */
+// Thêm điểm dừng mới
 async function create(stop) {
   const { route_id, stop_name, latitude, longitude } = stop;
   const [result] = await db.query(
@@ -70,12 +55,7 @@ async function create(stop) {
   };
 }
 
-/**
- * Cập nhật điểm dừng
- * @param {number} id
- * @param {Object} stop
- * @returns {Object}
- */
+// Cập nhật điểm dừng
 async function update(id, stop) {
   const { route_id, stop_name, latitude, longitude } = stop;
   const [result] = await db.query(
@@ -92,11 +72,7 @@ async function update(id, stop) {
   return { stop_id: id, route_id, stop_name, latitude, longitude };
 }
 
-/**
- * Xóa mềm điểm dừng
- * @param {number} id
- * @returns {Object}
- */
+// Xóa mềm điểm dừng
 async function softDelete(id) {
   const [result] = await db.query(
     `UPDATE stop SET is_deleted = 1 WHERE stop_id = ? AND is_deleted = 0`,

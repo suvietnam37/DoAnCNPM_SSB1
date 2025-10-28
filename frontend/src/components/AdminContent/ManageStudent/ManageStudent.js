@@ -1,113 +1,150 @@
-// src/pages/ManageStudent/ManageStudent.js
+// src/components/AdminContent/ManageStudent/ManageStudent.js
 import styles from './ManageStudent.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
 function ManageStudent() {
     const [students, setStudents] = useState([]);
+    const [parents, setParents] = useState([]);
+    const [routes, setRoutes] = useState([]);
+    const [allStops, setAllStops] = useState([]);
+    const [filteredStops, setFilteredStops] = useState([]);
+
     const [isOpenModal, setIsOpenModal] = useState('');
     const [selectedStudent, setSelectedStudent] = useState(null);
+
     const [studentName, setStudentName] = useState('');
     const [className, setClassName] = useState('');
-    const [parentId, setParentId] = useState('');
-    const [stopId, setStopId] = useState('');
     const [isAbsent, setIsAbsent] = useState(0);
+    const [selectedRouteId, setSelectedRouteId] = useState(null);
+    const [selectedStopId, setSelectedStopId] = useState(null);
+    const [selectedParentId, setSelectedParentId] = useState(null);
 
-    // Lấy danh sách học sinh từ API
-    const fetchStudents = async () => {
+    const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/students');
-            setStudents(response.data);
+            const [studentsRes, parentsRes, routesRes, stopsRes] = await Promise.all([
+                axios.get('http://localhost:5000/api/students'),
+                axios.get('http://localhost:5000/api/parents'),
+                axios.get('http://localhost:5000/api/routes'),
+                axios.get('http://localhost:5000/api/stops')
+            ]);
+            setStudents(studentsRes.data);
+            setParents(parentsRes.data);
+            setRoutes(routesRes.data);
+            setAllStops(stopsRes.data);
         } catch (error) {
-            console.error('Fetch error:', error);
+            console.error("Lỗi khi tải dữ liệu:", error);
+            showToast("Không thể tải dữ liệu trang.", false);
         }
     };
 
     useEffect(() => {
-        fetchStudents();
+        fetchData();
     }, []);
 
-    // Mở modal
-    const handleOpenModal = (type, student = null) => {
-        setIsOpenModal(type);
-        setSelectedStudent(student);
-        setStudentName(student ? student.student_name : '');
-        setClassName(student ? student.class_name : '');
-        setParentId(student ? student.parent_id : '');
-        setStopId(student ? student.stop_id : '');
-        setIsAbsent(student ? student.is_absent : 0);
-    };
+    useEffect(() => {
+        if (!selectedRouteId) {
+            setFilteredStops([]);
+            return;
+        }
+        const stopsForRoute = allStops.filter(stop => String(stop.route_id) === String(selectedRouteId));
+        setFilteredStops(stopsForRoute);
+    }, [selectedRouteId, allStops]);
 
-    // Đóng modal
-    const handleCloseModal = () => {
-        setIsOpenModal('');
-        setSelectedStudent(null);
+    const resetFormState = () => {
         setStudentName('');
         setClassName('');
-        setParentId('');
-        setStopId('');
         setIsAbsent(0);
+        setSelectedRouteId(null);
+        setSelectedStopId(null);
+        setSelectedParentId(null);
+        setSelectedStudent(null);
+        setFilteredStops([]);
     };
 
-    // Thêm học sinh
+    const handleOpenModal = (type, student = null) => {
+        resetFormState();
+        setIsOpenModal(type);
+
+        if (student) {
+            setSelectedStudent(student);
+            if (type === 'edit') {
+                setStudentName(student.student_name);
+                setClassName(student.class_name);
+                setSelectedParentId(String(student.parent_id));
+                setSelectedStopId(String(student.stop_id));
+                setIsAbsent(student.is_absent);
+
+                const currentStop = allStops.find(stop => String(stop.stop_id) === String(student.stop_id));
+                if (currentStop) {
+                    setSelectedRouteId(String(currentStop.route_id));
+                }
+            }
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsOpenModal('');
+        resetFormState();
+    };
+
     const handleAddStudent = async () => {
-        if (!studentName.trim() || !className.trim() || !parentId.trim() || !stopId.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+        if (!studentName.trim() || !className.trim() || !selectedParentId || !selectedStopId) {
+            showToast('Vui lòng điền đủ thông tin và chọn tuyến, trạm, phụ huynh!', false);
             return;
         }
         try {
             await axios.post('http://localhost:5000/api/students', {
                 student_name: studentName,
                 class_name: className,
-                parent_id: parentId,
-                stop_id: stopId,
+                parent_id: selectedParentId,
+                stop_id: selectedStopId,
                 is_absent: isAbsent,
             });
-            alert('Thêm học sinh thành công!');
+            showToast('Thêm học sinh thành công!', true);
             handleCloseModal();
-            fetchStudents();
+            fetchData();
         } catch (error) {
             console.error('Add student error:', error);
-            alert('Lỗi khi thêm học sinh.');
+            showToast('Lỗi khi thêm học sinh.', false);
         }
     };
 
-    // Sửa học sinh
     const handleEditStudent = async () => {
-        if (!studentName.trim() || !className.trim() || !parentId.trim() || !stopId.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+        if (!studentName.trim() || !className.trim() || !selectedParentId || !selectedStopId) {
+            showToast('Vui lòng điền đủ thông tin!', false);
             return;
         }
         try {
             await axios.put(`http://localhost:5000/api/students/${selectedStudent.student_id}`, {
                 student_name: studentName,
                 class_name: className,
-                parent_id: parentId,
-                stop_id: stopId,
+                parent_id: selectedParentId,
+                stop_id: selectedStopId,
                 is_absent: isAbsent,
             });
-            alert('Cập nhật học sinh thành công!');
+            showToast('Cập nhật học sinh thành công!', true);
             handleCloseModal();
-            fetchStudents();
+            fetchData();
         } catch (error) {
             console.error('Edit student error:', error);
-            alert('Lỗi khi sửa học sinh.');
+            showToast('Lỗi khi cập nhật học sinh.', false);
         }
     };
 
-    // Xóa học sinh
     const handleDeleteStudent = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/students/${selectedStudent.student_id}`);
-            alert('Xóa học sinh thành công!');
+            showToast('Xóa học sinh thành công!', true);
             handleCloseModal();
-            fetchStudents();
+            fetchData();
         } catch (error) {
             console.error('Delete student error:', error);
-            alert('Lỗi khi xóa học sinh.');
+            showToast('Lỗi khi xóa học sinh.', false);
         }
     };
 
@@ -119,15 +156,16 @@ function ManageStudent() {
                     Thêm học sinh
                 </button>
             </div>
+
             <table className={cx('table')}>
                 <thead>
                     <tr>
-                        <th>Mã học sinh</th>
+                        <th>Mã HS</th>
                         <th>Tên học sinh</th>
                         <th>Lớp</th>
-                        <th>Mã phụ huynh</th>
+                        <th>Mã PH</th>
                         <th>Mã trạm</th>
-                        <th>Vắng</th>
+                        <th>Vắng mặt</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
                     </tr>
@@ -140,147 +178,189 @@ function ManageStudent() {
                             <td>{student.class_name}</td>
                             <td>{student.parent_id}</td>
                             <td>{student.stop_id}</td>
-                            <td>{student.is_absent}</td>
+                            <td>{student.is_absent ? 'Có' : 'Không'}</td>
                             <td>
-                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', student)}>
-                                    Sửa
-                                </button>
-                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', student)}>
-                                    Xóa
-                                </button>
+                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', student)}>Sửa</button>
+                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', student)}>Xóa</button>
                             </td>
                             <td>
-                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', student)}>
-                                    ...
-                                </button>
+                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', student)}>...</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            {/* Modal Sửa */}
-            {isOpenModal === 'edit' && (
-                <div className={cx('modal-overlay')}>
-                    <div className={cx('modal-content')}>
-                        <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
-                            </button>
-                        </div>
-                        <h3>Sửa học sinh</h3>
-                        <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên học sinh"
-                                className={cx('input')}
-                                value={studentName}
-                                onChange={(e) => setStudentName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Lớp"
-                                className={cx('input')}
-                                value={className}
-                                onChange={(e) => setClassName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mã phụ huynh"
-                                className={cx('input')}
-                                value={parentId}
-                                onChange={(e) => setParentId(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mã trạm"
-                                className={cx('input')}
-                                value={stopId}
-                                onChange={(e) => setStopId(e.target.value)}
-                            />
-                            <select
-                                value={isAbsent}
-                                onChange={(e) => setIsAbsent(parseInt(e.target.value))}
-                                className={cx('input')}
-                            >
-                                <option value={0}>Không vắng</option>
-                                <option value={1}>Vắng</option>
-                            </select>
-                            <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={handleEditStudent}>
-                                    Cập nhật
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal Thêm */}
+            {/* MODAL THÊM */}
             {isOpenModal === 'add' && (
                 <div className={cx('modal-overlay')}>
-                    <div className={cx('modal-content')}>
-                        <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
-                            </button>
+                    <div className={cx('modal-content-large')}>
+                        <div className={cx('modal-header')}>
+                            <h3>Thêm học sinh mới</h3>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>X</button>
                         </div>
-                        <h3>Thêm học sinh</h3>
+
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên học sinh"
-                                className={cx('input')}
-                                value={studentName}
-                                onChange={(e) => setStudentName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Lớp"
-                                className={cx('input')}
-                                value={className}
-                                onChange={(e) => setClassName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mã phụ huynh"
-                                className={cx('input')}
-                                value={parentId}
-                                onChange={(e) => setParentId(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mã trạm"
-                                className={cx('input')}
-                                value={stopId}
-                                onChange={(e) => setStopId(e.target.value)}
-                            />
-                            <select
-                                value={isAbsent}
-                                onChange={(e) => setIsAbsent(parseInt(e.target.value))}
-                                className={cx('input')}
-                            >
-                                <option value={0}>Không vắng</option>
-                                <option value={1}>Vắng</option>
-                            </select>
-                            <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={handleAddStudent}>
-                                    Thêm
-                                </button>
+                            <div className={cx('input-group')}>
+                                <input type="text" placeholder="Tên học sinh" className={cx('input')} value={studentName} onChange={(e) => setStudentName(e.target.value)} />
+                                <input type="text" placeholder="Lớp" className={cx('input')} value={className} onChange={(e) => setClassName(e.target.value)} />
+                            </div>
+
+                            <div className={cx('selection-container')}>
+                                {/* Tuyến xe */}
+                                <div className={cx('selection-table-wrapper')}>
+                                    <h4>Chọn Tuyến Xe</h4>
+                                    <table className={cx('selection-table')}>
+                                        <thead><tr><th>Mã tuyến</th><th>Tên tuyến</th><th>Chọn</th></tr></thead>
+                                        <tbody>
+                                            {routes.map(route => (
+                                                <tr key={route.route_id} className={selectedRouteId === String(route.route_id) ? cx('selectedRow') : ''}>
+                                                    <td>{route.route_id}</td>
+                                                    <td>{route.route_name}</td>
+                                                    <td>
+                                                        <input type="radio" name="route" value={route.route_id} checked={selectedRouteId === String(route.route_id)} onChange={(e) => { setSelectedRouteId(e.target.value); setSelectedStopId(null); }} />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Trạm dừng */}
+                                <div className={cx('selection-table-wrapper')}>
+                                    <h4>Chọn Trạm Dừng</h4>
+                                    <table className={cx('selection-table')}>
+                                        <thead><tr><th>Mã trạm</th><th>Tên trạm</th><th>Chọn</th></tr></thead>
+                                        <tbody>
+                                            {filteredStops.length > 0 ? filteredStops.map(stop => (
+                                                <tr key={stop.stop_id} className={selectedStopId === String(stop.stop_id) ? cx('selectedRow') : ''}>
+                                                    <td>{stop.stop_id}</td>
+                                                    <td>{stop.stop_name}</td>
+                                                    <td>
+                                                        <input type="radio" name="stop" value={stop.stop_id} checked={selectedStopId === String(stop.stop_id)} onChange={(e) => setSelectedStopId(e.target.value)} />
+                                                    </td>
+                                                </tr>
+                                            )) : <tr><td colSpan="3">Vui lòng chọn một tuyến xe để xem trạm dừng.</td></tr>}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Phụ huynh */}
+                                <div className={cx('selection-table-wrapper')}>
+                                    <h4>Chọn Phụ Huynh</h4>
+                                    <table className={cx('selection-table')}>
+                                        <thead><tr><th>Mã PH</th><th>Tên Phụ huynh</th><th>Chọn</th></tr></thead>
+                                        <tbody>
+                                            {parents.map(parent => (
+                                                <tr key={parent.parent_id} className={selectedParentId === String(parent.parent_id) ? cx('selectedRow') : ''}>
+                                                    <td>{parent.parent_id}</td>
+                                                    <td>{parent.parent_name}</td>
+                                                    <td>
+                                                        <input type="radio" name="parent" value={parent.parent_id} checked={selectedParentId === String(parent.parent_id)} onChange={(e) => setSelectedParentId(e.target.value)} />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className={cx('buttons')} style={{ justifyContent: 'center', marginTop: '20px' }}>
+                                <button className={cx('btn', 'add')} onClick={handleAddStudent}>Thêm Học Sinh</button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Modal Chi tiết */}
+            {/* MODAL SỬA */}
+            {isOpenModal === 'edit' && selectedStudent && (
+                <div className={cx('modal-overlay')}>
+                    <div className={cx('modal-content-large')}>
+                        <div className={cx('modal-header')}>
+                            <h3>Sửa thông tin học sinh: {selectedStudent.student_name}</h3>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>X</button>
+                        </div>
+
+                        <div className={cx('form')}>
+                            <div className={cx('input-group')}>
+                                <input type="text" placeholder="Tên học sinh" className={cx('input')} value={studentName} onChange={(e) => setStudentName(e.target.value)} />
+                                <input type="text" placeholder="Lớp" className={cx('input')} value={className} onChange={(e) => setClassName(e.target.value)} />
+                            </div>
+
+                            <div className={cx('selection-container')}>
+                                {/* Tuyến xe */}
+                                <div className={cx('selection-table-wrapper')}>
+                                    <h4>Chọn Tuyến Xe</h4>
+                                    <table className={cx('selection-table')}>
+                                        <thead><tr><th>Mã tuyến</th><th>Tên tuyến</th><th>Chọn</th></tr></thead>
+                                        <tbody>
+                                            {routes.map(route => (
+                                                <tr key={route.route_id} className={selectedRouteId === String(route.route_id) ? cx('selectedRow') : ''}>
+                                                    <td>{route.route_id}</td>
+                                                    <td>{route.route_name}</td>
+                                                    <td>
+                                                        <input type="radio" name="route" value={route.route_id} checked={selectedRouteId === String(route.route_id)} onChange={(e) => { setSelectedRouteId(e.target.value); setSelectedStopId(null); }} />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Trạm dừng */}
+                                <div className={cx('selection-table-wrapper')}>
+                                    <h4>Chọn Trạm Dừng</h4>
+                                    <table className={cx('selection-table')}>
+                                        <thead><tr><th>Mã trạm</th><th>Tên trạm</th><th>Chọn</th></tr></thead>
+                                        <tbody>
+                                            {filteredStops.length > 0 ? filteredStops.map(stop => (
+                                                <tr key={stop.stop_id} className={selectedStopId === String(stop.stop_id) ? cx('selectedRow') : ''}>
+                                                    <td>{stop.stop_id}</td>
+                                                    <td>{stop.stop_name}</td>
+                                                    <td>
+                                                        <input type="radio" name="stop" value={stop.stop_id} checked={selectedStopId === String(stop.stop_id)} onChange={(e) => setSelectedStopId(e.target.value)} />
+                                                    </td>
+                                                </tr>
+                                            )) : <tr><td colSpan="3">Vui lòng chọn một tuyến xe để xem trạm dừng.</td></tr>}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Phụ huynh */}
+                                <div className={cx('selection-table-wrapper')}>
+                                    <h4>Chọn Phụ Huynh</h4>
+                                    <table className={cx('selection-table')}>
+                                        <thead><tr><th>Mã PH</th><th>Tên Phụ huynh</th><th>Chọn</th></tr></thead>
+                                        <tbody>
+                                            {parents.map(parent => (
+                                                <tr key={parent.parent_id} className={selectedParentId === String(parent.parent_id) ? cx('selectedRow') : ''}>
+                                                    <td>{parent.parent_id}</td>
+                                                    <td>{parent.parent_name}</td>
+                                                    <td>
+                                                        <input type="radio" name="parent" value={parent.parent_id} checked={selectedParentId === String(parent.parent_id)} onChange={(e) => setSelectedParentId(e.target.value)} />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className={cx('buttons')} style={{ justifyContent: 'center', marginTop: '20px' }}>
+                                <button className={cx('btn', 'add')} onClick={handleEditStudent}>Cập nhật</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL CHI TIẾT */}
             {isOpenModal === 'details' && selectedStudent && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
-                            </button>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>X</button>
                         </div>
                         <h3>Chi tiết học sinh</h3>
                         <div className={cx('form')}>
@@ -289,25 +369,29 @@ function ManageStudent() {
                             <input type="text" value={selectedStudent.class_name} readOnly className={cx('input')} />
                             <input type="text" value={selectedStudent.parent_id} readOnly className={cx('input')} />
                             <input type="text" value={selectedStudent.stop_id} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStudent.is_absent} readOnly className={cx('input')} />
+                            <input type="text" value={selectedStudent.is_absent ? 'Có' : 'Không'} readOnly className={cx('input')} />
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Modal Xóa */}
-            {isOpenModal === 'delete' && (
+            {/* MODAL XÓA */}
+            {isOpenModal === 'delete' && selectedStudent && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>X</button>
+                        </div>
+                    <h3>Xác nhận xóa</h3>
+                    <p>Bạn có chắc muốn xóa học sinh "<strong>{selectedStudent.student_name}</strong>"?</p>
+                        <div className={cx('buttons')}>
+                            <button className={cx('btn', 'cancel')} onClick={handleCloseModal}>
+                                Hủy
+                            </button>
+                            <button className={cx('btn', 'danger')} onClick={handleDeleteStudent}>
+                                Xác nhận Xóa
                             </button>
                         </div>
-                        <h3>Xác nhận xóa học sinh?</h3>
-                        <button className={cx('btn', 'add')} onClick={handleDeleteStudent}>
-                            Xác nhận
-                        </button>
                     </div>
                 </div>
             )}
