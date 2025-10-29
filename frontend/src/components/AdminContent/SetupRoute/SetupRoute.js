@@ -23,6 +23,7 @@ function SetupRoute() {
     const [status, setStatus] = useState('Not Started');
     const [departureTime, setDepartureTime] = useState('');
 
+    // Fetch dữ liệu
     const fetchData = async () => {
         try {
             const [assignRes, routesRes, driversRes, busesRes] = await Promise.all([
@@ -45,6 +46,7 @@ function SetupRoute() {
         fetchData();
     }, []);
 
+    // Reset form về mặc định
     const resetFormState = () => {
         setRouteId('');
         setDriverId('');
@@ -55,6 +57,7 @@ function SetupRoute() {
         setSelectedAssignment(null);
     };
 
+    // Mở modal (add, edit, delete, details)
     const handleOpenModal = (type, assignment = null) => {
         resetFormState();
         setIsOpenModal(type);
@@ -76,10 +79,12 @@ function SetupRoute() {
         resetFormState();
     };
 
+    // Kiểm tra form hợp lệ
     const validateForm = () => {
         return routeId && driverId && busId && runDate && departureTime;
     };
 
+    // Thêm mới
     const handleAddAssignment = async () => {
         if (!validateForm()) {
             showToast('Vui lòng điền đầy đủ thông tin!', false);
@@ -91,7 +96,7 @@ function SetupRoute() {
                 driver_id: driverId,
                 bus_id: busId,
                 run_date: runDate,
-                status: status,
+                status: 'Not Started', // Luôn mặc định là "Not Started"
                 departure_time: departureTime,
             });
             showToast('Thêm phân công tuyến thành công!', true);
@@ -102,6 +107,7 @@ function SetupRoute() {
         }
     };
 
+    // Sửa phân công
     const handleEditAssignment = async () => {
         if (!validateForm()) {
             showToast('Vui lòng điền đầy đủ thông tin!', false);
@@ -124,6 +130,7 @@ function SetupRoute() {
         }
     };
 
+    // Xóa phân công
     const handleDeleteAssignment = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/route_assignments/${selectedAssignment.assignment_id}`);
@@ -220,14 +227,22 @@ function SetupRoute() {
                             <input type="date" value={runDate} onChange={(e) => setRunDate(e.target.value)} />
                             <input type="time" value={departureTime} onChange={(e) => setDepartureTime(e.target.value)} />
 
-                            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                                <option value="Not Started">Chưa bắt đầu</option>
-                                <option value="Running">Đang chạy</option>
-                                <option value="Completed">Hoàn thành</option>
-                            </select>
+                            {/* Trạng thái chỉ chỉnh được khi SỬA */}
+                            {isOpenModal === 'edit' ? (
+                                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                                    <option value="Not Started">Chưa bắt đầu</option>
+                                    <option value="Running">Đang chạy</option>
+                                    <option value="Completed">Hoàn thành</option>
+                                </select>
+                            ) : (
+                                <input type="text" value="Not Started" readOnly />
+                            )}
 
                             <div className={cx('buttons')}>
-                                <button className={cx('btn', 'add')} onClick={isOpenModal === 'add' ? handleAddAssignment : handleEditAssignment}>
+                                <button
+                                    className={cx('btn', 'add')}
+                                    onClick={isOpenModal === 'add' ? handleAddAssignment : handleEditAssignment}
+                                >
                                     {isOpenModal === 'add' ? 'Thêm Mới' : 'Cập Nhật'}
                                 </button>
                             </div>
