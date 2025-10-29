@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './LoginContent.module.scss';
 import showToast from '../../untils/ShowToast/showToast';
+import axios from '../../untils/CustomAxios/axios.customize';
 const cx = classNames.bind(styles);
 
 function LoginContent() {
@@ -13,8 +14,9 @@ function LoginContent() {
 
     useEffect(() => {
         // Khi vào trang login => luôn xóa token cũ
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('role');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('username');
     }, []);
 
     const onLogin = async (e) => {
@@ -27,13 +29,12 @@ function LoginContent() {
         }
 
         try {
-            const res = await fetch('http://localhost:5000/api/accounts/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
+            const res = await axios.post('/accounts/login', {
+                username,
+                password,
             });
 
-            const data = await res.json();
+            const data = res.data;
             console.log('Login response:', data);
 
             if (data.EC !== 0 || (data.account.role !== 'Driver' && data.account.role !== 'Parent')) {
@@ -43,8 +44,9 @@ function LoginContent() {
             }
 
             // Login thành công
-            sessionStorage.setItem('access_token', data.access_token);
-            sessionStorage.setItem('role', data.account.role);
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('role', data.account.role);
+            localStorage.setItem('username', data.account.username);
             showToast('Đăng nhập thành công');
 
             // Điều hướng theo role

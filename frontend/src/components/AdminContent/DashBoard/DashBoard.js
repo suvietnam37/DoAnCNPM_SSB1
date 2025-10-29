@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import axios from 'axios';
+import axios from '../../../untils/CustomAxios/axios.customize';
 
 import { useState, useEffect } from 'react';
 

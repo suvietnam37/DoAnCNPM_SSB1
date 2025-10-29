@@ -11,6 +11,8 @@ import MapRoute from './MapRoute/MapRoute';
 
 const cx = classNames.bind(styles);
 
+const token = localStorage.getItem('access_token');
+
 // Giả định ID của phụ huynh và tài khoản
 const LOGGED_IN_PARENT_ID = 1;
 const LOGGED_IN_PARENT_ACCOUNT_ID = 3;
@@ -44,7 +46,9 @@ function ParentContent() {
                     const routeId = studentList[0].route_id;
 
                     try {
-                        const routeStatusRes = await axios.get(`http://localhost:5000/api/route_assignments/current?route_id=${routeId}`);
+                        const routeStatusRes = await axios.get(
+                            `http://localhost:5000/api/route_assignments/current?route_id=${routeId}`,
+                        );
                         setRouteStatus(routeStatusRes.data);
                     } catch (routeError) {
                         console.log('Tuyến xe của con hiện không hoạt động.');

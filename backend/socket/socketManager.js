@@ -7,15 +7,14 @@ let io;
 // Hàm tính khoảng cách giữa 2 điểm GPS theo mét (haversine formula)
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Bán kính Trái Đất (m)
-  const radLat1 = lat1 * Math.PI / 180;
-  const radLat2 = lat2 * Math.PI / 180;
-  const deltaLat = (lat2 - lat1) * Math.PI / 180;
-  const deltaLon = (lon2 - lon1) * Math.PI / 180;
+  const radLat1 = (lat1 * Math.PI) / 180;
+  const radLat2 = (lat2 * Math.PI) / 180;
+  const deltaLat = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLon = ((lon2 - lon1) * Math.PI) / 180;
 
   const a =
     Math.sin(deltaLat / 2) ** 2 +
-    Math.cos(radLat1) * Math.cos(radLat2) *
-    Math.sin(deltaLon / 2) ** 2;
+    Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(deltaLon / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // Khoảng cách tính bằng mét
@@ -25,8 +24,8 @@ function initSocket(httpServer) {
   io = new Server(httpServer, {
     cors: {
       origin: "http://localhost:3000", // Cho phép frontend kết nối
-      methods: ["GET", "POST"]
-    }
+      methods: ["GET", "POST"],
+    },
   });
 
   console.log("Socket.IO server đã được khởi tạo.");
@@ -44,7 +43,9 @@ function initSocket(httpServer) {
         return;
       }
 
-      console.log(`Xe ${vehicleId} - Tuyến ${routeId}: (${latitude}, ${longitude})`);
+      console.log(
+        `Xe ${vehicleId} - Tuyến ${routeId}: (${latitude}, ${longitude})`
+      );
 
       try {
         // Lấy danh sách các trạm (stop) thuộc tuyến xe

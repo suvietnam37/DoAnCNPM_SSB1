@@ -1,7 +1,7 @@
 // backend/server/Express.js
 const express = require("express");
-const http = require('http');
-const { initSocket } = require('../socket/socketManager');
+const http = require("http");
+const { initSocket } = require("../socket/socketManager");
 const app = express();
 // Tạo server HTTP từ app Express
 const server = http.createServer(app);
@@ -10,9 +10,8 @@ initSocket(server);
 const cors = require("./middleware/corsConfig");
 const errorHandler = require("./middleware/errorHandler");
 
-
 // Import kết nối MySQL
-const connection = require("../config/db"); 
+const connection = require("../config/db");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -60,5 +59,7 @@ app.use(errorHandler);
 
 const PORT = 5000;
 server.listen(PORT, () => {
-  console.log(`Server Express và Socket.IO đang chạy tại: http://localhost:${PORT}`);
+  console.log(
+    `Server Express và Socket.IO đang chạy tại: http://localhost:${PORT}`
+  );
 });

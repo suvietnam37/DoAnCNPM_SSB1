@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const accountController = require("../controllers/accountController");
+// const auth = require("../middleware/auth");
+
+// router.all(/.*/, auth);
 
 // Đăng nhập
 router.post("/login", accountController.handleLogin);

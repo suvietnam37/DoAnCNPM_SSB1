@@ -24,6 +24,12 @@
     font-weight: 600;
     padding: 16px 24px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    height: 100%;
+    float: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Sidebar menu */
@@ -57,4 +63,23 @@
 .active {
     background-color: #ffc30d;
     color: #2e2e2e;
+}
+
+.header-logout-btn {
+    border-radius: 24px;
+    width: 100px;
+    height: 45px;
+    margin-right: 40px;
+    cursor: pointer;
+    border: none;
+    background-color: var(--red);
+    color: black;
+
+    span {
+        font-weight: 600;
+    }
+
+    &:hover {
+        transform: scale(1.05);
+    }
 }

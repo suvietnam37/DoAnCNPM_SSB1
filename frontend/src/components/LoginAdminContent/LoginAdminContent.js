@@ -3,6 +3,8 @@ import classNames from 'classnames/bind';
 import styles from './LoginAdminContent.module.scss';
 import { useNavigate } from 'react-router-dom';
 import showToast from '../../untils/ShowToast/showToast';
+import axios from '../../untils/CustomAxios/axios.customize';
+
 const cx = classNames.bind(styles);
 
 function LoginAdminContent() {
@@ -13,38 +15,37 @@ function LoginAdminContent() {
 
     useEffect(() => {
         // Khi vào trang login => luôn xóa token cũ
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('role');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
     }, []);
 
     const onLogin = async (e) => {
         e.preventDefault(); // Ngăn reload trang
+        setError('');
 
         try {
-            const res = await fetch('http://localhost:5000/api/accounts/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // Phải có header này để server parse JSON
-                },
-                body: JSON.stringify({ username: name, password }), // gửi JSON
+            const res = await axios.post('/accounts/login', {
+                username: name,
+                password,
             });
 
-            const data = await res.json();
-            console.log(data);
+            const data = res.data;
 
             if (data.EC !== 0 || data.account.role !== 'Admin') {
-                // setError(data.message || 'Login failed');
                 showToast('Đăng nhập thất bại', false);
                 return;
             }
-            sessionStorage.setItem('access_token', data.access_token);
-            sessionStorage.setItem('role', data.account.role);
+
+            // ✅ Lưu token & role
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('role', data.account.role);
+
             showToast('Đăng nhập thành công');
-            // console.log('Login successful:', data);
             navigate('/admin/dashboard');
         } catch (err) {
             console.error('Login error:', err);
-            setError('Network error');
+            setError('Đăng nhập thất bại hoặc lỗi mạng');
+            showToast('Lỗi đăng nhập', false);
         }
     };
 
@@ -58,7 +59,6 @@ function LoginAdminContent() {
                     <input
                         type="text"
                         placeholder="Username"
-                        name="name"
                         className={cx('input')}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -66,7 +66,6 @@ function LoginAdminContent() {
                     <input
                         type="password"
                         placeholder="Password"
-                        name="password"
                         className={cx('input')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}

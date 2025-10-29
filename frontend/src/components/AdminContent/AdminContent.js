@@ -1,13 +1,35 @@
 import styles from './AdminContent.module.scss';
 import classNames from 'classnames/bind';
-import { NavLink, Outlet } from 'react-router-dom';
-
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import showToast from '../../untils/ShowToast/showToast';
 const cx = classNames.bind(styles);
 
 function AdminContent() {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        const role = localStorage.getItem('role');
+        localStorage.clear();
+        if (role === 'Admin') {
+            navigate('/admin');
+            showToast('Đăng xuất thành công');
+        } else {
+            navigate('/');
+            showToast('Đăng xuất thành công');
+        }
+    };
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('header')}>Admin Dashboard</div>
+            <div className={cx('header')}>
+                Admin Dashboard
+                <button
+                    className={cx('header-logout-btn')}
+                    onClick={() => {
+                        handleLogout();
+                    }}
+                >
+                    <span>Đăng Xuất</span>
+                </button>
+            </div>
             <div style={{ display: 'flex', flex: 1 }}>
                 {/* Sidebar */}
                 <div className={cx('sidebar')}>
