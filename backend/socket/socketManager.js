@@ -63,7 +63,7 @@ function initSocket(httpServer) {
 
           // Khi xe đến gần trong bán kính 100m thì gửi thông báo
           if (distance <= 100) {
-            const alertData = {
+            const showToastData = {
               vehicleId,
               stopId: stop.stop_id,
               stopName: stop.stop_name,
@@ -72,8 +72,8 @@ function initSocket(httpServer) {
             };
 
             // Gửi thông báo real-time đến tất cả client
-            io.emit("geoAlert", alertData);
-            console.log(`Gửi cảnh báo:`, alertData.message);
+            io.emit("geoshowToast", showToastData);
+            console.log(`Gửi cảnh báo:`, showToastData.message);
           }
         }
       } catch (err) {

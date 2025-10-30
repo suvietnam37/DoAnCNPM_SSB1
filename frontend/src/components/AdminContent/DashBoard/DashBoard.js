@@ -60,7 +60,7 @@ function DashBoard() {
             </div>
             <div className={cx('content')}>
                 <div className={cx('content-map')}>
-                    <MapContainer center={[21.0285, 105.8542]} zoom={13} style={{ height: '450px', width: '100%' }}>
+                    <MapContainer center={[21.0285, 105.8542]} zoom={13} style={{ height: '385px', width: '100%' }}>
                         {/* <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

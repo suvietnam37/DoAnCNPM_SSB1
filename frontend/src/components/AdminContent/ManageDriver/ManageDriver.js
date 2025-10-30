@@ -45,7 +45,7 @@ function ManageDriver() {
     // Thêm tài xế
     const handleAddDriver = async () => {
         if (!driverName.trim()) {
-            alert('Vui lòng nhập tên tài xế!');
+            showToast('Vui lòng nhập tên tài xế!', false);
             return;
         }
         try {
@@ -65,7 +65,7 @@ function ManageDriver() {
     // Sửa tài xế
     const handleEditDriver = async () => {
         if (!driverName.trim()) {
-            alert('Vui lòng nhập tên tài xế!');
+            showToast('Vui lòng nhập tên tài xế!', false);
             return;
         }
         try {
@@ -153,13 +153,16 @@ function ManageDriver() {
                         </div>
                         <h3>Sửa tài xế</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên tài xế"
-                                className={cx('input')}
-                                value={driverName}
-                                onChange={(e) => setDriverName(e.target.value)}
-                            />
+                            <div className={cx('flex-input')}>
+                                <label>Tên tài xế: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Tên tài xế"
+                                    className={cx('input')}
+                                    value={driverName}
+                                    onChange={(e) => setDriverName(e.target.value)}
+                                />
+                            </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditDriver}>
                                     Cập nhật
@@ -209,8 +212,19 @@ function ManageDriver() {
                         </div>
                         <h3>Chi tiết tài xế</h3>
                         <div className={cx('form')}>
-                            <input type="text" value={selectedDriver.driver_id} readOnly className={cx('input')} />
-                            <input type="text" value={selectedDriver.driver_name} readOnly className={cx('input')} />
+                            <div className={cx('flex-input')}>
+                                <label>Mã tài xế: </label>
+                                <input type="text" value={selectedDriver.driver_id} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Tên tài xế: </label>
+                                <input
+                                    type="text"
+                                    value={selectedDriver.driver_name}
+                                    readOnly
+                                    className={cx('input')}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

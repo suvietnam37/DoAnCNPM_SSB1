@@ -3,6 +3,7 @@ import styles from './ManageRoute.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -43,38 +44,38 @@ function ManageRoute() {
     // Thêm tuyến
     const handleAddRoute = async () => {
         if (!routeName.trim()) {
-            alert('Vui lòng nhập tên tuyến!');
+            showToast('Vui lòng nhập tên tuyến!', false);
             return;
         }
         try {
             await axios.post('http://localhost:5000/api/routes', {
                 route_name: routeName,
             });
-            alert('Thêm tuyến thành công!');
+            showToast('Thêm tuyến thành công!');
             handleCloseModal();
             fetchRoutes();
         } catch (error) {
             console.error('Add route error:', error);
-            alert('Lỗi khi thêm tuyến.');
+            showToast('Lỗi khi thêm tuyến.', false);
         }
     };
 
     // Sửa tuyến
     const handleEditRoute = async () => {
         if (!routeName.trim()) {
-            alert('Vui lòng nhập tên tuyến!');
+            showToast('Vui lòng nhập tên tuyến!');
             return;
         }
         try {
             await axios.put(`http://localhost:5000/api/routes/${selectedRoute.route_id}`, {
                 route_name: routeName,
             });
-            alert('Cập nhật tuyến thành công!');
+            showToast('Cập nhật tuyến thành công!');
             handleCloseModal();
             fetchRoutes();
         } catch (error) {
             console.error('Edit route error:', error);
-            alert('Lỗi khi sửa tuyến.');
+            showToast('Lỗi khi sửa tuyến.', false);
         }
     };
 
@@ -82,12 +83,12 @@ function ManageRoute() {
     const handleDeleteRoute = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/routes/${selectedRoute.route_id}`);
-            alert('Xóa tuyến thành công!');
+            showToast('Xóa tuyến thành công!');
             handleCloseModal();
             fetchRoutes();
         } catch (error) {
             console.error('Delete route error:', error);
-            alert('Lỗi khi xóa tuyến.');
+            showToast('Lỗi khi xóa tuyến.', false);
         }
     };
 
@@ -148,13 +149,16 @@ function ManageRoute() {
                         </div>
                         <h3>Sửa tuyến</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên tuyến"
-                                className={cx('input')}
-                                value={routeName}
-                                onChange={(e) => setRouteName(e.target.value)}
-                            />
+                            <div className={cx('flex-input')}>
+                                <label>Tên tuyến: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Tên tuyến"
+                                    className={cx('input')}
+                                    value={routeName}
+                                    onChange={(e) => setRouteName(e.target.value)}
+                                />
+                            </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditRoute}>
                                     Cập nhật
@@ -204,8 +208,12 @@ function ManageRoute() {
                         </div>
                         <h3>Chi tiết tuyến</h3>
                         <div className={cx('form')}>
-                            <div className={cx('form-container')}>
+                            <div className={cx('flex-input')}>
+                                <label>Mã tuyến: </label>
                                 <input type="text" value={selectedRoute.route_id} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Tên tuyến: </label>
                                 <input type="text" value={selectedRoute.route_name} readOnly className={cx('input')} />
                             </div>
                             {/* Có thể thêm bảng trạm nếu cần */}

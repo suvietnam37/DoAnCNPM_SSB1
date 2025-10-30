@@ -214,3 +214,14 @@
         width: 100px;
     }
 }
+
+.flex-input {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    width: 100%;
+    align-items: center;
+    label {
+        float: left;
+        text-align: start;
+    }
+}

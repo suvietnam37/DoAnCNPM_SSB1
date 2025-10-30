@@ -163,8 +163,7 @@ function ManageStudent() {
                         <th>Mã HS</th>
                         <th>Tên học sinh</th>
                         <th>Lớp</th>
-                        <th>Mã PH</th>
-                        <th>Mã trạm</th>
+
                         <th>Vắng mặt</th>
                         <th>Hành động</th>
                         <th>Chi tiết</th>
@@ -176,8 +175,6 @@ function ManageStudent() {
                             <td>{student.student_id}</td>
                             <td>{student.student_name}</td>
                             <td>{student.class_name}</td>
-                            <td>{student.parent_id}</td>
-                            <td>{student.stop_id}</td>
                             <td>{student.is_absent ? 'Có' : 'Không'}</td>
                             <td>
                                 <button
@@ -383,20 +380,26 @@ function ManageStudent() {
 
                         <div className={cx('form')}>
                             <div className={cx('input-group')}>
-                                <input
-                                    type="text"
-                                    placeholder="Tên học sinh"
-                                    className={cx('input')}
-                                    value={studentName}
-                                    onChange={(e) => setStudentName(e.target.value)}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Lớp"
-                                    className={cx('input')}
-                                    value={className}
-                                    onChange={(e) => setClassName(e.target.value)}
-                                />
+                                <div className={cx('flex-input')}>
+                                    <label>Tên: </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Tên học sinh"
+                                        className={cx('input')}
+                                        value={studentName}
+                                        onChange={(e) => setStudentName(e.target.value)}
+                                    />
+                                </div>
+                                <div className={cx('flex-input')}>
+                                    <label>Lớp: </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Lớp"
+                                        className={cx('input')}
+                                        value={className}
+                                        onChange={(e) => setClassName(e.target.value)}
+                                    />
+                                </div>
                             </div>
 
                             <div className={cx('selection-container')}>
@@ -545,17 +548,51 @@ function ManageStudent() {
                         </div>
                         <h3>Chi tiết học sinh</h3>
                         <div className={cx('form')}>
-                            <input type="text" value={selectedStudent.student_id} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStudent.student_name} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStudent.class_name} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStudent.parent_id} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStudent.stop_id} readOnly className={cx('input')} />
-                            <input
-                                type="text"
-                                value={selectedStudent.is_absent ? 'Có' : 'Không'}
-                                readOnly
-                                className={cx('input')}
-                            />
+                            <div className={cx('flex-input')}>
+                                <label>Mã học sinh: </label>
+                                <input
+                                    type="text"
+                                    value={selectedStudent.student_id}
+                                    readOnly
+                                    className={cx('input')}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Tên học sinh: </label>
+                                <input
+                                    type="text"
+                                    value={selectedStudent.student_name}
+                                    readOnly
+                                    className={cx('input')}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Lớp: </label>
+                                <input
+                                    type="text"
+                                    value={selectedStudent.class_name}
+                                    readOnly
+                                    className={cx('input')}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Mã phụ huynh: </label>
+                                <input type="text" value={selectedStudent.parent_id} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Mã trạm: </label>
+                                <input type="text" value={selectedStudent.stop_id} readOnly className={cx('input')} />
+                            </div>
+
+                            <div className={cx('flex-input')}>
+                                <label>Vắng mặt: </label>
+                                <input
+                                    type="text"
+                                    value={selectedStudent.is_absent ? 'Có' : 'Không'}
+                                    readOnly
+                                    className={cx('input')}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

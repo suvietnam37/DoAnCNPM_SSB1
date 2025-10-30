@@ -9,6 +9,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 import LocationPicker from './LocationPicker';
+import showToast from '../../../untils/ShowToast/showToast';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -77,7 +78,7 @@ function ManageStation() {
     // Thêm trạm
     const handleAddStop = async () => {
         if (!stopName.trim() || !address.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+            showToast('Vui lòng nhập đầy đủ thông tin!', false);
             return;
         }
         try {
@@ -88,19 +89,19 @@ function ManageStation() {
                 latitude: position[0],
                 longitude: position[1],
             });
-            alert('Thêm trạm thành công!');
+            showToast('Thêm trạm thành công!');
             handleCloseModal();
             fetchStops();
         } catch (error) {
             console.error('Add stop error:', error);
-            alert('Lỗi khi thêm trạm.');
+            showToast('Lỗi khi thêm trạm.', false);
         }
     };
 
     // Sửa trạm
     const handleEditStop = async () => {
         if (!stopName.trim() || !address.trim()) {
-            alert('Vui lòng nhập đầy đủ thông tin!');
+            showToast('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
         try {
@@ -111,12 +112,12 @@ function ManageStation() {
                 latitude: position[0],
                 longitude: position[1],
             });
-            alert('Cập nhật trạm thành công!');
+            showToast('Cập nhật trạm thành công!');
             handleCloseModal();
             fetchStops();
         } catch (error) {
             console.error('Edit stop error:', error);
-            alert('Lỗi khi sửa trạm.');
+            showToast('Lỗi khi sửa trạm.', false);
         }
     };
 
@@ -124,12 +125,12 @@ function ManageStation() {
     const handleDeleteStop = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/stops/${selectedStop.stop_id}`);
-            alert('Xóa trạm thành công!');
+            showToast('Xóa trạm thành công!');
             handleCloseModal();
             fetchStops();
         } catch (error) {
             console.error('Delete stop error:', error);
-            alert('Lỗi khi xóa trạm.');
+            showToast('Lỗi khi xóa trạm.', false);
         }
     };
 
@@ -191,20 +192,30 @@ function ManageStation() {
                         </div>
                         <h3>Sửa trạm</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên trạm"
-                                className={cx('input')}
-                                value={stopName}
-                                onChange={(e) => setStopName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Địa chỉ"
-                                className={cx('input')}
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                            />
+                            <div className={cx('form-input')}>
+                                <div className={cx('flex-input')}>
+                                    <label>Tên trạm: </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Tên trạm"
+                                        className={cx('input')}
+                                        value={stopName}
+                                        onChange={(e) => setStopName(e.target.value)}
+                                        readOnly
+                                    />
+                                </div>
+                                <div className={cx('flex-input')}>
+                                    <label>Địa chỉ: </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Địa chỉ"
+                                        className={cx('input')}
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
 
                             {/* Bảng chọn tuyến */}
                             <div className={cx('table-wrapper')}>
@@ -278,21 +289,23 @@ function ManageStation() {
                         </div>
                         <h3>Thêm trạm</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên trạm"
-                                className={cx('input')}
-                                value={stopName}
-                                onChange={(e) => setStopName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Địa chỉ"
-                                className={cx('input')}
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                readOnly
-                            />
+                            <div className={cx('form-input')}>
+                                <input
+                                    type="text"
+                                    placeholder="Tên trạm"
+                                    className={cx('input')}
+                                    value={stopName}
+                                    onChange={(e) => setStopName(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Địa chỉ"
+                                    className={cx('input')}
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    readOnly
+                                />
+                            </div>
 
                             <div className={cx('table-wrapper')}>
                                 <table className={cx('table')}>
@@ -337,6 +350,7 @@ function ManageStation() {
                                     />
                                 </MapContainer>
                             </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddStop}>
                                     Thêm
@@ -358,10 +372,22 @@ function ManageStation() {
                         </div>
                         <h3>Chi tiết trạm</h3>
                         <div className={cx('form')}>
-                            <input type="text" value={selectedStop.stop_id} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStop.stop_name} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStop.address} readOnly className={cx('input')} />
-                            <input type="text" value={selectedStop.route_id} readOnly className={cx('input')} />
+                            <div className={cx('flex-input')}>
+                                <label>Mã trạm: </label>
+                                <input type="text" value={selectedStop.stop_id} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Tên trạm: </label>
+                                <input type="text" value={selectedStop.stop_name} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Địa chỉ: </label>
+                                <input type="text" value={selectedStop.address} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Mã tuyến: </label>
+                                <input type="text" value={selectedStop.route_id} readOnly className={cx('input')} />
+                            </div>
                         </div>
                     </div>
                 </div>

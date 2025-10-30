@@ -2,6 +2,7 @@ import styles from './ManageBus.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -42,38 +43,38 @@ function ManageBus() {
     // Thêm xe
     const handleAddBus = async () => {
         if (!licensePlate.trim()) {
-            alert('Vui lòng nhập biển số xe!');
+            showToast('Vui lòng nhập biển số xe!', false);
             return;
         }
         try {
             await axios.post('http://localhost:5000/api/buses', {
                 license_plate: licensePlate,
             });
-            alert('Thêm xe thành công!');
+            showToast('Thêm xe thành công!');
             handleCloseModal();
             fetchBuses();
         } catch (error) {
             console.error('Add bus error:', error);
-            alert('Lỗi khi thêm xe.');
+            showToast('Lỗi khi thêm xe.', false);
         }
     };
 
     // Sửa xe
     const handleEditBus = async () => {
         if (!licensePlate.trim()) {
-            alert('Vui lòng nhập biển số xe!');
+            showToast('Vui lòng nhập biển số xe!', false);
             return;
         }
         try {
             await axios.put(`http://localhost:5000/api/buses/${selectedBus.bus_id}`, {
                 license_plate: licensePlate,
             });
-            alert('Cập nhật xe thành công!');
+            showToast('Cập nhật xe thành công!');
             handleCloseModal();
             fetchBuses();
         } catch (error) {
             console.error('Edit bus error:', error);
-            alert('Lỗi khi sửa xe.');
+            showToast('Lỗi khi sửa xe.', false);
         }
     };
 
@@ -81,12 +82,12 @@ function ManageBus() {
     const handleDeleteBus = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/buses/${selectedBus.bus_id}`);
-            alert('Xóa xe thành công!');
+            showToast('Xóa xe thành công!');
             handleCloseModal();
             fetchBuses();
         } catch (error) {
             console.error('Delete bus error:', error);
-            alert('Lỗi khi xóa xe.');
+            showToast('Lỗi khi xóa xe.', false);
         }
     };
 
@@ -137,13 +138,16 @@ function ManageBus() {
                         </div>
                         <h3>Sửa thông tin xe</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Biển số xe"
-                                className={cx('input')}
-                                value={licensePlate}
-                                onChange={(e) => setLicensePlate(e.target.value)}
-                            />
+                            <div className={cx('flex-input')}>
+                                <label>Tên tài xế: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Biển số xe"
+                                    className={cx('input')}
+                                    value={licensePlate}
+                                    onChange={(e) => setLicensePlate(e.target.value)}
+                                />
+                            </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditBus}>
                                     Cập nhật

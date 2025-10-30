@@ -322,34 +322,48 @@ function ManageAccount() {
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button
+                                className={cx('btn', 'danger', 'radius')}
+                                onClick={() => {
+                                    handleCloseModal();
+                                    setUsername('');
+                                }}
+                            >
                                 X
                             </button>
                         </div>
                         <h3>Sửa tài khoản</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên tài khoản"
-                                className={cx('input')}
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-
-                            <input
-                                type="text"
-                                placeholder="Mật khẩu cũ"
-                                className={cx('input')}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Mật khẩu mới"
-                                className={cx('input')}
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                            />
+                            <div className={cx('flex-input')}>
+                                <label>Tên tài khoản: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Tên tài khoản"
+                                    className={cx('input')}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Mật khẩu cũ: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Mật khẩu cũ"
+                                    className={cx('input')}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Mật khẩu mới: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Mật khẩu mới"
+                                    className={cx('input')}
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                            </div>
 
                             <div className={cx('roles')}>
                                 <label className={cx('role-label')}>
@@ -388,7 +402,6 @@ function ManageAccount() {
                                     <span>Admin</span>
                                 </label>
                             </div>
-                            <input type="text" placeholder="Tên tài xế / phụ huynh cần tìm" className={cx('input')} />
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
@@ -487,7 +500,13 @@ function ManageAccount() {
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
-                            <button className={cx('btn', 'danger', 'radius')} onClick={() => handleCloseModal()}>
+                            <button
+                                className={cx('btn', 'danger', 'radius')}
+                                onClick={() => {
+                                    handleCloseModal();
+                                    setUsername('');
+                                }}
+                            >
                                 X
                             </button>
                         </div>
@@ -546,7 +565,6 @@ function ManageAccount() {
                                     <span>Admin</span>
                                 </label>
                             </div>
-                            <input type="text" placeholder="Tên tài xế / phụ huynh cần tìm" className={cx('input')} />
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>

@@ -8,6 +8,7 @@ import RouteManage from './RouteManage/RouteManage';
 import StudentManage from './StudentManage/StudentManage';
 import Doing from './Doing/Doing';
 import Report from './Report/Report';
+import showToast from '../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -43,16 +44,15 @@ function DriverContent() {
 
             // 2. Tải lại dữ liệu
             fetchDriverData();
-            
+
             // 3. Tải danh sách học sinh cho tuyến đó
             fetchStudentsForRoute(routeId);
-
         } catch (error) {
-            console.error("Lỗi khi bắt đầu tuyến:", error);
-            alert("Không thể bắt đầu tuyến. Vui lòng thử lại.");
+            console.error('Lỗi khi bắt đầu tuyến:', error);
+            showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.');
         }
     };
-    
+
     // Hàm để tải tất cả dữ liệu ban đầu
     const fetchDriverData = async () => {
         setLoading(true);
@@ -69,18 +69,16 @@ function DriverContent() {
             if (currentAssignmentRes.data) {
                 fetchStudentsForRoute(currentAssignmentRes.data.route_id);
             }
-
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu cho tài xế:', error);
         } finally {
             setLoading(false);
         }
     };
-    
+
     useEffect(() => {
         fetchDriverData();
     }, []);
-
 
     const menus = [
         { name: 'Danh Sách Tuyến Xe', id: 'route-manage', offset: -300 },

@@ -86,7 +86,7 @@ function ManageParent() {
             return;
         }
         try {
-             // Payload chỉ chứa thông tin cần cập nhật của phụ huynh
+            // Payload chỉ chứa thông tin cần cập nhật của phụ huynh
             const payload = {
                 parent_name: parentName,
                 phone: phone,
@@ -176,27 +176,37 @@ function ManageParent() {
                         </div>
                         <h3>Sửa phụ huynh</h3>
                         <div className={cx('form')}>
-                            <input
-                                type="text"
-                                placeholder="Tên phụ huynh"
-                                className={cx('input')}
-                                value={parentName}
-                                onChange={(e) => setParentName(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="SĐT"
-                                className={cx('input')}
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Email"
-                                className={cx('input')}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                            <div className={cx('flex-input')}>
+                                <label>Tên: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Tên phụ huynh"
+                                    className={cx('input')}
+                                    value={parentName}
+                                    onChange={(e) => setParentName(e.target.value)}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Số điện thoại: </label>
+                                <input
+                                    type="text"
+                                    placeholder="SĐT"
+                                    className={cx('input')}
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Email: </label>
+                                <input
+                                    type="text"
+                                    placeholder="Email"
+                                    className={cx('input')}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditParent}>
                                     Cập nhật
@@ -260,10 +270,27 @@ function ManageParent() {
                         </div>
                         <h3>Chi tiết phụ huynh</h3>
                         <div className={cx('form')}>
-                            <input type="text" value={selectedParent.parent_id} readOnly className={cx('input')} />
-                            <input type="text" value={selectedParent.parent_name} readOnly className={cx('input')} />
-                            <input type="text" value={selectedParent.phone} readOnly className={cx('input')} />
-                            <input type="text" value={selectedParent.email} readOnly className={cx('input')} />
+                            <div className={cx('flex-input')}>
+                                <label>Mã phụ huynh</label>
+                                <input type="text" value={selectedParent.parent_id} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Tên: </label>
+                                <input
+                                    type="text"
+                                    value={selectedParent.parent_name}
+                                    readOnly
+                                    className={cx('input')}
+                                />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Số điện thoại: </label>
+                                <input type="text" value={selectedParent.phone} readOnly className={cx('input')} />
+                            </div>
+                            <div className={cx('flex-input')}>
+                                <label>Email: </label>
+                                <input type="text" value={selectedParent.email} readOnly className={cx('input')} />
+                            </div>
                         </div>
                     </div>
                 </div>
