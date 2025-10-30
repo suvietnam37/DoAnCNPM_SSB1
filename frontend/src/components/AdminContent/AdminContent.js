@@ -2,13 +2,26 @@ import styles from './AdminContent.module.scss';
 import classNames from 'classnames/bind';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import showToast from '../../untils/ShowToast/showToast';
+import { useContext, useEffect } from 'react';
+import { AuthContext } from '../../context/auth.context';
+import axios from '../../untils/CustomAxios/axios.customize';
 const cx = classNames.bind(styles);
 
 function AdminContent() {
+    const authContext = useContext(AuthContext);
+    const username = authContext.auth.user.username;
     const navigate = useNavigate();
     const handleLogout = () => {
-        const role = localStorage.getItem('role');
-        localStorage.clear();
+        const role = authContext?.auth?.user?.role;
+        localStorage.removeItem('access_token');
+        authContext.setAuth({
+            isAuthenticated: false,
+            user: {
+                username: '',
+                account_id: '',
+                role: '',
+            },
+        });
         if (role === 'Admin') {
             navigate('/admin');
             showToast('Đăng xuất thành công');
@@ -17,18 +30,42 @@ function AdminContent() {
             showToast('Đăng xuất thành công');
         }
     };
+
+    const fetchAccount = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/accounts/account');
+            authContext.setAuth({
+                isAuthenticated: true,
+                user: {
+                    username: response.data.username,
+                    account_id: response.data.account_id,
+                    role: response.data.role,
+                },
+            });
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+
+    useEffect(() => {
+        // Khi vào trang login => luôn xóa token cũ
+        fetchAccount();
+    }, []);
     return (
         <div className={cx('wrapper')}>
             <div className={cx('header')}>
                 Admin Dashboard
-                <button
-                    className={cx('header-logout-btn')}
-                    onClick={() => {
-                        handleLogout();
-                    }}
-                >
-                    <span>Đăng Xuất</span>
-                </button>
+                <div className={cx('header-infor-acc')}>
+                    <span>Welcome {username}</span>
+                    <button
+                        className={cx('header-logout-btn')}
+                        onClick={() => {
+                            handleLogout();
+                        }}
+                    >
+                        <span>Đăng Xuất</span>
+                    </button>
+                </div>
             </div>
             <div style={{ display: 'flex', flex: 1 }}>
                 {/* Sidebar */}

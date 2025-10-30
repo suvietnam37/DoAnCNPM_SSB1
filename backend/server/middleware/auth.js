@@ -7,10 +7,16 @@ const auth = (req, res, next) => {
   } else {
     if (req.headers && req.headers.authorization) {
       const token = req.headers.authorization.split(" ")[1];
+      // console.log(token);
       //verify
       try {
         var decode = jwt.verify(token, "84e504f4-f398-4e8d-85c6-d02f732177e8");
         console.log(decode);
+        req.user = {
+          username: decode.username,
+          account_id: decode.account_id,
+          role: decode.role,
+        };
         next();
       } catch (error) {
         return res.status(401).json({

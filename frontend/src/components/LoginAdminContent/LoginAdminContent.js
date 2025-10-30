@@ -1,23 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import classNames from 'classnames/bind';
 import styles from './LoginAdminContent.module.scss';
 import { useNavigate } from 'react-router-dom';
 import showToast from '../../untils/ShowToast/showToast';
 import axios from '../../untils/CustomAxios/axios.customize';
+import { AuthContext } from '../../context/auth.context';
 
 const cx = classNames.bind(styles);
 
 function LoginAdminContent() {
+    const authContext = useContext(AuthContext);
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // useEffect(() => {
+    //     localStorage.removeItem('access_token');
+    // }, []);
+
     useEffect(() => {
-        // Khi vào trang login => luôn xóa token cũ
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('role');
-    }, []);
+        if (authContext.auth.isAuthenticated && authContext.auth.user.role === 'Admin') {
+            navigate('/admin/dashboard');
+        }
+        if (authContext.auth.isAuthenticated && authContext.auth.user.role === 'Parent') {
+            navigate('/parent');
+        }
+        if (authContext.auth.isAuthenticated && authContext.auth.user.role === 'Driver') {
+            navigate('/driver');
+        }
+    }, [authContext.auth, navigate]);
 
     const onLogin = async (e) => {
         e.preventDefault(); // Ngăn reload trang
@@ -36,9 +48,16 @@ function LoginAdminContent() {
                 return;
             }
 
-            // ✅ Lưu token & role
+            authContext.setAuth({
+                isAuthenticated: true,
+                user: {
+                    username: data.account.username,
+                    account_id: data.account.account_id,
+                    role: data.account.role,
+                },
+            });
+
             localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('role', data.account.role);
 
             showToast('Đăng nhập thành công');
             navigate('/admin/dashboard');

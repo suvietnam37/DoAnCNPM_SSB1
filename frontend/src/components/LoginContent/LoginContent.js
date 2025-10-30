@@ -1,23 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './LoginContent.module.scss';
 import showToast from '../../untils/ShowToast/showToast';
 import axios from '../../untils/CustomAxios/axios.customize';
+import { AuthContext } from '../../context/auth.context';
+
 const cx = classNames.bind(styles);
 
 function LoginContent() {
+    const authContext = useContext(AuthContext);
+
     const [role, setRole] = useState('parent'); // default
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    // useEffect(() => {
+    //     // Khi vào trang login => luôn xóa token cũ
+    //     localStorage.removeItem('access_token');
+    // }, []);
+
     useEffect(() => {
-        // Khi vào trang login => luôn xóa token cũ
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('username');
-    }, []);
+        if (authContext.auth.isAuthenticated && authContext.auth.user.role === 'Admin') {
+            navigate('/admin/dashboard');
+        }
+        if (authContext.auth.isAuthenticated && authContext.auth.user.role === 'Parent') {
+            navigate('/parent');
+        }
+        if (authContext.auth.isAuthenticated && authContext.auth.user.role === 'Driver') {
+            navigate('/driver');
+        }
+    }, [authContext.auth, navigate]);
 
     const onLogin = async (e) => {
         e.preventDefault();
@@ -35,7 +49,6 @@ function LoginContent() {
             });
 
             const data = res.data;
-            console.log('Login response:', data);
 
             if (data.EC !== 0 || (data.account.role !== 'Driver' && data.account.role !== 'Parent')) {
                 // Login thất bại
@@ -43,10 +56,17 @@ function LoginContent() {
                 return;
             }
 
+            authContext.setAuth({
+                isAuthenticated: true,
+                user: {
+                    username: data.account.username,
+                    account_id: data.account.account_id,
+                    role: data.account.role,
+                },
+            });
+
             // Login thành công
             localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('role', data.account.role);
-            localStorage.setItem('username', data.account.username);
             showToast('Đăng nhập thành công');
 
             // Điều hướng theo role

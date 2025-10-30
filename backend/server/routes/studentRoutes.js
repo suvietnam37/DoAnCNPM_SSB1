@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const studentController = require("../controllers/studentController");
 const auth = require("../middleware/auth");
-// router.all(/.*/, auth);
+router.all(/.*/, auth);
 
 // CRUD Endpoints
 router.get("/", studentController.getAllStudents); // GET /api/students

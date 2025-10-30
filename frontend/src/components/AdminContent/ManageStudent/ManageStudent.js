@@ -2,7 +2,8 @@
 import styles from './ManageStudent.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import axios from '../../../untils/CustomAxios/axios.customize';
 import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);

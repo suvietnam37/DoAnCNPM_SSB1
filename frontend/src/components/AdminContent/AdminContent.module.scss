@@ -30,6 +30,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .header-infor-acc {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
 }
 
 /* Sidebar menu */

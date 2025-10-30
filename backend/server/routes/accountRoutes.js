@@ -1,18 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const accountController = require("../controllers/accountController");
-// const auth = require("../middleware/auth");
-
-// router.all(/.*/, auth);
+const auth = require("../middleware/auth");
 
 // Đăng nhập
 router.post("/login", accountController.handleLogin);
+
+router.all(/.*/, auth);
 
 // Tạo tài khoản
 router.post("/create", accountController.createAccount);
 
 // Lấy tất cả tài khoản
 router.get("/", accountController.getAllAccounts);
+router.get("/account", accountController.getAccount);
 
 // Lấy tài khoản theo id
 router.get("/:id", accountController.getAccountById);

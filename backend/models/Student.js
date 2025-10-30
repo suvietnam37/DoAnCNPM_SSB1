@@ -39,7 +39,8 @@ async function getById(id) {
 
 // Lấy học sinh theo parent_id + thông tin điểm dừng, tuyến đường
 async function getByParentId(parentId) {
-  const [rows] = await db.query(`
+  const [rows] = await db.query(
+    `
       SELECT 
         s.*, 
         st.stop_name, st.latitude, st.longitude,
@@ -49,7 +50,9 @@ async function getByParentId(parentId) {
       JOIN route r ON st.route_id = r.route_id AND r.is_deleted = 0
       WHERE s.parent_id = ? AND s.is_deleted = 0
       ORDER BY s.student_name
-    `, [parentId]);
+    `,
+    [parentId]
+  );
   return rows;
 }
 
@@ -72,7 +75,13 @@ async function getByRouteId(routeId) {
 
 // Thêm học sinh mới
 async function create(student) {
-  const { parent_id, stop_id, student_name, class_name, is_absent = 0 } = student;
+  const {
+    parent_id,
+    stop_id,
+    student_name,
+    class_name,
+    is_absent = 0,
+  } = student;
   const [result] = await db.query(
     `INSERT INTO student 
      (parent_id, stop_id, student_name, class_name, is_absent) 
@@ -103,7 +112,14 @@ async function update(id, student) {
     throw new Error("Student not found or already deleted");
   }
 
-  return { student_id: id, parent_id, stop_id, student_name, class_name, is_absent };
+  return {
+    student_id: id,
+    parent_id,
+    stop_id,
+    student_name,
+    class_name,
+    is_absent,
+  };
 }
 
 // Xóa mềm học sinh

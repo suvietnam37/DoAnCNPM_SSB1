@@ -50,6 +50,10 @@ const getAllAccounts = async (req, res) => {
   }
 };
 
+const getAccount = async (req, res) => {
+  res.status(200).json(req.user);
+};
+
 // Lấy tài khoản theo id
 const getAccountById = async (req, res) => {
   try {
@@ -148,4 +152,5 @@ module.exports = {
   updateAccount,
   deleteAccount,
   updateStatusAccount,
+  getAccount,
 };
