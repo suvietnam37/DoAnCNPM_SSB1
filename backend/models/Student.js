@@ -39,18 +39,17 @@ async function getById(id) {
 
 // Lấy học sinh theo parent_id + thông tin điểm dừng, tuyến đường
 async function getByParentId(parentId) {
-  const [rows] = await db.query(
-    `SELECT 
-       s.*, 
-       st.stop_name, st.latitude, st.longitude,
-       r.route_name, r.route_id
-     FROM student s
-     JOIN stop st ON s.stop spatio_id = st.stop_id AND st.is_deleted = 0
-     JOIN route r ON st.route_id = r.route_id AND r.is_deleted = 0
-     WHERE s.parent_id = ? AND s.is_deleted = 0
-     ORDER BY s.student_name`,
-    [parentId]
-  );
+  const [rows] = await db.query(`
+      SELECT 
+        s.*, 
+        st.stop_name, st.latitude, st.longitude,
+        r.route_name, r.route_id
+      FROM student s
+      JOIN stop st ON s.stop_id = st.stop_id AND st.is_deleted = 0
+      JOIN route r ON st.route_id = r.route_id AND r.is_deleted = 0
+      WHERE s.parent_id = ? AND s.is_deleted = 0
+      ORDER BY s.student_name
+    `, [parentId]);
   return rows;
 }
 

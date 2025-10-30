@@ -230,12 +230,12 @@ function SetupRoute() {
                             {/* Trạng thái chỉ chỉnh được khi SỬA */}
                             {isOpenModal === 'edit' ? (
                                 <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                                    <option value="Not Started">Chưa bắt đầu</option>
-                                    <option value="Running">Đang chạy</option>
-                                    <option value="Completed">Hoàn thành</option>
+                                    <option value="Chưa bắt đầu">Chưa bắt đầu</option>
+                                    <option value="Đang chạy">Đang chạy</option>
+                                    <option value="Hoàn thành">Hoàn thành</option>
                                 </select>
                             ) : (
-                                <input type="text" value="Not Started" readOnly />
+                                <input type="text" value="Chưa bắt đầu" readOnly />
                             )}
 
                             <div className={cx('buttons')}>
