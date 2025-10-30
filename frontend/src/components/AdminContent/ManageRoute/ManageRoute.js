@@ -117,12 +117,18 @@ function ManageRoute() {
                                 <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', route)}>
                                     Sửa
                                 </button>
-                                <button className={cx('btn', 'danger')} onClick={() => handleOpenModal('delete', route)}>
+                                <button
+                                    className={cx('btn', 'danger')}
+                                    onClick={() => handleOpenModal('delete', route)}
+                                >
                                     Xóa
                                 </button>
                             </td>
                             <td>
-                                <button className={cx('btn', 'details')} onClick={() => handleOpenModal('details', route)}>
+                                <button
+                                    className={cx('btn', 'details')}
+                                    onClick={() => handleOpenModal('details', route)}
+                                >
                                     ...
                                 </button>
                             </td>

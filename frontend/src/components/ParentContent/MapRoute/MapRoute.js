@@ -23,13 +23,17 @@ function MapRoute({ routeStatus }) {
             <div className={cx('map-route-title')}>
                 <FontAwesomeIcon icon={faMap} className={cx('map-route-title-icon')} />
                 <span>Bản Đồ Theo Dõi Lộ Trình Xe</span>
-                </div>
+            </div>
             {routeStatus ? (
-                 <div className={cx('map-route-location')}>
+                <div className={cx('map-route-location')}>
                     <MapContainer center={[10.762622, 106.682214]} zoom={13} style={{ height: '450px', width: '100%' }}>
-                        <TileLayer
+                        {/* <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        /> */}
+                        <TileLayer
+                            url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
                         />
                         {/* Marker vị trí xe sẽ được thêm ở đây trong Tuần 6 */}
                     </MapContainer>

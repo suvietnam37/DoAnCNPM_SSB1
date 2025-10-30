@@ -44,18 +44,18 @@ async function getByRouteId(routeId) {
 
 // Thêm điểm dừng mới
 async function create(stop) {
-  const { route_id, stop_name, latitude, longitude } = stop;
+  const { route_id, stop_name, address, latitude, longitude } = stop;
   const [result] = await db.query(
-    `INSERT INTO stop (route_id, stop_name, latitude, longitude) 
-     VALUES (?, ?, ?, ?)`,
-    [route_id, stop_name, latitude || null, longitude || null]
+    `INSERT INTO stop (route_id, stop_name,address, latitude, longitude) 
+     VALUES (?, ?,?, ?, ?)`,
+    [route_id, stop_name, address, latitude, longitude]
   );
   return {
     stop_id: result.insertId,
     route_id,
     stop_name,
-    latitude: latitude || null,
-    longitude: longitude || null,
+    latitude: latitude,
+    longitude: longitude,
   };
 }
 

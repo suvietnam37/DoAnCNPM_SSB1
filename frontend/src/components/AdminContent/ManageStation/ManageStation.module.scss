@@ -59,12 +59,16 @@
     overflow: hidden;
     overflow-y: scroll;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    table-layout: fixed;
 
     th,
     td {
         padding: 12px;
         border-bottom: 1px solid #eee;
         text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     th {
@@ -132,7 +136,8 @@
     background: #fff;
     padding: 30px;
     border-radius: 8px;
-    width: 90%;
+    width: fit-content;
+    min-width: 50%;
     // max-width: 400px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -158,6 +163,7 @@
 
         .input {
             flex: none; // Không flex ở đây
+            width: 80%;
         }
     }
 

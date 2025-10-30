@@ -7,11 +7,11 @@ exports.getAllStops = async (req, res) => {
     let results;
 
     if (route_id) {
-        results = await Stop.getByRouteId(route_id);
+      results = await Stop.getByRouteId(route_id);
     } else {
-        results = await Stop.getAll();
+      results = await Stop.getAll();
     }
-    
+
     res.json(results);
   } catch (err) {
     console.error(err);
@@ -24,7 +24,8 @@ exports.getStopById = async (req, res) => {
   try {
     const id = req.params.id;
     const stop = await Stop.getById(id);
-    if (!stop) return res.status(404).json({ error: "Điểm dừng không tồn tại" });
+    if (!stop)
+      return res.status(404).json({ error: "Điểm dừng không tồn tại" });
     res.json(stop);
   } catch (err) {
     console.error(err);
@@ -35,11 +36,20 @@ exports.getStopById = async (req, res) => {
 // Thêm điểm dừng mới
 exports.createStop = async (req, res) => {
   try {
-    const { route_id, stop_name } = req.body;
-    if (!route_id || !stop_name) {
-      return res.status(400).json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+    const { route_id, stop_name, address, latitude, longitude } = req.body;
+    console.log(req.body);
+    if (!route_id || !stop_name || !address || !latitude || !longitude) {
+      return res
+        .status(400)
+        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
     }
-    const newStop = await Stop.create({ route_id, stop_name });
+    const newStop = await Stop.create({
+      route_id,
+      stop_name,
+      address,
+      latitude,
+      longitude,
+    });
     res.status(201).json(newStop);
   } catch (err) {
     console.error(err);
@@ -53,7 +63,9 @@ exports.updateStop = async (req, res) => {
     const id = req.params.id;
     const { route_id, stop_name } = req.body;
     if (!route_id || !stop_name) {
-      return res.status(400).json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+      return res
+        .status(400)
+        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
     }
     const updatedStop = await Stop.update(id, { route_id, stop_name });
     res.json(updatedStop);

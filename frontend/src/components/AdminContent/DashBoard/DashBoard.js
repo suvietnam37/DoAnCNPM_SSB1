@@ -61,9 +61,13 @@ function DashBoard() {
             <div className={cx('content')}>
                 <div className={cx('content-map')}>
                     <MapContainer center={[21.0285, 105.8542]} zoom={13} style={{ height: '450px', width: '100%' }}>
-                        <TileLayer
+                        {/* <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        /> */}
+                        <TileLayer
+                            url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
                         />
                         <Marker position={waypoints[0]} icon={busIcon}></Marker>
                         <Marker position={waypoints[1]} icon={busIcon}></Marker>

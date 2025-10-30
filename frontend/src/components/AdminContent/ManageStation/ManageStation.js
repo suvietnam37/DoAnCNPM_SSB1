@@ -27,6 +27,7 @@ function ManageStation() {
     const [address, setAddress] = useState('');
     const [routeId, setRouteId] = useState('');
     const [position, setPosition] = useState([10.762622, 106.660172]); // mặc định HCM
+    const [routes, setRoutes] = useState([]);
 
     // Lấy danh sách trạm từ API
     const fetchStops = async () => {
@@ -38,8 +39,18 @@ function ManageStation() {
         }
     };
 
+    const fetchRoutes = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/routes');
+            setRoutes(response.data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+
     useEffect(() => {
         fetchStops();
+        fetchRoutes();
     }, []);
 
     // Mở modal
@@ -65,7 +76,7 @@ function ManageStation() {
 
     // Thêm trạm
     const handleAddStop = async () => {
-        if (!stopName.trim() || !address.trim() || !routeId.trim()) {
+        if (!stopName.trim() || !address.trim()) {
             alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
@@ -88,7 +99,7 @@ function ManageStation() {
 
     // Sửa trạm
     const handleEditStop = async () => {
-        if (!stopName.trim() || !address.trim() || !routeId.trim()) {
+        if (!stopName.trim() || !address.trim()) {
             alert('Vui lòng nhập đầy đủ thông tin!');
             return;
         }
@@ -194,14 +205,8 @@ function ManageStation() {
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
                             />
-                            {/* <input
-                                type="text"
-                                placeholder="Mã tuyến"
-                                className={cx('input')}
-                                value={routeId}
-                                onChange={(e) => setRouteId(e.target.value)}
-                            /> */}
 
+                            {/* Bảng chọn tuyến */}
                             <div className={cx('table-wrapper')}>
                                 <table className={cx('table')}>
                                     <thead>
@@ -212,38 +217,37 @@ function ManageStation() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
+                                        {routes.map((route) => (
+                                            <tr key={route.route_id}>
+                                                <td>{route.route_id}</td>
+                                                <td>{route.route_name}</td>
+                                                <td>
+                                                    <input
+                                                        type="radio"
+                                                        name="route"
+                                                        value={route.route_id}
+                                                        checked={routeId === route.route_id}
+                                                        onChange={() => setRouteId(route.route_id)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Map chọn vị trí */}
                             <div style={{ height: '240px', width: '80%' }}>
                                 <MapContainer
-                                    key={address} // remount mỗi khi address thay đổi, đảm bảo reset popup
+                                    key={selectedStop?.stop_id || 'new'}
                                     center={position}
                                     zoom={13}
-                                    style={{ height: '240px', width: '80%' }}
+                                    style={{ height: '240px', width: '100%' }}
                                 >
-                                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    <TileLayer
+                                        url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                                    />
                                     <LocationPicker
                                         position={position}
                                         setPosition={setPosition}
@@ -252,6 +256,7 @@ function ManageStation() {
                                     />
                                 </MapContainer>
                             </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditStop}>
                                     Cập nhật
@@ -288,13 +293,6 @@ function ManageStation() {
                                 onChange={(e) => setAddress(e.target.value)}
                                 readOnly
                             />
-                            {/* <input
-                                type="text"
-                                placeholder="Mã tuyến"
-                                className={cx('input')}
-                                value={routeId}
-                                onChange={(e) => setRouteId(e.target.value)}
-                            /> */}
 
                             <div className={cx('table-wrapper')}>
                                 <table className={cx('table')}>
@@ -306,33 +304,31 @@ function ManageStation() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R01</td>
-                                            <td>Cầu Ông Lãnh</td>
-                                            <td>
-                                                <input type="radio" name="route" />
-                                            </td>
-                                        </tr>
+                                        {routes.map((route) => (
+                                            <tr key={route.route_id}>
+                                                <td>{route.route_id}</td>
+                                                <td>{route.route_name}</td>
+                                                <td>
+                                                    <input
+                                                        type="radio"
+                                                        name="route"
+                                                        value={route.route_id}
+                                                        checked={routeId === route.route_id}
+                                                        onChange={() => setRouteId(route.route_id)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
                             <div style={{ height: '240px', width: '80%' }}>
                                 <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
-                                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
+                                    <TileLayer
+                                        url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                                    />
                                     <LocationPicker
                                         position={position}
                                         setPosition={setPosition}
