@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import io from 'socket.io-client'; // 🆕 Thêm socket.io-client
+import io from 'socket.io-client';
 import NavMenu from '../NavMenu/NavMenu';
 import classNames from 'classnames/bind';
 import styles from './ParentContent.module.scss';
@@ -8,6 +8,7 @@ import RouteStatus from './RouteStatus/RouteStatus';
 import StudentManage from './StudentManage/StudentManage';
 import Notification from './Notification/Notification';
 import MapRoute from './MapRoute/MapRoute';
+import showToast from '../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -17,15 +18,16 @@ const token = localStorage.getItem('access_token');
 const LOGGED_IN_PARENT_ID = 1;
 const LOGGED_IN_PARENT_ACCOUNT_ID = 3;
 
-// 🆕 Tạo kết nối socket (chỉ cần tạo 1 lần)
+// Tạo kết nối socket (chỉ cần tạo 1 lần)
 const socket = io('http://localhost:5000'); // Đổi URL theo backend của bạn nếu khác
 
 function ParentContent() {
     // State quản lý dữ liệu
     const [students, setStudents] = useState([]);
     const [notifications, setNotifications] = useState([]);
-    const [routeStatus, setRouteStatus] = useState(null); // Lưu thông tin tuyến xe đang chạy
+    const [routeStatus, setRouteStatus] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [busLocation, setBusLocation] = useState(null);
 
     useEffect(() => {
         const fetchParentData = async () => {
@@ -65,24 +67,42 @@ function ParentContent() {
         fetchParentData();
     }, []);
 
-    // 🆕 useEffect cho socket.io: nhận dữ liệu thời gian thực
+    // useEffect cho socket.io: nhận dữ liệu thời gian thực
     useEffect(() => {
-        socket.on('busLocationUpdate', (data) => {
-            console.log('Nhận vị trí xe buýt mới:', data);
-            // Nếu tuyến hiện tại trùng với route_id của dữ liệu gửi đến → cập nhật giao diện
-            if (routeStatus && data.route_id === routeStatus.route_id) {
-                setRouteStatus((prev) => ({
-                    ...prev,
-                    current_location: data.location,
-                }));
-            }
-        });
+        // Chỉ thực hiện khi có thông tin tuyến xe
+        if (routeStatus) {
+            console.log(`Đang tham gia phòng cho tuyến ${routeStatus.route_id}`);
+            // 1. Gửi sự kiện để tham gia vào phòng của tuyến xe này
+            socket.emit('join_route_room', routeStatus.route_id);
 
-        // Cleanup khi component unmount
-        return () => {
-            socket.off('busLocationUpdate');
-        };
+            // 2. Lắng nghe sự kiện "new_location" mà backend gửi
+            const handleNewLocation = (data) => {
+                console.log('Nhận vị trí xe buýt mới:', data);
+                setBusLocation({ lat: data.lat, lng: data.lng });
+            };
+            socket.on('new_location', handleNewLocation);
+
+            // 3. Lắng nghe sự kiện "approaching_stop" mà backend gửi
+            const handleApproachingStop = (data) => {
+                showToast(`Xe sắp đến trạm "${data.stopName}" (còn ${data.distance}m)!`);
+            };
+            socket.on('approaching_stop', handleApproachingStop);
+
+            // Cleanup function: Rất quan trọng để tránh lỗi
+            return () => {
+                console.log(`Rời phòng của tuyến ${routeStatus.route_id}`);
+                socket.off('new_location', handleNewLocation);
+                socket.off('approaching_stop', handleApproachingStop);
+            };
+        }
     }, [routeStatus]);
+
+    useEffect(() => {
+        return () => {
+            console.log("Ngắt kết nối socket.");
+            socket.disconnect();
+        };
+    }, []);
 
     const menus = [
         { name: 'Trạng Thái Tuyến Xe', id: 'route-status', offset: -300 },
@@ -102,7 +122,7 @@ function ParentContent() {
                 <RouteStatus routeStatus={routeStatus} />
                 <StudentManage students={students} />
                 <Notification notifications={notifications} />
-                <MapRoute routeStatus={routeStatus} />
+                <MapRoute routeStatus={routeStatus} busLocation={busLocation} />
             </div>
         </div>
     );

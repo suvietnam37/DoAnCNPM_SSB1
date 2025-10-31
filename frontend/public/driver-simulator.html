@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head><title>Driver GPS Simulator</title></head>
+<body>
+    <h1>Driver GPS Simulator</h1>
+    <p>Giả lập gửi tọa độ cho chuyến xe đang chạy.</p>
+    <label>Assignment ID:</label><input type="text" id="assignmentId" value="1"><br>
+    <label>Route ID:</label><input type="text" id="routeId" value="1"><br>
+    <label>Latitude:</label><input type="text" id="lat" value="10.762622"><br>
+    <label>Longitude:</label><input type="text" id="lng" value="10.682214"><br>
+    <button onclick="updateLocation()">Gửi Vị Trí</button>
+    <button onclick="startAutoSend()">Bắt Đầu Tự Động</button>
+    <button onclick="stopAutoSend()">Dừng</button>
+    <p id="status"></p>
+
+    <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io("http://localhost:5000");
+        let interval;
+
+        function updateLocation() {
+            const data = {
+                assignment_id: document.getElementById('assignmentId').value,
+                route_id: document.getElementById('routeId').value,
+                lat: parseFloat(document.getElementById('lat').value),
+                lng: parseFloat(document.getElementById('lng').value),
+            };
+            socket.emit('update_location', data);
+            document.getElementById('status').innerText = 'Đã gửi: ' + JSON.stringify(data);
+        }
+
+        function startAutoSend() {
+            stopAutoSend();
+            interval = setInterval(() => {
+                const lat = document.getElementById('lat');
+                lat.value = parseFloat(lat.value) + 0.0001; // Giả lập di chuyển
+                updateLocation();
+            }, 3000); // Gửi mỗi 3 giây
+        }
+
+        function stopAutoSend() { clearInterval(interval); }
+    </script>
+</body>
+</html>

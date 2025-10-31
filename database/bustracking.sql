@@ -319,5 +319,26 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+--
+-- Table structure for table `bus_location`
+--
+
+DROP TABLE IF EXISTS `bus_location`;
+CREATE TABLE `bus_location` (
+  `assignment_id` INT(11) NOT NULL PRIMARY KEY,
+  `latitude` DOUBLE NOT NULL,
+  `longitude` DOUBLE NOT NULL,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `bus_location_ibfk_1` FOREIGN KEY (`assignment_id`) REFERENCES `route_assignment` (`assignment_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bus_location`
+--
+
+LOCK TABLES `bus_location` WRITE;
+/*!40000 ALTER TABLE `bus_location` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bus_location` ENABLE KEYS */;
+UNLOCK TABLES;
 
 -- Dump completed on 2025-10-24  8:05:12
