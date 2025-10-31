@@ -53,7 +53,7 @@ exports.createDriver = async (req, res) => {
       driver_name: driver_name,
       account_id: null,
     };
-    
+
     const newDriver = await Driver.create(newDriverData);
     res.status(201).json(newDriver);
   } catch (err) {

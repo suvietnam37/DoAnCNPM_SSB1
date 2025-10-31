@@ -6,10 +6,9 @@ const auth = require("../middleware/auth");
 // Đăng nhập
 router.post("/login", accountController.handleLogin);
 
-router.all(/.*/, auth);
-
 // Tạo tài khoản
 router.post("/create", accountController.createAccount);
+router.all(/.*/, auth);
 
 // Lấy tất cả tài khoản
 router.get("/", accountController.getAllAccounts);

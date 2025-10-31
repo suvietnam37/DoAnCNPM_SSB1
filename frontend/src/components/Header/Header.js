@@ -13,7 +13,6 @@ const cx = classNames.bind(styles);
 function Header() {
     const authContext = useContext(AuthContext);
     const username = authContext.auth.user.username;
-    const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef();
 
     const navigate = useNavigate();
@@ -38,16 +37,6 @@ function Header() {
             showToast('Đăng xuất thành công');
         }
     };
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setMenuOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     const fetchAccount = async () => {
         try {
@@ -77,17 +66,10 @@ function Header() {
             </div>
 
             <div className={cx('header-login')} ref={menuRef}>
-                <div className={cx('header-acc-infor')} onClick={() => setMenuOpen(!menuOpen)}>
-                    <FontAwesomeIcon icon={faChevronDown} className={cx('dropdown-icon', { open: menuOpen })} />
-                    <p>{username}</p>
+                <div className={cx('header-acc-infor')}>
+                    <span>{username}</span>
                     <FontAwesomeIcon icon={faUser} />
                 </div>
-
-                {menuOpen && (
-                    <div className={cx('dropdown-menu')}>
-                        <button className={cx('dropdown-item')}>Đổi mật khẩu</button>
-                    </div>
-                )}
 
                 <button
                     className={cx('header-logout-btn')}

@@ -1,8 +1,9 @@
 import styles from './ManageAccount.module.scss';
 import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
+import axios from '../../../untils/CustomAxios/axios.customize';
 
 const cx = classNames.bind(styles);
 
@@ -26,6 +27,9 @@ function ManageAccount() {
 
     const handleCloseModal = () => {
         setIsOpenModalOpen('');
+        setUsername('');
+        setPassword('');
+        setNewPassword('');
     };
 
     const fetchAccounts = async () => {

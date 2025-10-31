@@ -46,3 +46,35 @@
         }
     }
 }
+
+.btn {
+    margin: 0 4px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #5555558d;
+
+    &.change {
+        background: #3498db;
+    }
+    &.danger {
+        background: #e74c3c;
+    }
+
+    &.add {
+        background: #27ae60;
+    }
+
+    &.radius {
+        border-radius: 8px;
+        padding: 5px 12px;
+    }
+    &.details {
+        background-color: whitesmoke;
+        font-size: 16px;
+    }
+    &:hover {
+        color: #555555;
+    }
+}

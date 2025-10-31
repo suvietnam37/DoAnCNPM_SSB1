@@ -57,31 +57,33 @@ function Report() {
             )}
             {isOpenModalOpen === 'driver' && (
                 <div className={cx('form-container')}>
-                    <table className={cx('table')}>
-                        <thead>
-                            <tr>
-                                <th>Mã tài xế</th>
-                                <th>Tên tài xế </th>
-                                <th>Chọn</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>TX01</td>
-                                <td>Nguyễn Ông Lãnh</td>
-                                <td>
-                                    <input type="checkbox" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>TX01</td>
-                                <td>Nguyễn Kim Lãnh</td>
-                                <td>
-                                    <input type="checkbox" />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className={cx('table-wrapper')}>
+                        <table className={cx('table')}>
+                            <thead>
+                                <tr>
+                                    <th>Mã tài xế</th>
+                                    <th>Tên tài xế </th>
+                                    <th>Chọn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>TX01</td>
+                                    <td>Nguyễn Ông Lãnh</td>
+                                    <td>
+                                        <input type="checkbox" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>TX01</td>
+                                    <td>Nguyễn Kim Lãnh</td>
+                                    <td>
+                                        <input type="checkbox" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
             <div className={cx('send-btn')}>

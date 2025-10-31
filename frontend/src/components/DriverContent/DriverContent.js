@@ -1,5 +1,5 @@
 // frontend/src/components/DriverContent/DriverContent.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, use } from 'react';
 import axios from 'axios';
 import NavMenu from '../NavMenu/NavMenu';
 import classNames from 'classnames/bind';
@@ -9,18 +9,23 @@ import StudentManage from './StudentManage/StudentManage';
 import Doing from './Doing/Doing';
 import Report from './Report/Report';
 import showToast from '../../untils/ShowToast/showToast';
+import { AuthContext } from '../../context/auth.context';
 
 const cx = classNames.bind(styles);
 
 // Giả định ID của tài xế đã đăng nhập
-const LOGGED_IN_DRIVER_ID = 1;
 
 function DriverContent() {
+    const authContext = useContext(AuthContext);
+    const ACCOUNT_ID = authContext.auth.user.account_id;
+    const LOGGED_IN_DRIVER_ID = 1;
+
     // State quản lý toàn bộ dữ liệu cho trang Driver
     const [assignments, setAssignments] = useState([]);
     const [currentAssignment, setCurrentAssignment] = useState(null);
     const [studentsOnRoute, setStudentsOnRoute] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [driver, setDriver] = useState(null);
 
     // Hàm gọi API lấy danh sách học sinh khi một tuyến bắt đầu
     const fetchStudentsForRoute = async (routeId) => {
@@ -33,39 +38,40 @@ function DriverContent() {
         }
     };
 
-    // Hàm để tài xế bắt đầu một tuyến
-    const handleStartRoute = async (assignmentId, routeId) => {
+    // Lấy tài xế từ account_id
+    useEffect(() => {
+        fetchDriverByAcountId(ACCOUNT_ID);
+    }, []);
+
+    // Khi driver đã có -> load toàn bộ dữ liệu
+    useEffect(() => {
+        if (driver) {
+            fetchDriverData(driver.driver_id);
+        }
+    }, [driver]);
+
+    // Hàm lấy tài xế theo account_id
+    const fetchDriverByAcountId = async (ACCOUNT_ID) => {
         try {
-            // 1. Cập nhật trạng thái của assignment thành 'Running'
-            await axios.put(`http://localhost:5000/api/route_assignments/${assignmentId}`, {
-                status: 'Running',
-                // Cần gửi lại đủ các trường khác hoặc để backend tự xử lý
-            });
-
-            // 2. Tải lại dữ liệu
-            fetchDriverData();
-
-            // 3. Tải danh sách học sinh cho tuyến đó
-            fetchStudentsForRoute(routeId);
+            const response = await axios.get(`http://localhost:5000/api/drivers/by-account/${ACCOUNT_ID}`);
+            setDriver(response.data);
         } catch (error) {
-            console.error('Lỗi khi bắt đầu tuyến:', error);
-            showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.');
+            console.error('Lỗi khi tải tài xế:', error);
         }
     };
 
-    // Hàm để tải tất cả dữ liệu ban đầu
-    const fetchDriverData = async () => {
+    // Hàm lấy toàn bộ dữ liệu liên quan tài xế
+    const fetchDriverData = async (driverId) => {
         setLoading(true);
         try {
             const [assignmentsRes, currentAssignmentRes] = await Promise.all([
-                axios.get(`http://localhost:5000/api/route_assignments?driver_id=${LOGGED_IN_DRIVER_ID}`),
-                axios.get(`http://localhost:5000/api/route_assignments/current?driver_id=${LOGGED_IN_DRIVER_ID}`),
+                axios.get(`http://localhost:5000/api/route_assignments?driver_id=${driverId}`),
+                axios.get(`http://localhost:5000/api/route_assignments/current?driver_id=${driverId}`),
             ]);
 
             setAssignments(assignmentsRes.data);
             setCurrentAssignment(currentAssignmentRes.data);
 
-            // Nếu đã có tuyến đang chạy, tải luôn danh sách học sinh
             if (currentAssignmentRes.data) {
                 fetchStudentsForRoute(currentAssignmentRes.data.route_id);
             }
@@ -76,9 +82,20 @@ function DriverContent() {
         }
     };
 
-    useEffect(() => {
-        fetchDriverData();
-    }, []);
+    // Khi bắt đầu tuyến
+    const handleStartRoute = async (assignmentId, routeId) => {
+        try {
+            await axios.put(`http://localhost:5000/api/route_assignments/${assignmentId}`, {
+                status: 'Running',
+            });
+
+            fetchDriverData(driver.driver_id); // ✅ Sửa
+            fetchStudentsForRoute(routeId);
+        } catch (error) {
+            console.error('Lỗi khi bắt đầu tuyến:', error);
+            showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.');
+        }
+    };
 
     const menus = [
         { name: 'Danh Sách Tuyến Xe', id: 'route-manage', offset: -300 },
