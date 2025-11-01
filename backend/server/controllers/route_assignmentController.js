@@ -38,6 +38,7 @@ exports.createRouteAssignment = async (req, res) => {
   try {
     const { route_id, driver_id, bus_id, run_date, status, departure_time } =
       req.body;
+
     if (
       !route_id ||
       !driver_id ||
@@ -91,6 +92,24 @@ exports.updateRouteAssignment = async (req, res) => {
       status,
       departure_time,
     });
+    res.json(updatedRouteAssignment);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi cập nhật phân công tuyến" });
+  }
+};
+
+// Cập nhật phân công tuyến
+exports.startRouteAssignment = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { status } = req.body;
+    if (!status) {
+      return res
+        .status(400)
+        .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
+    }
+    const updatedRouteAssignment = await RouteAssignment.start(id, status);
     res.json(updatedRouteAssignment);
   } catch (err) {
     console.error(err);

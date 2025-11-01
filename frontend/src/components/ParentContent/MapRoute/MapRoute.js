@@ -10,12 +10,11 @@ import { useEffect, useState, useRef } from 'react';
 const cx = classNames.bind(styles);
 
 const busIcon = new L.Icon({
-    iconUrl: '/bus-icon.png', 
+    iconUrl: '/bus-icon.png',
     iconSize: [40, 40],
     iconAnchor: [20, 40],
-    popupAnchor: [0, -40] 
+    popupAnchor: [0, -40],
 });
-
 
 function MapRoute({ routeStatus, busLocation }) {
     const markerRef = useRef(null);
@@ -54,26 +53,22 @@ function MapRoute({ routeStatus, busLocation }) {
                 <FontAwesomeIcon icon={faMap} className={cx('map-route-title-icon')} />
                 <span>Bản Đồ Theo Dõi Lộ Trình Xe</span>
             </div>
-            
+
             <div className={cx('map-route-location')}>
-                <MapContainer 
-                    center={initialPosition} 
+                <MapContainer
+                    center={initialPosition}
                     zoom={16} // Zoom gần hơn một chút
                     style={{ height: '500px', width: '100%' }}
                     whenCreated={setMap} // Lưu đối tượng map vào state khi nó được tạo
                 >
-                    <TileLayer 
+                    <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     />
-                    
+
                     {/* Chỉ render Marker khi có vị trí ban đầu */}
                     {busLocation && (
-                        <Marker 
-                            ref={markerRef} 
-                            position={initialPosition} 
-                            icon={busIcon}
-                        >
+                        <Marker ref={markerRef} position={initialPosition} icon={busIcon}>
                             <Popup>Vị trí hiện tại của xe.</Popup>
                         </Marker>
                     )}

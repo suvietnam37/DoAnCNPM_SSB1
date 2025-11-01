@@ -1,23 +1,16 @@
 // models/Route_assignment.js
 const db = require("../config/db");
 
-// Hàm convert thời gian UTC → +07:00 cho tất cả nơi cần SELECT
-const TIMEZONE_CONVERT = `CONVERT_TZ(ra.run_date, '+00:00', '+07:00') AS run_date_vn`;
-
 // -------------------------
 // Lấy tất cả phân công
 // -------------------------
 async function getAll() {
   const [rows] = await db.query(
     `
-    SELECT 
-      ra.*, 
-      ${TIMEZONE_CONVERT}
+    SELECT ra.*
     FROM route_assignment ra
     WHERE ra.is_deleted = 0
-    ORDER BY 
-      CONVERT_TZ(ra.run_date, '+00:00', '+07:00') DESC, 
-      ra.departure_time DESC
+    ORDER BY ra.run_date DESC, ra.departure_time DESC
     `
   );
   return rows;
@@ -29,9 +22,7 @@ async function getAll() {
 async function getById(id) {
   const [rows] = await db.query(
     `
-    SELECT 
-      ra.*,
-      ${TIMEZONE_CONVERT}
+    SELECT ra.*
     FROM route_assignment ra
     WHERE ra.assignment_id = ?
       AND ra.is_deleted = 0
@@ -113,15 +104,11 @@ async function softDelete(id) {
 async function getByDriverId(driverId) {
   const [rows] = await db.query(
     `
-    SELECT 
-      ra.*,
-      ${TIMEZONE_CONVERT}
+    SELECT ra.*
     FROM route_assignment ra
     WHERE ra.driver_id = ?
       AND ra.is_deleted = 0
-    ORDER BY 
-      CONVERT_TZ(ra.run_date, '+00:00', '+07:00') DESC, 
-      ra.departure_time DESC
+    ORDER BY ra.run_date DESC, ra.departure_time DESC
     `,
     [driverId]
   );
@@ -137,7 +124,6 @@ async function getCurrentByDriverId(driverId) {
     `
     SELECT 
       ra.*,
-      ${TIMEZONE_CONVERT},
       r.route_name,
       d.driver_name,
       b.license_plate
@@ -163,7 +149,6 @@ async function getCurrentByRouteId(routeId) {
     `
     SELECT 
       ra.*,
-      ${TIMEZONE_CONVERT},
       r.route_name,
       d.driver_name,
       b.license_plate
@@ -199,12 +184,34 @@ async function getStopCountByAssignmentId(assignmentId) {
   return rows[0]?.stop_count || 0;
 }
 
+async function start(id, status) {
+  const assignment_id = id;
+  const newstatus = status;
+
+  const [result] = await db.query(
+    `
+    UPDATE route_assignment 
+    SET  status = ?
+    WHERE assignment_id = ? 
+      AND is_deleted = 0
+    `,
+    [newstatus, assignment_id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Route assignment not found or already deleted");
+  }
+
+  return { assignment_id: id, status };
+}
+
 module.exports = {
   getAll,
   getById,
   create,
   update,
   softDelete,
+  start,
   getByDriverId,
   getCurrentByDriverId,
   getCurrentByRouteId,

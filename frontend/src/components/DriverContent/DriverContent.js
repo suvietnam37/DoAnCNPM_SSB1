@@ -18,7 +18,6 @@ const cx = classNames.bind(styles);
 function DriverContent() {
     const authContext = useContext(AuthContext);
     const ACCOUNT_ID = authContext.auth.user.account_id;
-    const LOGGED_IN_DRIVER_ID = 1;
 
     // State quản lý toàn bộ dữ liệu cho trang Driver
     const [assignments, setAssignments] = useState([]);
@@ -84,16 +83,23 @@ function DriverContent() {
 
     // Khi bắt đầu tuyến
     const handleStartRoute = async (assignmentId, routeId) => {
+        const runningAssignment = assignments.find((a) => a.status === 'Running');
+        if (runningAssignment) {
+            showToast('Vui lòng hoàn thành tuyến đã bắt đầu.', false);
+            return;
+        }
         try {
-            await axios.put(`http://localhost:5000/api/route_assignments/${assignmentId}`, {
+            const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                 status: 'Running',
             });
-
-            fetchDriverData(driver.driver_id); // ✅ Sửa
-            fetchStudentsForRoute(routeId);
+            if (response) {
+                fetchDriverData(driver.driver_id);
+                fetchStudentsForRoute(routeId);
+                showToast('Tuyến xe đã bắt đầu chúc bác tài làm việc vui vẻ');
+            }
         } catch (error) {
             console.error('Lỗi khi bắt đầu tuyến:', error);
-            showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.');
+            showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.', false);
         }
     };
 
