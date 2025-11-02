@@ -201,7 +201,6 @@ function ManageStation() {
                                         className={cx('input')}
                                         value={stopName}
                                         onChange={(e) => setStopName(e.target.value)}
-                                        readOnly
                                     />
                                 </div>
                                 <div className={cx('flex-input')}>
@@ -212,7 +211,6 @@ function ManageStation() {
                                         className={cx('input')}
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
-                                        readOnly
                                     />
                                 </div>
                             </div>

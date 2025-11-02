@@ -236,6 +236,9 @@ CREATE TABLE `route_assignment` (
   CONSTRAINT `route_assignment_ibfk_3` FOREIGN KEY (`bus_id`) REFERENCES `bus` (`bus_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+ALTER TABLE route_assignment
+ADD COLUMN current_stop_id INT NULL,
+ADD COLUMN next_stop_id INT NULL;
 
 --
 -- Dumping data for table `route_assignment`
@@ -300,6 +303,8 @@ CREATE TABLE `student` (
   CONSTRAINT `student_ibfk_2` FOREIGN KEY (`stop_id`) REFERENCES `stop` (`stop_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+ALTER TABLE student 
+ADD COLUMN status TINYINT(1) NOT NULL DEFAULT 0 AFTER class_name;
 
 --
 -- Dumping data for table `student`
