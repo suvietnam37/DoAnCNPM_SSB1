@@ -112,3 +112,31 @@ exports.getStudentsByRoute = async (req, res) => {
       .json({ error: "Lỗi khi lấy danh sách học sinh theo tuyến" });
   }
 };
+exports.updateStatus = async (req, res) => {
+  try {
+    const { status, student_id } = req.body;
+
+    if (student_id) {
+      const result = await Student.updateStatusById(student_id, status);
+
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật trạng thái 1 học sinh thành công!",
+        data: result,
+      });
+    }
+
+    const result = await Student.updateStatusAll(status);
+
+    return res.status(200).json({
+      success: true,
+      message: "Cập nhật trạng thái hàng loạt thành công!",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

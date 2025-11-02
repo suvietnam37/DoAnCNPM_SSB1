@@ -24,6 +24,27 @@
     .student-manage-table {
         border-radius: 24px;
         width: 100%;
+        gap: 20px;
+
+        .student-manage-table-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+
+            button {
+                width: fit-content;
+                height: 35px;
+                cursor: pointer;
+                border-radius: 16px;
+                border: none;
+                background-color: rgb(129, 255, 127);
+                padding: 0 20px;
+                &:hover {
+                    background-color: rgb(114, 228, 112);
+                }
+            }
+        }
 
         table {
             margin: 20px 50px;
@@ -32,29 +53,6 @@
             border-radius: 16px;
             overflow: hidden;
             border: none;
-
-            td:last-child {
-                display: flex;
-                justify-content: space-around;
-
-                span {
-                    text-align: start;
-                    width: 60%;
-                }
-
-                button {
-                    width: 80%;
-                    height: 35px;
-                    cursor: pointer;
-                    border-radius: 16px;
-                    border: none;
-                    background-color: rgb(129, 255, 127);
-
-                    &:hover {
-                        background-color: rgb(114, 228, 112);
-                    }
-                }
-            }
         }
 
         th,

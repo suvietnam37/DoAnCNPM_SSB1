@@ -45,9 +45,21 @@ function DriverContent() {
     // Khi driver đã có -> load toàn bộ dữ liệu
     useEffect(() => {
         if (driver) {
-            fetchDriverData(driver.driver_id);
+            fetchAssignmentByDriverId(driver.driver_id);
         }
     }, [driver]);
+
+    useEffect(() => {
+        const runningAssignment = assignments.find((a) => {
+            const today = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
+            const run_date = new Date(a.run_date).toLocaleDateString('vi-VN').replace(/\//g, '-');
+            if (a.status === 'Running' && today === run_date) return a.status === 'Running';
+        });
+
+        if (runningAssignment) {
+            fetchStudentsForRoute(runningAssignment.route_id);
+        }
+    }, [assignments]);
 
     // Hàm lấy tài xế theo account_id
     const fetchDriverByAcountId = async (ACCOUNT_ID) => {
@@ -60,24 +72,32 @@ function DriverContent() {
     };
 
     // Hàm lấy toàn bộ dữ liệu liên quan tài xế
-    const fetchDriverData = async (driverId) => {
+    const fetchAssignmentByDriverId = async (driverId) => {
         setLoading(true);
         try {
-            const [assignmentsRes, currentAssignmentRes] = await Promise.all([
-                axios.get(`http://localhost:5000/api/route_assignments?driver_id=${driverId}`),
-                axios.get(`http://localhost:5000/api/route_assignments/current?driver_id=${driverId}`),
-            ]);
+            const assignmentsRes = await axios.get(`http://localhost:5000/api/route_assignments?driver_id=${driverId}`);
 
             setAssignments(assignmentsRes.data);
-            setCurrentAssignment(currentAssignmentRes.data);
-
-            if (currentAssignmentRes.data) {
-                fetchStudentsForRoute(currentAssignmentRes.data.route_id);
-            }
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu cho tài xế:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResetStatusStudent = async () => {
+        try {
+            const { data } = await axios.put('http://localhost:5000/api/students/status', {
+                status: 'Not Started',
+            });
+
+            if (data.success) {
+                showToast('Xác nhận thành công');
+            } else {
+                showToast(data.message || 'Xác nhận thất bại', false);
+            }
+        } catch (error) {
+            showToast('Lỗi hệ thống', false);
         }
     };
 
@@ -93,13 +113,35 @@ function DriverContent() {
                 status: 'Running',
             });
             if (response) {
-                fetchDriverData(driver.driver_id);
+                fetchAssignmentByDriverId(driver.driver_id);
+                handleResetStatusStudent();
                 fetchStudentsForRoute(routeId);
                 showToast('Tuyến xe đã bắt đầu chúc bác tài làm việc vui vẻ');
             }
         } catch (error) {
             console.error('Lỗi khi bắt đầu tuyến:', error);
             showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.', false);
+        }
+    };
+
+    const handleConfirmStudent = async (newStatus, student_id) => {
+        try {
+            const { data } = await axios.put('http://localhost:5000/api/students/status', {
+                status: newStatus,
+                student_id,
+            });
+
+            if (data.success) {
+                showToast('Xác nhận thành công');
+                setStudentsOnRoute(
+                    //ghi lai thuoc tinh cu va ghi de status
+                    (prev) => prev.map((st) => (st.student_id === student_id ? { ...st, status: newStatus } : st)),
+                );
+            } else {
+                showToast(data.message || 'Xác nhận thất bại', false);
+            }
+        } catch (error) {
+            showToast('Lỗi hệ thống', false);
         }
     };
 
@@ -118,9 +160,8 @@ function DriverContent() {
         <div className={cx('header-position')}>
             <NavMenu menus={menus} role={'Driver'} />
             <div className={cx('content-position')}>
-                {/* Truyền dữ liệu và hàm xử lý xuống component con */}
                 <RouteManage assignments={assignments} onStartRoute={handleStartRoute} />
-                <StudentManage students={studentsOnRoute} />
+                <StudentManage students={studentsOnRoute} handleConfirmStudent={handleConfirmStudent} />
                 <Doing currentAssignment={currentAssignment} />
                 <Report />
             </div>

@@ -60,14 +60,10 @@ async function getByParentId(parentId) {
 async function getByRouteId(routeId) {
   const [rows] = await db.query(
     `SELECT 
-       s.*, 
-       st.stop_name, st.latitude, st.longitude,
-       p.parent_name
+       *
      FROM student s
      JOIN stop st ON s.stop_id = st.stop_id AND st.is_deleted = 0
-     JOIN parent p ON s.parent_id = p.parent_id AND p.is_deleted = 0
-     WHERE st.route_id = ? AND s.is_deleted = 0
-     ORDER BY st.stop_name, s.student_name`,
+     WHERE st.route_id = ? AND s.is_deleted = 0  AND s.is_absent = 0`,
     [routeId]
   );
   return rows;
@@ -136,6 +132,45 @@ async function softDelete(id) {
   return { message: "Student soft deleted successfully" };
 }
 
+async function updateStatusById(studentId, status) {
+  const student_id = studentId;
+  const newStatus = status;
+  const [result] = await db.query(
+    `UPDATE student 
+     SET status = ?
+     WHERE student_id = ? AND is_deleted = 0 AND is_absent = 0`,
+    [newStatus, student_id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Student not found or already deleted");
+  }
+
+  return {
+    status: newStatus,
+    student_id: student_id,
+  };
+}
+
+// Update tất cả học sinh theo điều kiện (route_id hoặc stop_id hoặc all)
+async function updateStatusAll(status) {
+  const newStatus = status;
+  const [result] = await db.query(
+    `UPDATE student 
+     SET status = ?
+     WHERE is_deleted = 0 AND is_absent = 0`,
+    [newStatus]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Student not found or already deleted");
+  }
+
+  return {
+    status: newStatus,
+  };
+}
+
 module.exports = {
   getAll,
   getById,
@@ -144,4 +179,6 @@ module.exports = {
   create,
   update,
   softDelete,
+  updateStatusById,
+  updateStatusAll,
 };

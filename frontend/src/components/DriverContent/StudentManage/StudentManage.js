@@ -2,8 +2,11 @@ import styles from './StudentManage.module.scss';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { useEffect, useState } from 'react';
+import showToast from '../../../untils/ShowToast/showToast';
+import axios from 'axios';
 const cx = classNames.bind(styles);
-function StudentManage() {
+function StudentManage({ students, handleConfirmStudent }) {
     return (
         <div className={cx('student-manage')} id="student-manage">
             <div className={cx('student-manage-title')}>
@@ -14,41 +17,36 @@ function StudentManage() {
                 <table>
                     <thead>
                         <tr>
+                            <th>Mã học sinh</th>
                             <th>Họ tên</th>
                             <th>Lớp</th>
-                            <th>Mã học sinh</th>
                             <th>Trạng thái</th>
-                            <th>Đã lên xe</th>
-                            {/* <th>Trạng thái tiếp theo</th> */}
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Nguyễn Văn A</td>
-                            <td>10A1</td>
-                            <td>
-                                <span>HS001</span>
-                            </td>
-                            <td>
-                                <span>Đã lên xe</span>
-                            </td>
-                            <td>
-                                <button>Xác Nhận</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Trần Thị B</td>
-                            <td>10B2</td>
-                            <td>
-                                <span>HS002</span>
-                            </td>
-                            <td>
-                                <span>Đang ở trường</span>
-                            </td>
-                            <td>
-                                <button>Xác Nhận</button>
-                            </td>
-                        </tr>
+                        {students.map((st) => (
+                            <tr key={st.student_id}>
+                                <td>
+                                    <span>{st.student_id}</span>
+                                </td>
+                                <td>{st.student_name}</td>
+                                <td>{st.class_name}</td>
+                                <td>
+                                    <div className={cx('student-manage-table-btn')}>
+                                        {st.status == 1 ? 'Đã lên xe' : 'Chưa lên xe'}
+                                        {st.status == 0 && (
+                                            <button
+                                                onClick={() => {
+                                                    handleConfirmStudent(1, st.student_id);
+                                                }}
+                                            >
+                                                Xác nhận đã lên xe
+                                            </button>
+                                        )}
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

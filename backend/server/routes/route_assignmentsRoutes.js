@@ -7,7 +7,7 @@ router.get("/current", routeAssignmentController.getCurrentAssignment); // GET /
 router.get("/", routeAssignmentController.getAllRouteAssignments); // GET /api/route_assignments
 router.get("/:id", routeAssignmentController.getRouteAssignmentById); // GET /api/route_assignments/:id
 router.get("/:id/stop-count", routeAssignmentController.getStopCount);
-
+    
 router.post("/", routeAssignmentController.createRouteAssignment); // POST /api/route_assignments
 router.put("/:id", routeAssignmentController.updateRouteAssignment); // PUT /api/route_assignments/:id
 router.put("/start/:id", routeAssignmentController.startRouteAssignment); // PUT /api/route_assignments/:id
