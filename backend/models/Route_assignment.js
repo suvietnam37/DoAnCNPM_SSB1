@@ -205,6 +205,24 @@ async function start(id, status) {
   return { assignment_id: id, status };
 }
 
+async function updateStops(id, current_stop_id, next_stop_id) {
+  const [result] = await db.query(
+    `
+    UPDATE route_assignment 
+    SET current_stop_id = ?, next_stop_id = ?
+    WHERE assignment_id = ? 
+      AND is_deleted = 0
+    `,
+    [current_stop_id, next_stop_id, id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Route assignment not found or already deleted");
+  }
+
+  return { assignment_id: id, current_stop_id, next_stop_id };
+}
+
 module.exports = {
   getAll,
   getById,
@@ -216,4 +234,5 @@ module.exports = {
   getCurrentByDriverId,
   getCurrentByRouteId,
   getStopCountByAssignmentId,
+  updateStops,
 };

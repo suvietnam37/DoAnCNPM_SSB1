@@ -3,9 +3,9 @@
 
 :root {
     /* Màu sắc chủ đạo */
-    --primary: #ffca28;        /* vàng dịu hơn, dễ nhìn */
-    --primary-hover: #ffb300;  /* vàng đậm khi hover */
-    --gray: #f3f3f3;
+    --primary: #ffca28; /* vàng dịu hơn, dễ nhìn */
+    --primary-hover: #ffb300; /* vàng đậm khi hover */
+    --gray: #00000022;
     --white: #ffffff;
     --black: #2e2e2e;
     --text-gray: #555555;
@@ -105,7 +105,9 @@ img {
 }
 
 /* Input & Form */
-input, select, textarea {
+input,
+select,
+textarea {
     font-family: inherit;
     font-size: 1.5rem;
     padding: 0.8rem 1.2rem;

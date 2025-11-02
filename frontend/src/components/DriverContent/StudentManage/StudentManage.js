@@ -7,6 +7,17 @@ import showToast from '../../../untils/ShowToast/showToast';
 import axios from 'axios';
 const cx = classNames.bind(styles);
 function StudentManage({ students, handleConfirmStudent }) {
+    if (!students) {
+        return (
+            <div className={cx('student-manage')} id="student-manage">
+                <div className={cx('student-manage-title')}>
+                    <FontAwesomeIcon icon={faGraduationCap} />
+                    <span>Quản Lý Học Sinh</span>
+                </div>
+                <h2>Hiện không có tuyến nào đang được thực hiện.</h2>
+            </div>
+        );
+    }
     return (
         <div className={cx('student-manage')} id="student-manage">
             <div className={cx('student-manage-title')}>

@@ -10,11 +10,104 @@ import {
     faRightLong,
     faMapPin,
 } from '@fortawesome/free-solid-svg-icons';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import showConfirm from '../../../untils/ShowConfirm/showConfirm';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
-function Doing({ currentAssignment }) {
-    // Nếu không có tuyến nào đang chạy, hiển thị thông báo
+function Doing({ currentAssignment, handleEndRoute }) {
+    const [bus, setBus] = useState([]);
+    const [driver, setDriver] = useState([]);
+    const [stops, setStops] = useState([]);
+    const [currentStop, setCurrentStop] = useState('');
+    const [nextStop, setNextStop] = useState('');
+    const [endRoute, setEndRoute] = useState(false);
+    useEffect(() => {
+        if (currentAssignment) {
+            fetchBusByBusId(currentAssignment.bus_id);
+            fetchDriverByDriverId(currentAssignment.driver_id);
+            fetchStopByRouteId(currentAssignment.route_id);
+        }
+    }, [currentAssignment]);
+
+    useEffect(() => {
+        if (stops.length >= 2) {
+            setCurrentStop(stops[0].stop_name);
+            setNextStop(stops[1].stop_name);
+        }
+    }, [stops]);
+
+    const fetchBusByBusId = async (bus_id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/buses/${bus_id}`);
+            setBus(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải tài xế:', error);
+        }
+    };
+
+    const fetchDriverByDriverId = async (driver_id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/drivers/${driver_id}`);
+            setDriver(response.data);
+        } catch (error) {
+            console.error('Lỗi khi tải tài xế:', error);
+        }
+    };
+
+    const fetchStopByRouteId = async (route_id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/stops?route_id=${route_id}`);
+            setStops(response.data);
+        } catch (err) {
+            console.error('Lỗi fetch stops:', err);
+        }
+    };
+
+    const handleChangeStop = async () => {
+        showConfirm('Bạn xác nhận đã đến?', 'Xác nhận', async () => {
+            // Lấy index của current stop
+            const currentIndex = stops.findIndex((s) => s.stop_name === currentStop);
+
+            if (currentIndex === -1) return;
+
+            // trạm cuối cùng
+            if (currentIndex === stops.length - 1) {
+                setCurrentStop(stops[currentIndex].stop_name);
+                setNextStop('Hoàn thành tuyến');
+                return;
+            }
+
+            //trạm tiếp theo
+            const newCurrent = stops[currentIndex + 1];
+            const newNext = currentIndex + 2 < stops.length ? stops[currentIndex + 2] : null;
+            if (newNext === null) {
+                setEndRoute(true);
+            }
+
+            // Cập nhật UI ngay lập tức
+            setCurrentStop(newCurrent.stop_name);
+            setNextStop(newNext ? newNext.stop_name : 'Đã đến trạm cuối');
+
+            // Gửi về backend để đồng bộ
+            try {
+                await axios.put(
+                    `http://localhost:5000/api/route_assignments/update-stop/${currentAssignment.assignment_id}`,
+                    {
+                        current_stop_id: newCurrent.stop_id,
+                        next_stop_id: newNext ? newNext.stop_id : null,
+                    },
+                );
+
+                showToast('Xác nhận đến trạm thành công');
+            } catch (err) {
+                console.error('Error updating stop:', err);
+            }
+        });
+    };
+
     if (!currentAssignment) {
         return (
             <div className={cx('doing')} id="doing">
@@ -22,36 +115,62 @@ function Doing({ currentAssignment }) {
                     <FontAwesomeIcon icon={faBell} />
                     <span>Tuyến Xe Đang Thực Hiện</span>
                 </div>
-                <p>Hiện không có tuyến nào đang được thực hiện.</p>
+                <h2>Hiện không có tuyến nào đang được thực hiện.</h2>
             </div>
         );
     }
 
     return (
         <div className={cx('doing')} id="doing">
-            {/* ... (giữ lại title) */}
+            <div className={cx('doing-title')}>
+                <FontAwesomeIcon icon={faBell} />
+                <span>Tuyến Xe Đang Thực Hiện</span>
+            </div>
+            <div className={cx('doing-realtime')}>
+                {endRoute === true && (
+                    <button
+                        className={cx('doing-realtime-details')}
+                        onClick={() => handleEndRoute(currentAssignment.assignment_id)}
+                    >
+                        Kết Thúc
+                    </button>
+                )}
+                {endRoute === false && (
+                    <button className={cx('doing-realtime-details')} onClick={() => handleChangeStop()}>
+                        Đến Trạm Dừng
+                    </button>
+                )}
+            </div>
             <div className={cx('doing-infor')}>
                 <div className={cx('route-num')}>
                     <div className={cx('route-num-title')}>
                         <FontAwesomeIcon icon={faBus} className={cx('route-num-title-icon')} />
-                        <span>Xe 01 </span>
+                        <span>Xe số {bus?.bus_id}</span>
                     </div>
                     {/* Thay thế dữ liệu tĩnh bằng dữ liệu từ props */}
-                    <div className={cx('route-num-name')}>{currentAssignment.license_plate}</div>
+                    <div className={cx('route-num-name')}>{bus?.license_plate}</div>
                 </div>
                 <div className={cx('driver-infor')}>
                     <div className={cx('driver-infor-title')}>
                         <FontAwesomeIcon icon={faIdCard} className={cx('driver-infor-title-icon')} />
                         <span>Tài xế </span>
                     </div>
-                    <div className={cx('driver-infor-name')}>{currentAssignment.driver_name}</div>
+                    <div className={cx('driver-infor-name')}>{driver?.driver_name}</div>
                 </div>
                 <div className={cx('bus-active')}>
                     <div className={cx('bus-active-title')}>
-                        <FontAwesomeIcon icon={faSignal} className={cx('bus-active-title-icon')} />
-                        <span>Trạng thái </span>
+                        <FontAwesomeIcon
+                            icon={faSignal}
+                            className={cx('bus-active-title-icon', {
+                                start: currentAssignment?.status === 'Running',
+                                done: currentAssignment?.status !== 'Running',
+                            })}
+                        />
+                        <span>Trạng thái</span>
                     </div>
-                    <div className={cx('bus-active-name')}>{currentAssignment.status}</div>
+                    <div className={cx('bus-active-name')}>
+                        {currentAssignment?.status === 'Running' ? 'Hoạt động' : 'Hoàn thành'}
+                    </div>
                 </div>
             </div>
             <div className={cx('doing-route')}>
@@ -60,8 +179,24 @@ function Doing({ currentAssignment }) {
                     <span>Tuyến đường </span>
                 </div>
                 <div className={cx('doing-route-name')}>
-                    {/* Hiển thị tên tuyến */}
-                    <span>{currentAssignment.route_name}</span>
+                    {stops.map((stop, index) => (
+                        <div key={stop.stop_id}>
+                            <span>{stop.stop_name}</span>
+                            {index < stops.length - 1 && <FontAwesomeIcon icon={faRightLong} />}
+                        </div>
+                    ))}
+                </div>
+                <div className={cx('doing-route-location')}>
+                    <FontAwesomeIcon icon={faMapPin} className={cx('doing-route-title-icon')} />
+                    <span>
+                        Vị trí hiện tại : <p>{currentStop}</p>
+                    </span>
+                </div>
+                <div className={cx('doing-route-location')}>
+                    <FontAwesomeIcon icon={faMapPin} className={cx('doing-route-title-icon')} />
+                    <span>
+                        Điểm tiếp theo : <p>{nextStop}</p>
+                    </span>
                 </div>
                 {/* Các phần vị trí hiện tại và điểm tiếp theo sẽ được cập nhật ở Tuần 6 (real-time) */}
             </div>

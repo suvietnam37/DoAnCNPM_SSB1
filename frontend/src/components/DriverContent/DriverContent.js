@@ -23,7 +23,7 @@ function DriverContent() {
     // State quản lý toàn bộ dữ liệu cho trang Driver
     const [assignments, setAssignments] = useState([]);
     const [currentAssignment, setCurrentAssignment] = useState(null);
-    const [studentsOnRoute, setStudentsOnRoute] = useState([]);
+    const [studentsOnRoute, setStudentsOnRoute] = useState(null);
     const [loading, setLoading] = useState(true);
     const [driver, setDriver] = useState(null);
 
@@ -131,6 +131,24 @@ function DriverContent() {
         });
     };
 
+    const handleEndRoute = async (assignmentId) => {
+        showConfirm('Bạn có chắc muốn kết thúc tuyến ?', 'Kết thúc', async () => {
+            try {
+                const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
+                    status: 'Completed',
+                });
+                setCurrentAssignment(null);
+                fetchAssignmentByDriverId(driver.driver_id);
+                handleResetStatusStudent();
+                setStudentsOnRoute([]);
+                showToast('Tuyến xe đã kết thúc chúc bác tài làm việc vui vẻ');
+            } catch (error) {
+                console.error('Lỗi khi kết thúc tuyến:', error);
+                showToast('Không thể kết thúc tuyến. Vui lòng thử lại.', false);
+            }
+        });
+    };
+
     const handleConfirmStudent = async (newStatus, student_id) => {
         showConfirm('Xác nhận học sinh đã lên xe', 'Xác nhận', async () => {
             try {
@@ -171,7 +189,7 @@ function DriverContent() {
             <div className={cx('content-position')}>
                 <RouteManage assignments={assignments} onStartRoute={handleStartRoute} />
                 <StudentManage students={studentsOnRoute} handleConfirmStudent={handleConfirmStudent} />
-                <Doing currentAssignment={currentAssignment} />
+                <Doing currentAssignment={currentAssignment} handleEndRoute={handleEndRoute} />
                 <Report />
             </div>
         </div>

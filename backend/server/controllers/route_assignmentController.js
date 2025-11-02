@@ -117,6 +117,24 @@ exports.startRouteAssignment = async (req, res) => {
   }
 };
 
+exports.updateCurrentNextStopRouteAssignment = async (req, res) => {
+  try {
+    const id = req.params.assignmentId;
+    const { current_stop_id, next_stop_id } = req.body;
+
+    const updated = await RouteAssignment.updateStops(
+      id,
+      current_stop_id,
+      next_stop_id
+    );
+
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi cập nhật current/next stop" });
+  }
+};
+
 // Xóa phân công tuyến
 exports.deleteRouteAssignment = async (req, res) => {
   try {

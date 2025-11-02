@@ -11,6 +11,10 @@ router.get("/:id/stop-count", routeAssignmentController.getStopCount);
 router.post("/", routeAssignmentController.createRouteAssignment); // POST /api/route_assignments
 router.put("/:id", routeAssignmentController.updateRouteAssignment); // PUT /api/route_assignments/:id
 router.put("/start/:id", routeAssignmentController.startRouteAssignment); // PUT /api/route_assignments/:id
+router.put(
+  "/update-stop/:assignmentId",
+  routeAssignmentController.updateCurrentNextStopRouteAssignment
+);
 router.delete("/:id", routeAssignmentController.deleteRouteAssignment); // DELETE /api/route_assignments/:id
 
 module.exports = router;

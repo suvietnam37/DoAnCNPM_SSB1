@@ -6,6 +6,13 @@
     margin-top: 230px;
     display: flex;
     flex-direction: column;
+    min-height: 450px;
+
+    h2 {
+        width: 100%;
+        text-align: center;
+        padding-top: 10%;
+    }
 
     .doing-title {
         width: 100%;
@@ -122,7 +129,14 @@
 
                 .bus-active-title-icon {
                     font-size: 20px;
-                    color: rgb(49, 253, 185);
+
+                    &.done {
+                        color: #fab23d;
+                    }
+
+                    &.start {
+                        color: rgb(49, 253, 185);
+                    }
                 }
 
                 span {
@@ -166,12 +180,16 @@
             padding: 10px 10px 10px 15px;
             color: #5b5b5bd9;
 
-            span {
+            div {
                 // margin-left: 25px;
                 height: 100%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+
+                span {
+                    margin-right: 15px;
+                }
             }
         }
         .doing-route-location {
