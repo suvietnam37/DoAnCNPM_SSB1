@@ -325,9 +325,9 @@ function SetupRoute() {
                             <div className={cx('flex-input')}>
                                 <label>Trạng thái: </label>
                                 <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                                    <option value="Chưa bắt đầu">Chưa bắt đầu</option>
-                                    <option value="Đang chạy">Đang chạy</option>
-                                    <option value="Hoàn thành">Hoàn thành</option>
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="Running">Running</option>
+                                    <option value="Completed">Completed</option>
                                 </select>
                             </div>
 
