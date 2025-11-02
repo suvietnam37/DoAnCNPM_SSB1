@@ -239,7 +239,8 @@
     border-radius: 8px;
     height: fit-content;
     height: 280px;
-    overflow: hidden;
+    overflow-y: auto; /* ✅ Cho phép cuộn dọc */
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     background: #fff;
