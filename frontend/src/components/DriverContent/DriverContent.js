@@ -9,6 +9,7 @@ import StudentManage from './StudentManage/StudentManage';
 import Doing from './Doing/Doing';
 import Report from './Report/Report';
 import showToast from '../../untils/ShowToast/showToast';
+import showConfirm from '../../untils/ShowConfirm/showConfirm';
 import { AuthContext } from '../../context/auth.context';
 
 const cx = classNames.bind(styles);
@@ -53,11 +54,15 @@ function DriverContent() {
         const runningAssignment = assignments.find((a) => {
             const today = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
             const run_date = new Date(a.run_date).toLocaleDateString('vi-VN').replace(/\//g, '-');
-            if (a.status === 'Running' && today === run_date) return a.status === 'Running';
+            if (a.status === 'Running' && today === run_date) return true;
+
+            return false;
         });
 
         if (runningAssignment) {
+            console.log('runningAssignment:', runningAssignment);
             fetchStudentsForRoute(runningAssignment.route_id);
+            setCurrentAssignment(runningAssignment);
         }
     }, [assignments]);
 
@@ -108,41 +113,45 @@ function DriverContent() {
             showToast('Vui lòng hoàn thành tuyến đã bắt đầu.', false);
             return;
         }
-        try {
-            const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
-                status: 'Running',
-            });
-            if (response) {
+
+        showConfirm('Bạn có chắc muốn bắt đầu tuyến?', 'Bắt đầu', async () => {
+            try {
+                const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
+                    status: 'Running',
+                });
+                setCurrentAssignment(response.data);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
                 fetchStudentsForRoute(routeId);
                 showToast('Tuyến xe đã bắt đầu chúc bác tài làm việc vui vẻ');
+            } catch (error) {
+                console.error('Lỗi khi bắt đầu tuyến:', error);
+                showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.', false);
             }
-        } catch (error) {
-            console.error('Lỗi khi bắt đầu tuyến:', error);
-            showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.', false);
-        }
+        });
     };
 
     const handleConfirmStudent = async (newStatus, student_id) => {
-        try {
-            const { data } = await axios.put('http://localhost:5000/api/students/status', {
-                status: newStatus,
-                student_id,
-            });
+        showConfirm('Xác nhận học sinh đã lên xe', 'Xác nhận', async () => {
+            try {
+                const { data } = await axios.put('http://localhost:5000/api/students/status', {
+                    status: newStatus,
+                    student_id,
+                });
 
-            if (data.success) {
-                showToast('Xác nhận thành công');
-                setStudentsOnRoute(
-                    //ghi lai thuoc tinh cu va ghi de status
-                    (prev) => prev.map((st) => (st.student_id === student_id ? { ...st, status: newStatus } : st)),
-                );
-            } else {
-                showToast(data.message || 'Xác nhận thất bại', false);
+                if (data.success) {
+                    showToast('Xác nhận thành công');
+                    setStudentsOnRoute(
+                        //ghi lai thuoc tinh cu va ghi de status
+                        (prev) => prev.map((st) => (st.student_id === student_id ? { ...st, status: newStatus } : st)),
+                    );
+                } else {
+                    showToast(data.message || 'Xác nhận thất bại', false);
+                }
+            } catch (error) {
+                showToast('Lỗi hệ thống', false);
             }
-        } catch (error) {
-            showToast('Lỗi hệ thống', false);
-        }
+        });
     };
 
     const menus = [
