@@ -154,7 +154,7 @@ function ParentContent() {
         { name: 'Trạng Thái Tuyến Xe', id: 'route-status', offset: -300 },
         { name: 'Quản Lý Con Em', id: 'student-manage', offset: -280 },
         { name: 'Thông Báo Hệ Thống', id: 'notification', offset: -250 },
-        { name: 'Theo Dõi Tuyến Đường', id: 'map-route', offset: -200 },
+        { name: 'Theo Dõi Tuyến Đường', id: 'map-route', offset: -190 },
     ];
 
     if (loading) return <div>Đang tải thông tin...</div>;

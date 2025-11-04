@@ -38,7 +38,6 @@ async function getByRouteId(routeId) {
      ORDER BY s.stop_name`,
     [routeId]
   );
-  console.log(`[Stop] getByRouteId(${routeId}) -> ${rows.length} results`);
   return rows;
 }
 

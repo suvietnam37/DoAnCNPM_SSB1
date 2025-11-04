@@ -6,6 +6,7 @@ const auth = require("../middleware/auth");
 
 // CRUD Endpoints
 router.get("/", studentController.getAllStudents); // GET /api/students
+router.get("/with-parent/list", studentController.getStudentWithParent);
 router.get("/:id", studentController.getStudentById); // GET /api/students/:id
 router.get("/route/:routeId", studentController.getStudentsByRoute); // GET /api/students/route/:routeId
 router.post("/", studentController.createStudent); // POST /api/students

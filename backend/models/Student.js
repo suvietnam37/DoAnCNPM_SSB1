@@ -37,6 +37,25 @@ async function getById(id) {
   return rows[0] || null;
 }
 
+async function getStudentAndParent() {
+  const [rows] = await db.query(`
+    SELECT 
+      s.student_id,
+      s.student_name,
+      s.class_name,
+      s.parent_id,
+      p.parent_name,
+      p.phone,
+      p.email
+    FROM student s
+    LEFT JOIN parent p ON s.parent_id = p.parent_id
+    WHERE s.is_deleted = 0 AND p.is_deleted = 0
+    
+  `);
+
+  return rows;
+}
+
 // Lấy học sinh theo parent_id + thông tin điểm dừng, tuyến đường
 async function getByParentId(parentId) {
   const [rows] = await db.query(
@@ -181,4 +200,5 @@ module.exports = {
   softDelete,
   updateStatusById,
   updateStatusAll,
+  getStudentAndParent,
 };

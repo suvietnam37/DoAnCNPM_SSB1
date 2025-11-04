@@ -58,7 +58,7 @@ function MapRoute({ routeStatus, busLocation }) {
                 <MapContainer
                     center={initialPosition}
                     zoom={16} // Zoom gần hơn một chút
-                    style={{ height: '500px', width: '100%' }}
+                    style={{ height: '450px', width: '100%' }}
                     whenCreated={setMap} // Lưu đối tượng map vào state khi nó được tạo
                 >
                     {/* <TileLayer

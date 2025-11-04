@@ -33,6 +33,18 @@ exports.getStudentById = async (req, res) => {
   }
 };
 
+exports.getStudentWithParent = async (req, res) => {
+  try {
+    const rows = await Student.getStudentAndParent();
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ error: "Lỗi khi lấy danh sách học sinh và phụ huynh" });
+  }
+};
+
 // Thêm học sinh mới
 exports.createStudent = async (req, res) => {
   try {
