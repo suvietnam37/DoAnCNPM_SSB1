@@ -134,7 +134,7 @@ function DriverContent() {
     const handleEndRoute = async (assignmentId) => {
         showConfirm('Bạn có chắc muốn kết thúc tuyến ?', 'Kết thúc', async () => {
             try {
-                const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
+                await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Completed',
                 });
                 setCurrentAssignment(null);

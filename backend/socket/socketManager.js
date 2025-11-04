@@ -1,7 +1,7 @@
 // backend/socket/socketManager.js
 const { Server } = require("socket.io");
 const Stop = require("../models/Stop");
-const Location = require('../models/Location');
+const Location = require("../models/Location");
 
 let io;
 
@@ -22,63 +22,68 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function initSocket(httpServer) {
-    io = new Server(httpServer, {
-        cors: { origin: "http://localhost:3000" }
+  io = new Server(httpServer, {
+    cors: { origin: "http://localhost:3000" },
+  });
+  console.log("Socket.IO server đã được khởi tạo.");
+
+  io.on("connection", (socket) => {
+    console.log(`Một người dùng đã kết nối: ${socket.id}`);
+
+    // --- SỰ KIỆN 1: THAM GIA PHÒNG ---
+    socket.on("join_route_room", (routeId) => {
+      if (!routeId) return;
+      console.log(`Client ${socket.id} tham gia phòng của tuyến ${routeId}`);
+      socket.join(`route_${routeId}`);
     });
-    console.log("Socket.IO server đã được khởi tạo.");
 
-    io.on("connection", (socket) => {
-        console.log(`Một người dùng đã kết nối: ${socket.id}`);
+    // --- SỰ KIỆN 2: CẬP NHẬT VỊ TRÍ (DUY NHẤT) ---
+    socket.on("update_location", async (data) => {
+      const { assignment_id, route_id, lat, lng } = data;
+      if (!assignment_id || !route_id || !lat || !lng) return;
 
-        // --- SỰ KIỆN 1: THAM GIA PHÒNG ---
-        socket.on('join_route_room', (routeId) => {
-            if (!routeId) return;
-            console.log(`Client ${socket.id} tham gia phòng của tuyến ${routeId}`);
-            socket.join(`route_${routeId}`); 
-        });
+      console.log(`Nhận vị trí cho tuyến ${route_id}: (${lat}, ${lng})`);
 
-        // --- SỰ KIỆN 2: CẬP NHẬT VỊ TRÍ (DUY NHẤT) ---
-        socket.on('update_location', async (data) => {
-            const { assignment_id, route_id, lat, lng } = data;
-            if (!assignment_id || !route_id || !lat || !lng) return;
+      // 1. Lưu vị trí mới vào DB
+      await Location.upsert({ assignment_id, latitude: lat, longitude: lng });
 
-            console.log(`Nhận vị trí cho tuyến ${route_id}: (${lat}, ${lng})`);
+      // 2. Phát vị trí mới đến TẤT CẢ PHỤ HUYNH trong phòng của tuyến đó
+      io.to(`route_${route_id}`).emit("new_location", {
+        assignment_id,
+        lat,
+        lng,
+      });
 
-            // 1. Lưu vị trí mới vào DB
-            await Location.upsert({ assignment_id, latitude: lat, longitude: lng });
-
-            // 2. Phát vị trí mới đến TẤT CẢ PHỤ HUYNH trong phòng của tuyến đó
-            io.to(`route_${route_id}`).emit('new_location', {
-                assignment_id,
-                lat,
-                lng
-            });
-
-            // 3. Xử lý Geofencing ngay tại đây
-            try {
-                const stops = await Stop.getByRouteId(route_id);
-                for (const stop of stops) {
-                    if (stop.latitude && stop.longitude) {
-                        const distance = calculateDistance(lat, lng, stop.latitude, stop.longitude);
-                        // Khi xe đến gần trong bán kính 200m
-                        if (distance <= 200) {
-                            // Phát cảnh báo geofence cũng CHỈ đến những người trong phòng
-                            io.to(`route_${route_id}`).emit("approaching_stop", {
-                                stopName: stop.stop_name,
-                                distance: Math.round(distance),
-                            });
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("Lỗi khi xử lý Geofence:", error);
+      // 3. Xử lý Geofencing ngay tại đây
+      try {
+        const stops = await Stop.getByRouteId(route_id);
+        for (const stop of stops) {
+          if (stop.latitude && stop.longitude) {
+            const distance = calculateDistance(
+              lat,
+              lng,
+              stop.latitude,
+              stop.longitude
+            );
+            // Khi xe đến gần trong bán kính 200m
+            if (distance <= 200) {
+              // Phát cảnh báo geofence cũng CHỈ đến những người trong phòng
+              io.to(`route_${route_id}`).emit("approaching_stop", {
+                stopName: stop.stop_name,
+                distance: Math.round(distance),
+              });
             }
-        });
-
-        socket.on("disconnect", () => {
-            console.log(`Người dùng đã ngắt kết nối: ${socket.id}`);
-        });
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi khi xử lý Geofence:", error);
+      }
     });
+
+    socket.on("disconnect", () => {
+      console.log(`Người dùng đã ngắt kết nối: ${socket.id}`);
+    });
+  });
 }
 
 // Hàm lấy đối tượng io để dùng nơi khác (ví dụ trong controller)

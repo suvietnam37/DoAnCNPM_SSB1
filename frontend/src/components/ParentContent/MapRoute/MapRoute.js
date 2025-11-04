@@ -61,9 +61,13 @@ function MapRoute({ routeStatus, busLocation }) {
                     style={{ height: '500px', width: '100%' }}
                     whenCreated={setMap} // Lưu đối tượng map vào state khi nó được tạo
                 >
-                    <TileLayer
+                    {/* <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    /> */}
+                    <TileLayer
+                        url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
                     />
 
                     {/* Chỉ render Marker khi có vị trí ban đầu */}

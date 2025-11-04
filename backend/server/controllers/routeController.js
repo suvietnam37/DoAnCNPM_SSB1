@@ -16,7 +16,35 @@ exports.getRouteById = async (req, res) => {
   try {
     const id = req.params.id;
     const route = await Route.getById(id);
-    if (!route) return res.status(404).json({ error: "Tuyến xe không tồn tại" });
+    if (!route)
+      return res.status(404).json({ error: "Tuyến xe không tồn tại" });
+    res.json(route);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy tuyến xe" });
+  }
+};
+
+exports.getRouteByStopId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const route = await Route.getByStopId(id);
+    if (!route)
+      return res.status(404).json({ error: "Tuyến xe không tồn tại" });
+    res.json(route);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy tuyến xe" });
+  }
+};
+
+exports.getRouteByDateStopId = async (req, res) => {
+  try {
+    const stop_id = req.params.stop_id;
+    const date = req.params.date;
+    const route = await Route.getByDateStopId(stop_id, date);
+    if (!route)
+      return res.status(404).json({ error: "Tuyến xe không tồn tại" });
     res.json(route);
   } catch (err) {
     console.error(err);

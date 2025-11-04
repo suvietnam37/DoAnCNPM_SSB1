@@ -11,14 +11,14 @@ function StudentManage({ students }) {
             <div className={cx('student-manage-title')}>
                 <FontAwesomeIcon icon={faGraduationCap} />
                 <span>Quản Lý Con Em</span>
-                </div>
+            </div>
             <div className={cx('student-manage-table')}>
                 <table>
                     <thead>
                         <tr>
+                            <th>Mã học sinh</th>
                             <th>Họ tên</th>
                             <th>Lớp</th>
-                            <th>Mã học sinh</th>
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -26,12 +26,11 @@ function StudentManage({ students }) {
                         {students.length > 0 ? (
                             students.map((student) => (
                                 <tr key={student.student_id}>
+                                    <td>{student.student_id}</td>
                                     <td>{student.student_name}</td>
                                     <td>{student.class_name}</td>
-                                    <td>HS{student.student_id}</td>
                                     <td>
-                                        {/* Trạng thái này sẽ được cập nhật real-time sau */}
-                                        <span>Đang cập nhật...</span>
+                                        <span>{student.status === 0 ? 'Chưa lên xe' : 'Đã lên xe'}</span>
                                     </td>
                                 </tr>
                             ))

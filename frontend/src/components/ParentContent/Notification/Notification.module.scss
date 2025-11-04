@@ -1,11 +1,17 @@
 .notification {
     height: fit-content;
+    min-height: 200px;
     width: 68%;
     background-color: var(--gray);
     border-radius: 16px;
     margin-top: 230px;
     display: flex;
     flex-direction: column;
+
+    h2 {
+        width: 100%;
+        text-align: center;
+    }
 
     .notification-title {
         width: 100%;
@@ -166,12 +172,16 @@
             padding: 10px 10px 10px 15px;
             color: #5b5b5bd9;
 
-            span {
+            div {
                 // margin-left: 25px;
                 height: 100%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+
+                span {
+                    margin-right: 15px;
+                }
             }
         }
         .notification-route-location {
