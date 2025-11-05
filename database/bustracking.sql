@@ -110,9 +110,7 @@ DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification` (
   `notification_id` int NOT NULL AUTO_INCREMENT,
   `account_id` int DEFAULT NULL,
-  `title` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `content` text COLLATE utf8mb4_general_ci,
-  `type` enum('Normal','Arrived','Delayed','Emergency') COLLATE utf8mb4_general_ci DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint DEFAULT '0',
   PRIMARY KEY (`notification_id`),

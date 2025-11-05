@@ -96,6 +96,71 @@
 
 // module.exports = { initSocket, getIO };
 
+//---------------------------------------------------------------------------------------
+
+// const { Server } = require("socket.io");
+
+// function initSocket(server) {
+//   const io = new Server(server, {
+//     cors: { origin: "*" },
+//   });
+
+//   console.log("✅ Socket.IO initialized");
+
+//   io.on("connection", (socket) => {
+//     console.log("🔌 Client connected:", socket.id);
+
+//     // ===============================
+//     // ✅ 1) PHỤ HUYNH JOIN ROOM ROUTE
+//     // ===============================
+//     socket.on("join_route_room", (routeId) => {
+//       const roomName = `route_${routeId}`;
+//       socket.join(roomName);
+//       console.log(`👨‍👩‍👧 Client ${socket.id} JOINED room ${roomName}`);
+//     });
+
+//     // ===============================
+//     // ✅ 2) PHỤ HUYNH LEAVE ROOM ROUTE
+//     // ===============================
+//     socket.on("leave_route_room", (routeId) => {
+//       const roomName = `route_${routeId}`;
+//       socket.leave(roomName);
+//       console.log(`🚪 Client ${socket.id} LEFT room ${roomName}`);
+//     });
+
+//     // ========================================================
+//     // ✅ 3) TÀI XẾ GỬI VỊ TRÍ MỚI → PHÁT CHO ROOM CỦA TUYẾN
+//     // ========================================================
+//     socket.on("driver_new_location", ({ routeId, lat, lng }) => {
+//       const roomName = `route_${routeId}`;
+//       io.to(roomName).emit("new_location", { lat, lng });
+
+//       console.log(`🚌 New location for ${roomName}: lat=${lat}, lng=${lng}`);
+//     });
+
+//     // ===============================================================
+//     // ✅ 4) TÀI XẾ GỬI CẢNH BÁO → PHÁT CHO ROOM CỦA TUYẾN
+//     // ===============================================================
+//     socket.on("driver_approaching_stop", ({ routeId, stopName, distance }) => {
+//       const roomName = `route_${routeId}`;
+//       io.to(roomName).emit("approaching_stop", { stopName, distance });
+
+//       console.log(
+//         `⚠️ Approaching stop for ${roomName}: ${stopName} (${distance}m)`
+//       );
+//     });
+
+//     // Ngắt kết nối
+//     socket.on("disconnect", () => {
+//       console.log("❌ Client disconnected:", socket.id);
+//     });
+//   });
+// }
+
+// module.exports = { initSocket };
+
+//---------------------------------------------------------------------------------------
+
 const { Server } = require("socket.io");
 
 function initSocket(server) {
@@ -103,54 +168,35 @@ function initSocket(server) {
     cors: { origin: "*" },
   });
 
-  console.log("✅ Socket.IO initialized");
+  const onlineUsers = new Map();
 
   io.on("connection", (socket) => {
-    console.log("🔌 Client connected:", socket.id);
+    console.log("Client connected:", socket.id);
 
-    // ===============================
-    // ✅ 1) PHỤ HUYNH JOIN ROOM ROUTE
-    // ===============================
-    socket.on("join_route_room", (routeId) => {
-      const roomName = `route_${routeId}`;
-      socket.join(roomName);
-      console.log(`👨‍👩‍👧 Client ${socket.id} JOINED room ${roomName}`);
+    socket.on("register", (userId) => {
+      onlineUsers.set(userId, socket.id);
     });
 
-    // ===============================
-    // ✅ 2) PHỤ HUYNH LEAVE ROOM ROUTE
-    // ===============================
-    socket.on("leave_route_room", (routeId) => {
-      const roomName = `route_${routeId}`;
-      socket.leave(roomName);
-      console.log(`🚪 Client ${socket.id} LEFT room ${roomName}`);
+    socket.on("sendNotification", ({ toUserIds, message }) => {
+      console.log("Online Users:", onlineUsers);
+      console.log("Sending to:", toUserIds);
+      console.log("message: ", message);
+      if (!Array.isArray(toUserIds)) toUserIds = [toUserIds];
+      toUserIds.forEach((userId) => {
+        const targetSocketId = onlineUsers.get(userId);
+        if (targetSocketId) {
+          io.to(targetSocketId).emit("notification", { message });
+        }
+      });
     });
-
-    // ========================================================
-    // ✅ 3) TÀI XẾ GỬI VỊ TRÍ MỚI → PHÁT CHO ROOM CỦA TUYẾN
-    // ========================================================
-    socket.on("driver_new_location", ({ routeId, lat, lng }) => {
-      const roomName = `route_${routeId}`;
-      io.to(roomName).emit("new_location", { lat, lng });
-
-      console.log(`🚌 New location for ${roomName}: lat=${lat}, lng=${lng}`);
-    });
-
-    // ===============================================================
-    // ✅ 4) TÀI XẾ GỬI CẢNH BÁO → PHÁT CHO ROOM CỦA TUYẾN
-    // ===============================================================
-    socket.on("driver_approaching_stop", ({ routeId, stopName, distance }) => {
-      const roomName = `route_${routeId}`;
-      io.to(roomName).emit("approaching_stop", { stopName, distance });
-
-      console.log(
-        `⚠️ Approaching stop for ${roomName}: ${stopName} (${distance}m)`
-      );
-    });
-
     // Ngắt kết nối
     socket.on("disconnect", () => {
-      console.log("❌ Client disconnected:", socket.id);
+      for (let [userId, sid] of onlineUsers.entries()) {
+        if (sid === socket.id) {
+          onlineUsers.delete(userId);
+          break;
+        }
+      }
     });
   });
 }

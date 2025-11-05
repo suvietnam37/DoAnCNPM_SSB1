@@ -89,10 +89,12 @@ function ParentContent() {
 
     const fetchParentData = async (PARENT_ID, ACCOUNT_ID) => {
         setLoading(true);
+        const date = new Date().toISOString().split('T')[0];
+
         try {
             const [studentsRes, notificationsRes] = await Promise.all([
                 axios.get(`http://localhost:5000/api/students?parent_id=${PARENT_ID}`),
-                axios.get(`http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}`),
+                axios.get(`http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}?date=${date}`),
             ]);
 
             const studentList = studentsRes.data;
@@ -165,7 +167,11 @@ function ParentContent() {
             <div className={cx('content-position')}>
                 <RouteStatus routeStatus={routeStatus} />
                 <StudentManage students={students} />
-                <Notification notifications={notifications} routeStatus={routeStatus} />
+                <Notification
+                    setNotifications={setNotifications}
+                    notifications={notifications}
+                    routeStatus={routeStatus}
+                />
                 <MapRoute routeStatus={routeStatus} busLocation={busLocation} />
             </div>
         </div>

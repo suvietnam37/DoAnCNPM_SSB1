@@ -12,6 +12,16 @@ async function getByAccountId(accountId) {
   return rows;
 }
 
+async function getByAccountIdDate(accountId, date) {
+  const [rows] = await db.query(
+    `SELECT * FROM notification 
+     WHERE account_id = ? AND DATE(created_at) = ?  AND is_deleted = 0 
+     ORDER BY created_at DESC`,
+    [accountId, date]
+  );
+  return rows;
+}
+
 // Lấy tất cả thông báo (bao gồm đã xóa - dành cho admin)
 async function getAll() {
   const [rows] = await db.query(
@@ -37,9 +47,26 @@ async function softDelete(id) {
   return { message: "Notification soft deleted successfully" };
 }
 
+async function createNotification(accountId, content) {
+  const [result] = await db.query(
+    `INSERT INTO notification (account_id, content) 
+     VALUES (?, ?)`,
+    [accountId, content]
+  );
+
+  const [rows] = await db.query(
+    `SELECT * FROM notification WHERE notification_id = ?`,
+    [result.insertId]
+  );
+
+  return rows[0];
+}
+
 // Export
 module.exports = {
   getByAccountId,
   getAll,
   softDelete,
+  createNotification,
+  getByAccountIdDate,
 };

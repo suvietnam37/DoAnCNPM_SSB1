@@ -4,5 +4,6 @@ const router = express.Router();
 const notificationController = require("../controllers/notificationController");
 
 router.get("/", notificationController.getAllNotifications); // GET /api/notifications?account_id=3
+router.post("/create", notificationController.createNotification);
 
 module.exports = router;

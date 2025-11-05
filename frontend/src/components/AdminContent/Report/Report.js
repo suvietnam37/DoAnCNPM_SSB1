@@ -1,11 +1,16 @@
 import styles from './Report.module.scss';
 import classNames from 'classnames/bind';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
+import io from 'socket.io-client';
+import { AuthContext } from '../../../context/auth.context';
+
 const cx = classNames.bind(styles);
 
 function Report() {
+    const socketRef = useRef(null);
+
     const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
     const [parents, setParents] = useState([]);
     const [studentParents, setStudentParents] = useState([]);
@@ -13,9 +18,56 @@ function Report() {
     const [selectAll, setSelectAll] = useState(false);
     const [selectedParents, setSelectedParents] = useState([]);
     const [selectedDrivers, setSelectedDrivers] = useState([]);
+    const [noti, setNoti] = useState('');
+
+    const authContext = useContext(AuthContext);
+
+    useEffect(() => {
+        console.log(authContext.auth);
+    }, [authContext]);
 
     const handleOpenModal = (type) => {
         setIsOpenModalOpen(type);
+    };
+
+    useEffect(() => {
+        socketRef.current = io('http://localhost:5000');
+
+        socketRef.current.emit('register', authContext?.auth?.user?.account_id);
+
+        return () => {
+            console.log('Ngắt kết nối socket');
+            socketRef.current.disconnect();
+        };
+    }, []);
+
+    const send = async () => {
+        const toUserIds = isOpenModalOpen === 'driver' ? selectedDrivers : selectedParents;
+        toUserIds.forEach(async (i) => {
+            try {
+                await axios.post('http://localhost:5000/api/notifications/create', {
+                    accountId: i,
+                    content: noti,
+                });
+            } catch (error) {
+                console.log(error, 'Lỗi khi thêm notification');
+            }
+        });
+
+        if (!noti.trim() || toUserIds.length < 1) {
+            showToast('Vui lòng nhập thông báo hoặc chọn người nhận', false);
+            return;
+        }
+
+        socketRef.current.emit('sendNotification', {
+            toUserIds,
+            message: noti,
+        });
+
+        showToast('Gửi thông báo thành công');
+        setNoti('');
+        setSelectedDrivers([]);
+        setSelectedParents([]);
     };
 
     useEffect(() => {
@@ -25,15 +77,18 @@ function Report() {
     }, []);
 
     useEffect(() => {
-        if (isOpenModalOpen === 'parent') {
-            setSelectAll(selectedParents.length === studentParents.length);
-        }
+        if (isOpenModalOpen !== 'parent') return;
+
+        // new set loai bo trung lap
+        const uniqueParentIds = [...new Set(studentParents.map((p) => p.parent_id))];
+
+        setSelectAll(uniqueParentIds.length > 0 && selectedParents.length === uniqueParentIds.length);
     }, [selectedParents, studentParents, isOpenModalOpen]);
 
     useEffect(() => {
-        if (isOpenModalOpen === 'driver') {
-            setSelectAll(selectedDrivers.length === drivers.length);
-        }
+        if (isOpenModalOpen !== 'driver') return;
+
+        setSelectAll(drivers.length > 0 && drivers.length === selectedDrivers.length);
     }, [selectedDrivers, drivers, isOpenModalOpen]);
 
     const fetchStudentParent = async () => {
@@ -50,7 +105,6 @@ function Report() {
             const response = await axios.get('http://localhost:5000/api/parents');
             setParents(response.data);
         } catch (error) {
-            console.error('Lỗi khi tải danh sách phụ huynh:', error);
             showToast('Không thể tải danh sách phụ huynh.', false);
         }
     };
@@ -60,7 +114,6 @@ function Report() {
             const response = await axios.get('http://localhost:5000/api/drivers');
             setDrivers(response.data);
         } catch (error) {
-            console.error('Fetch error:', error);
             showToast('Không thể tải danh sách tài xế.', false);
         }
     };
@@ -68,13 +121,24 @@ function Report() {
     return (
         <div className={cx('wrapper')}>
             <h2 className={cx('title')}>Báo cáo sự cố</h2>
-            <textarea placeholder="Nhập nội dung báo cáo..." className={cx('textarea')} />
+
+            <textarea
+                placeholder="Nhập nội dung báo cáo..."
+                className={cx('textarea')}
+                value={noti}
+                onChange={(e) => {
+                    setNoti(e.target.value);
+                }}
+            />
+
             <div className={cx('report-content')}>
                 <label>Người nhận:</label>
+
                 <select
                     className={cx('report-select')}
                     onChange={(e) => {
                         handleOpenModal(e.target.value);
+
                         setSelectAll(false);
                         setSelectedDrivers([]);
                         setSelectedParents([]);
@@ -84,10 +148,13 @@ function Report() {
                     <option value="parent">Phụ huynh</option>
                     <option value="driver">Tài xế</option>
                 </select>
+
                 <input type="text" placeholder="tìm kiếm ..." className={cx('input')} />
+
                 {isOpenModalOpen && (
                     <div className={cx('select-all')}>
                         <label htmlFor="checkall">Chọn tất cả</label>
+
                         <input
                             type="checkbox"
                             id="checkall"
@@ -95,11 +162,12 @@ function Report() {
                             onChange={(e) => {
                                 const checked = e.target.checked;
                                 setSelectAll(checked);
+
                                 if (checked) {
                                     if (isOpenModalOpen === 'parent') {
-                                        setSelectedParents(studentParents.map((sp) => sp.parent_id));
-                                    }
-                                    if (isOpenModalOpen === 'driver') {
+                                        const uniqueParentIds = [...new Set(studentParents.map((p) => p.parent_id))];
+                                        setSelectedParents(uniqueParentIds);
+                                    } else if (isOpenModalOpen === 'driver') {
                                         setSelectedDrivers(drivers.map((d) => d.driver_id));
                                     }
                                 } else {
@@ -111,6 +179,7 @@ function Report() {
                     </div>
                 )}
             </div>
+
             {isOpenModalOpen === 'parent' && (
                 <div className={cx('form-container')}>
                     <table className={cx('table')}>
@@ -123,6 +192,7 @@ function Report() {
                                 <th>Chọn</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {studentParents.map((sp) => (
                                 <tr key={sp.student_id}>
@@ -130,6 +200,7 @@ function Report() {
                                     <td>{sp.student_name}</td>
                                     <td>{sp.parent_name}</td>
                                     <td>{sp.phone}</td>
+
                                     <td>
                                         <input
                                             type="checkbox"
@@ -137,12 +208,13 @@ function Report() {
                                             checked={selectedParents.includes(sp.parent_id)}
                                             onChange={() => {
                                                 const id = sp.parent_id;
+
                                                 setSelectedParents((prev) =>
                                                     prev.includes(id)
                                                         ? prev.filter((item) => item !== id)
                                                         : [...prev, id],
                                                 );
-                                            }} // để React không warning
+                                            }}
                                         />
                                     </td>
                                 </tr>
@@ -151,6 +223,7 @@ function Report() {
                     </table>
                 </div>
             )}
+
             {isOpenModalOpen === 'driver' && (
                 <div className={cx('form-container')}>
                     <div className={cx('table-wrapper')}>
@@ -158,41 +231,49 @@ function Report() {
                             <thead>
                                 <tr>
                                     <th>Mã tài xế</th>
-                                    <th>Tên tài xế </th>
+                                    <th>Tên tài xế</th>
                                     <th>Chọn</th>
                                 </tr>
                             </thead>
+
                             <tbody>
-                                {drivers.map((driver) => {
-                                    return (
-                                        <tr key={driver.driver_id}>
-                                            <td>{driver.driver_id}</td>
-                                            <td>{driver.driver_name}</td>
-                                            <td>
-                                                <input
-                                                    type="checkbox"
-                                                    value={driver.driver_id}
-                                                    checked={selectedDrivers.includes(driver.driver_id)}
-                                                    onChange={() => {
-                                                        const id = driver.driver_id;
-                                                        setSelectedDrivers((prev) =>
-                                                            prev.includes(id)
-                                                                ? prev.filter((item) => item !== id)
-                                                                : [...prev, id],
-                                                        );
-                                                    }}
-                                                />
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                {drivers.map((driver) => (
+                                    <tr key={driver.driver_id}>
+                                        <td>{driver.driver_id}</td>
+                                        <td>{driver.driver_name}</td>
+
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedDrivers.includes(driver.driver_id)}
+                                                onChange={() => {
+                                                    const id = driver.driver_id;
+
+                                                    setSelectedDrivers((prev) =>
+                                                        prev.includes(id)
+                                                            ? prev.filter((item) => item !== id)
+                                                            : [...prev, id],
+                                                    );
+                                                }}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
             )}
+
             <div className={cx('send-btn')}>
-                <button className={cx('btn', 'danger')}>Gửi báo cáo</button>
+                <button
+                    className={cx('btn', 'danger')}
+                    onClick={() => {
+                        send();
+                    }}
+                >
+                    Gửi báo cáo
+                </button>
             </div>
         </div>
     );

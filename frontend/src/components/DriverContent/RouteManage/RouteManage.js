@@ -75,6 +75,7 @@ function RouteManage({ assignments, onStartRoute }) {
                                             <td>{asm.departure_time}</td>
                                             <td>
                                                 <div
+                                                    className={cx('stop-num')}
                                                     style={{
                                                         display: 'flex',
                                                         alignItems: 'center',
