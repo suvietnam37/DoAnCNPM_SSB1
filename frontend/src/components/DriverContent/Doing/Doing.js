@@ -10,20 +10,66 @@ import {
     faRightLong,
     faMapPin,
 } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import showConfirm from '../../../untils/ShowConfirm/showConfirm';
 import showToast from '../../../untils/ShowToast/showToast';
+import { AuthContext } from '../../../context/auth.context';
+import { io } from 'socket.io-client';
 
 const cx = classNames.bind(styles);
 
-function Doing({ currentAssignment, handleEndRoute }) {
+function Doing({ currentAssignment, handleEndRoute, notifications, setNotifications }) {
+    const socketRef = useRef(null);
+
     const [bus, setBus] = useState([]);
     const [driver, setDriver] = useState([]);
     const [stops, setStops] = useState([]);
     const [currentStop, setCurrentStop] = useState('');
     const [nextStop, setNextStop] = useState('');
     const [endRoute, setEndRoute] = useState(false);
+    const [noti, setNoti] = useState('');
+
+    const authContext = useContext(AuthContext);
+
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+    };
+
+    const handleOpenModal = () => {
+        setModalOpen(true);
+    };
+
+    useEffect(() => {
+        socketRef.current = io('http://localhost:5000');
+
+        socketRef.current.emit('register', authContext?.auth?.user?.account_id);
+
+        socketRef.current.on('notification', (data) => {
+            setNoti(data.message);
+            showToast('Có thông báo mới');
+        });
+
+        return () => {
+            socketRef.current.off('notification');
+            socketRef.current.disconnect();
+        };
+    }, []);
+
+    const fetchNotifications = async (ACCOUNT_ID) => {
+        const date = new Date().toISOString().split('T')[0];
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}date=${date}`,
+            );
+            setNotifications(response.data);
+        } catch (err) {
+            console.error('Lỗi fetch notification:', err);
+        }
+    };
+
     useEffect(() => {
         if (currentAssignment) {
             fetchBusByBusId(currentAssignment.bus_id);
@@ -125,22 +171,35 @@ function Doing({ currentAssignment, handleEndRoute }) {
             <div className={cx('doing-title')}>
                 <FontAwesomeIcon icon={faBell} />
                 <span>Tuyến Xe Đang Thực Hiện</span>
+                <div className={cx('doing-realtime')}>
+                    {endRoute === true && (
+                        <button
+                            className={cx('doing-realtime-details')}
+                            onClick={() => handleEndRoute(currentAssignment.assignment_id)}
+                        >
+                            Kết Thúc
+                        </button>
+                    )}
+                    {endRoute === false && (
+                        <button className={cx('doing-realtime-details')} onClick={() => handleChangeStop()}>
+                            Đến Trạm Dừng
+                        </button>
+                    )}
+                </div>
             </div>
-            <div className={cx('doing-realtime')}>
-                {endRoute === true && (
-                    <button
-                        className={cx('doing-realtime-details')}
-                        onClick={() => handleEndRoute(currentAssignment.assignment_id)}
-                    >
-                        Kết Thúc
-                    </button>
-                )}
-                {endRoute === false && (
-                    <button className={cx('doing-realtime-details')} onClick={() => handleChangeStop()}>
-                        Đến Trạm Dừng
-                    </button>
-                )}
+            <div className={cx('notification-realtime')}>
+                <p>{noti || 'Chưa có thông báo mới từ hệ thống '}</p>
+                <button
+                    className={cx('notification-realtime-details')}
+                    onClick={() => {
+                        handleOpenModal();
+                        fetchNotifications(authContext?.auth?.user?.account_id);
+                    }}
+                >
+                    Xem chi tiết
+                </button>
             </div>
+
             <div className={cx('doing-infor')}>
                 <div className={cx('route-num')}>
                     <div className={cx('route-num-title')}>
@@ -199,6 +258,37 @@ function Doing({ currentAssignment, handleEndRoute }) {
                     </span>
                 </div>
                 {/* Các phần vị trí hiện tại và điểm tiếp theo sẽ được cập nhật ở Tuần 6 (real-time) */}
+
+                {modalOpen && (
+                    <div className={cx('modal-overlay')} onClick={handleCloseModal}>
+                        <div className={cx('modal-content')}>
+                            <button className={cx('modal-close')} onClick={handleCloseModal}>
+                                &times;
+                            </button>
+                            <h3>Chi tiết thông báo</h3>
+                            <div className={cx('table-wrapper')}>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Nội dung</th>
+                                            <th>Thời gian gửi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {notifications.map((n) => {
+                                            return (
+                                                <tr key={n.notification_id}>
+                                                    <td>{n.content}</td>
+                                                    <td>{new Date(n.created_at).toTimeString().split(' ')[0]}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -51,70 +51,70 @@ function RouteManage({ assignments, onStartRoute }) {
                 <FontAwesomeIcon icon={faRoute} />
                 <span>Danh Sách Tuyến Xe Cần Thực Hiện Ngày: {todayDisplay}</span>
             </div>
-
-            <div className={cx('route-manage-table')}>
-                <div className={cx('table-wrapper')}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ngày chạy</th>
-                                <th>Giờ khởi hành</th>
-                                <th>Số trạm</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {assignments.map((asm) => {
-                                if (new Date(asm.run_date).toLocaleDateString('vi-VN').replace(/\//g, '-') === today) {
-                                    return (
-                                        <tr key={asm.assignment_id}>
-                                            <td>
-                                                {new Date(asm.run_date).toLocaleDateString('vi-VN').replace(/\//g, '-')}
-                                            </td>
-                                            <td>{asm.departure_time}</td>
-                                            <td>
-                                                <div
-                                                    className={cx('stop-num')}
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        gap: '8px',
-                                                    }}
-                                                >
-                                                    {stopCounts[asm.assignment_id]}
-                                                    <button
-                                                        className={cx('btn', 'details')}
-                                                        onClick={() => handleOpenModal(asm)}
-                                                    >
-                                                        chi tiết
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>{asm.status}</td>
-                                            <td>
-                                                {asm.status === 'Not Started' && (
-                                                    <button
-                                                        onClick={() => onStartRoute(asm.assignment_id, asm.route_id)}
-                                                        className={cx('btn', 'add')}
-                                                    >
-                                                        Bắt đầu
-                                                    </button>
-                                                )}
-                                                {asm.status === 'Running' && <span>Đang thực hiện</span>}
-                                                {asm.status === 'Completed' && <span>Đã hoàn thành</span>}
-                                            </td>
-                                        </tr>
-                                    );
-                                }
-                            })}
-                        </tbody>
-                    </table>
+            {assignments ? (
+                <div className={cx('route-manage-table')}>
+                    <div className={cx('table-wrapper')}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ngày chạy</th>
+                                    <th>Giờ khởi hành</th>
+                                    <th>Số trạm</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {assignments.map((asm) => {
+                                    if (
+                                        new Date(asm.run_date).toLocaleDateString('vi-VN').replace(/\//g, '-') === today
+                                    ) {
+                                        return (
+                                            <tr key={asm.assignment_id}>
+                                                <td>
+                                                    {new Date(asm.run_date)
+                                                        .toLocaleDateString('vi-VN')
+                                                        .replace(/\//g, '-')}
+                                                </td>
+                                                <td>{asm.departure_time}</td>
+                                                <td>
+                                                    <div className={cx('stop-num')}>
+                                                        {stopCounts[asm.assignment_id]}
+                                                        <button
+                                                            className={cx('btn', 'details')}
+                                                            onClick={() => handleOpenModal(asm)}
+                                                        >
+                                                            chi tiết
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>{asm.status}</td>
+                                                <td>
+                                                    {asm.status === 'Not Started' && (
+                                                        <button
+                                                            onClick={() =>
+                                                                onStartRoute(asm.assignment_id, asm.route_id)
+                                                            }
+                                                            className={cx('btn', 'add')}
+                                                        >
+                                                            Bắt đầu
+                                                        </button>
+                                                    )}
+                                                    {asm.status === 'Running' && <span>Đang thực hiện</span>}
+                                                    {asm.status === 'Completed' && <span>Đã hoàn thành</span>}
+                                                </td>
+                                            </tr>
+                                        );
+                                    }
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-
-            {/* Modal */}
+            ) : (
+                <h2>Không có tuyến xe cần thực hiện</h2>
+            )}
+            ;{/* Modal */}
             {modalOpen && (
                 <div className={cx('modal-overlay')} onClick={handleCloseModal}>
                     <div className={cx('modal-content')} onClick={(e) => e.stopPropagation()}>

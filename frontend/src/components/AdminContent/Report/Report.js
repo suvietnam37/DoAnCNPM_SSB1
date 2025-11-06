@@ -23,8 +23,14 @@ function Report() {
     const authContext = useContext(AuthContext);
 
     useEffect(() => {
-        console.log(authContext.auth);
-    }, [authContext]);
+        console.log('selectedParents: ', selectedParents);
+        console.log('selectedDrivers: ', selectedDrivers);
+    }, [selectedParents, selectedDrivers]);
+
+    // useEffect(() => {
+    //     console.log('studentParents: ', studentParents);
+    //     console.log('drivers: ', drivers);
+    // }, [studentParents, drivers]);
 
     const handleOpenModal = (type) => {
         setIsOpenModalOpen(type);
@@ -80,7 +86,7 @@ function Report() {
         if (isOpenModalOpen !== 'parent') return;
 
         // new set loai bo trung lap
-        const uniqueParentIds = [...new Set(studentParents.map((p) => p.parent_id))];
+        const uniqueParentIds = [...new Set(studentParents.map((p) => p.account_id))];
 
         setSelectAll(uniqueParentIds.length > 0 && selectedParents.length === uniqueParentIds.length);
     }, [selectedParents, studentParents, isOpenModalOpen]);
@@ -165,10 +171,10 @@ function Report() {
 
                                 if (checked) {
                                     if (isOpenModalOpen === 'parent') {
-                                        const uniqueParentIds = [...new Set(studentParents.map((p) => p.parent_id))];
+                                        const uniqueParentIds = [...new Set(studentParents.map((p) => p.account_id))];
                                         setSelectedParents(uniqueParentIds);
                                     } else if (isOpenModalOpen === 'driver') {
-                                        setSelectedDrivers(drivers.map((d) => d.driver_id));
+                                        setSelectedDrivers(drivers.map((d) => d.account_id));
                                     }
                                 } else {
                                     setSelectedParents([]);
@@ -204,10 +210,10 @@ function Report() {
                                     <td>
                                         <input
                                             type="checkbox"
-                                            value={sp.parent_id}
-                                            checked={selectedParents.includes(sp.parent_id)}
+                                            value={sp.account_id}
+                                            checked={selectedParents.includes(sp.account_id)}
                                             onChange={() => {
-                                                const id = sp.parent_id;
+                                                const id = sp.account_id;
 
                                                 setSelectedParents((prev) =>
                                                     prev.includes(id)
@@ -245,9 +251,9 @@ function Report() {
                                         <td>
                                             <input
                                                 type="checkbox"
-                                                checked={selectedDrivers.includes(driver.driver_id)}
+                                                checked={selectedDrivers.includes(driver.account_id)}
                                                 onChange={() => {
-                                                    const id = driver.driver_id;
+                                                    const id = driver.account_id;
 
                                                     setSelectedDrivers((prev) =>
                                                         prev.includes(id)

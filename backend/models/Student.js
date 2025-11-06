@@ -46,10 +46,11 @@ async function getStudentAndParent() {
       s.parent_id,
       p.parent_name,
       p.phone,
-      p.email
+      p.email,
+      p.account_id
     FROM student s
     LEFT JOIN parent p ON s.parent_id = p.parent_id
-    WHERE s.is_deleted = 0 AND p.is_deleted = 0
+    WHERE s.is_deleted = 0 AND p.is_deleted = 0 AND p.account_id IS NOT NULL
     
   `);
 

@@ -189,6 +189,10 @@ function initSocket(server) {
         }
       });
     });
+
+    socket.on("startRoute", (message) => {
+      io.emit("startRoute", message);
+    });
     // Ngắt kết nối
     socket.on("disconnect", () => {
       for (let [userId, sid] of onlineUsers.entries()) {

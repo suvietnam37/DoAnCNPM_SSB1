@@ -1,5 +1,5 @@
 // frontend/src/components/DriverContent/DriverContent.js
-import { useState, useEffect, useContext, use } from 'react';
+import { useState, useEffect, useContext, use, useRef } from 'react';
 import axios from 'axios';
 import NavMenu from '../NavMenu/NavMenu';
 import classNames from 'classnames/bind';
@@ -11,21 +11,35 @@ import Report from './Report/Report';
 import showToast from '../../untils/ShowToast/showToast';
 import showConfirm from '../../untils/ShowConfirm/showConfirm';
 import { AuthContext } from '../../context/auth.context';
+import { io } from 'socket.io-client';
 
 const cx = classNames.bind(styles);
 
 // Giả định ID của tài xế đã đăng nhập
 
 function DriverContent() {
+    const socketRef = useRef(null);
     const authContext = useContext(AuthContext);
     const ACCOUNT_ID = authContext.auth.user.account_id;
 
     // State quản lý toàn bộ dữ liệu cho trang Driver
     const [assignments, setAssignments] = useState([]);
+    const [notifications, setNotifications] = useState([]);
     const [currentAssignment, setCurrentAssignment] = useState(null);
     const [studentsOnRoute, setStudentsOnRoute] = useState(null);
     const [loading, setLoading] = useState(true);
     const [driver, setDriver] = useState(null);
+
+    useEffect(() => {
+        socketRef.current = io('http://localhost:5000');
+
+        socketRef.current.emit('register', ACCOUNT_ID);
+
+        return () => {
+            socketRef.current.off('startRoute');
+            socketRef.current.disconnect();
+        };
+    }, []);
 
     // Hàm gọi API lấy danh sách học sinh khi một tuyến bắt đầu
     const fetchStudentsForRoute = async (routeId) => {
@@ -41,6 +55,7 @@ function DriverContent() {
     // Lấy tài xế từ account_id
     useEffect(() => {
         fetchDriverByAcountId(ACCOUNT_ID);
+        fetchNotifications(ACCOUNT_ID);
     }, []);
 
     // Khi driver đã có -> load toàn bộ dữ liệu
@@ -119,6 +134,7 @@ function DriverContent() {
                 const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Running',
                 });
+                socketRef.current.emit('startRoute', 'Tuyến xe đã bắt đầu');
                 setCurrentAssignment(response.data);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
@@ -172,6 +188,18 @@ function DriverContent() {
         });
     };
 
+    const fetchNotifications = async (ACCOUNT_ID) => {
+        const date = new Date().toISOString().split('T')[0];
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}?date=${date}`,
+            );
+            setNotifications(response.data);
+        } catch (err) {
+            console.error('Lỗi fetch notification:', err);
+        }
+    };
+
     const menus = [
         { name: 'Danh Sách Tuyến Xe', id: 'route-manage', offset: -300 },
         { name: 'Quản Lý Học Sinh', id: 'student-manage', offset: -250 },
@@ -189,7 +217,12 @@ function DriverContent() {
             <div className={cx('content-position')}>
                 <RouteManage assignments={assignments} onStartRoute={handleStartRoute} />
                 <StudentManage students={studentsOnRoute} handleConfirmStudent={handleConfirmStudent} />
-                <Doing currentAssignment={currentAssignment} handleEndRoute={handleEndRoute} />
+                <Doing
+                    notifications={notifications}
+                    currentAssignment={currentAssignment}
+                    handleEndRoute={handleEndRoute}
+                    setNotifications={setNotifications}
+                />
                 <Report />
             </div>
         </div>

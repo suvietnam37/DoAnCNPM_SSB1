@@ -19,7 +19,6 @@ const cx = classNames.bind(styles);
 
 function Notification({ notifications, routeStatus, setNotifications }) {
     const socketRef = useRef(null);
-
     const [bus, setBus] = useState([]);
     const [driver, setDriver] = useState([]);
     const [stops, setStops] = useState([]);
@@ -35,6 +34,7 @@ function Notification({ notifications, routeStatus, setNotifications }) {
 
     const handleOpenModal = () => {
         setModalOpen(true);
+        fetchNotifications(authContext?.auth?.user?.account_id);
     };
 
     useEffect(() => {
@@ -62,10 +62,14 @@ function Notification({ notifications, routeStatus, setNotifications }) {
             if (routeStatus.current_stop_id) {
                 fetchNameCurrentStop(routeStatus.current_stop_id);
             } else {
-                setCurrentStop(stops[0].stop_name);
+                setCurrentStop(stops[0]?.stop_name);
             }
         }
     }, [routeStatus]);
+
+    useEffect(() => {
+        console.log(stops);
+    }, [stops]);
 
     const fetchNameCurrentStop = async (STOP_ID) => {
         try {
@@ -107,7 +111,7 @@ function Notification({ notifications, routeStatus, setNotifications }) {
         const date = new Date().toISOString().split('T')[0];
         try {
             const response = await axios.get(
-                `http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}?date=${date}`,
+                `http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}&date=${date}`,
             );
             setNotifications(response.data);
         } catch (err) {
@@ -130,7 +134,6 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                             className={cx('notification-realtime-details')}
                             onClick={() => {
                                 handleOpenModal();
-                                fetchNotifications(authContext?.auth?.user?.account_id);
                             }}
                         >
                             Xem chi tiết

@@ -15,6 +15,8 @@ function RouteStatus({ routeStatus }) {
             fetchStopByRouteId(routeStatus.route_id);
             if (routeStatus.current_stop_id) {
                 fetchNameCurrentNextStop(routeStatus.current_stop_id, 'current');
+            } else {
+                setCurrentStop(stops[0]?.stop_name);
             }
             if (routeStatus.next_stop_id) {
                 fetchNameCurrentNextStop(routeStatus.next_stop_id, 'next');

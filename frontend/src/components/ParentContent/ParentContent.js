@@ -28,26 +28,58 @@ function ParentContent() {
     const [parent, setParent] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // useEffect(() => {
-    //     if (!loading) {
-    //         console.log('✅ Tất cả dữ liệu đã load xong:');
-    //         console.log('Parent:', parent);
-    //         console.log('Students:', students);
-    //         console.log('Notifications:', notifications);
-    //         console.log('Route Status:', routeStatus);
-    //         console.log('Bus Location:', busLocation);
-    //     }
-    // }, [loading, parent, students, notifications, routeStatus, busLocation]);
+    useEffect(() => {
+        console.log('Students:', students);
+        console.log('Notifications:', notifications);
+    }, [students, notifications]);
 
-    //kết nối socket
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
 
+        socketRef.current.emit('register', ACCOUNT_ID);
+
+        socketRef.current.on('startRoute', async (message) => {
+            showToast(message);
+
+            if (parent) {
+                fetchParentData(parent.parent_id, ACCOUNT_ID);
+            }
+        });
+
         return () => {
-            console.log('Ngắt kết nối socket');
+            socketRef.current.off('startRoute');
             socketRef.current.disconnect();
         };
     }, []);
+
+    //  //lắng nghe sự kiện socket theo routeStatus
+    // useEffect(() => {
+    //     if (!routeStatus) return;
+
+    //     const socket = socketRef.current;
+    //     const routeId = routeStatus.route_id;
+
+    //     console.log(`Join room route: ${routeId}`);
+    //     socket.emit('join_route_room', routeId);
+
+    //     const handleNewLocation = (data) => {
+    //         setBusLocation({ lat: data.lat, lng: data.lng });
+    //     };
+
+    //     const handleApproachingStop = (data) => {
+    //         showToast(`Xe sắp đến trạm "${data.stopName}" (còn ${data.distance}m)!`);
+    //     };
+
+    //     socket.on('new_location', handleNewLocation);
+    //     socket.on('approaching_stop', handleApproachingStop);
+
+    //     return () => {
+    //         console.log(`Leave room route: ${routeId}`);
+    //         socket.off('new_location', handleNewLocation);
+    //         socket.off('approaching_stop', handleApproachingStop);
+    //         socket.emit('leave_route_room', routeId);
+    //     };
+    // }, [routeStatus]);
 
     //lấy parent từ account
     useEffect(() => {
@@ -57,35 +89,6 @@ function ParentContent() {
     useEffect(() => {
         if (parent) fetchParentData(parent.parent_id, ACCOUNT_ID);
     }, [parent]);
-
-    //lắng nghe sự kiện socket theo routeStatus
-    useEffect(() => {
-        if (!routeStatus) return;
-
-        const socket = socketRef.current;
-        const routeId = routeStatus.route_id;
-
-        console.log(`Join room route: ${routeId}`);
-        socket.emit('join_route_room', routeId);
-
-        const handleNewLocation = (data) => {
-            setBusLocation({ lat: data.lat, lng: data.lng });
-        };
-
-        const handleApproachingStop = (data) => {
-            showToast(`Xe sắp đến trạm "${data.stopName}" (còn ${data.distance}m)!`);
-        };
-
-        socket.on('new_location', handleNewLocation);
-        socket.on('approaching_stop', handleApproachingStop);
-
-        return () => {
-            console.log(`Leave room route: ${routeId}`);
-            socket.off('new_location', handleNewLocation);
-            socket.off('approaching_stop', handleApproachingStop);
-            socket.emit('leave_route_room', routeId);
-        };
-    }, [routeStatus]);
 
     const fetchParentData = async (PARENT_ID, ACCOUNT_ID) => {
         setLoading(true);
@@ -115,7 +118,7 @@ function ParentContent() {
                 console.log('Không có tuyến chạy hiện tại.');
                 setRouteStatus(null);
             }
-            const today = new Date().toISOString().split('T')[0];
+            // const today = new Date().toISOString().split('T')[0];
             // fetchRoutes(today, stopId);
         } catch (error) {
             console.error('Lỗi fetch dữ liệu phụ huynh:', error);
@@ -133,15 +136,15 @@ function ParentContent() {
             setRouteStatus(null);
         }
     };
-    // const fetchRoutes = async (date, stop_id) => {
-    //     try {
-    //         const res = await axios.get(`http://localhost:5000/api/routes/date/${date}/stop/${stop_id}`);
-    //         setRoutes(res.data);
-    //     } catch (e) {
-    //         console.log('Không có routes');
-    //         setRouteStatus(null);
-    //     }
-    // };
+    const fetchRoutes = async (date, stop_id) => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/routes/date/${date}/stop/${stop_id}`);
+            setRoutes(res.data);
+        } catch (e) {
+            console.log('Không có routes');
+            setRouteStatus(null);
+        }
+    };
 
     const fetchParentsByAcountId = async (ACCOUNT_ID) => {
         try {
