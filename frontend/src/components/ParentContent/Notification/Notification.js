@@ -67,10 +67,6 @@ function Notification({ notifications, routeStatus, setNotifications }) {
         }
     }, [routeStatus]);
 
-    useEffect(() => {
-        console.log(stops);
-    }, [stops]);
-
     const fetchNameCurrentStop = async (STOP_ID) => {
         try {
             const response = await axios.get(`http://localhost:5000/api/stops/${STOP_ID}`);

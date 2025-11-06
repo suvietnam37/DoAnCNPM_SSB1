@@ -29,28 +29,34 @@ function ParentContent() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log('Students:', students);
-        console.log('Notifications:', notifications);
-    }, [students, notifications]);
+        console.log('Parent thay đổi:', parent);
+    }, [parent]);
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
 
         socketRef.current.emit('register', ACCOUNT_ID);
 
-        socketRef.current.on('startRoute', async (message) => {
-            showToast(message);
-
-            if (parent) {
-                fetchParentData(parent.parent_id, ACCOUNT_ID);
-            }
-        });
-
         return () => {
             socketRef.current.off('startRoute');
             socketRef.current.disconnect();
         };
     }, []);
+
+    useEffect(() => {
+        if (!parent) return;
+
+        const handleStartRoute = (message) => {
+            showToast(message);
+            fetchParentData(parent.parent_id, ACCOUNT_ID);
+        };
+
+        socketRef.current.on('startRoute', handleStartRoute);
+
+        return () => {
+            socketRef.current.off('startRoute', handleStartRoute);
+        };
+    }, [parent]);
 
     //  //lắng nghe sự kiện socket theo routeStatus
     // useEffect(() => {
@@ -91,6 +97,7 @@ function ParentContent() {
     }, [parent]);
 
     const fetchParentData = async (PARENT_ID, ACCOUNT_ID) => {
+        console.log('hihi');
         setLoading(true);
         const date = new Date().toISOString().split('T')[0];
 
