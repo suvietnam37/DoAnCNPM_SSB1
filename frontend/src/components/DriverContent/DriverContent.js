@@ -129,10 +129,13 @@ function DriverContent() {
             return;
         }
 
+        const firstStopId = await fetchStopByRouteId(routeId);
+
         showConfirm('Bạn có chắc muốn bắt đầu tuyến?', 'Bắt đầu', async () => {
             try {
                 const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Running',
+                    current_stop_id: firstStopId,
                 });
                 socketRef.current.emit('startRoute', 'Tuyến xe đã bắt đầu');
                 setCurrentAssignment(response.data);
@@ -197,6 +200,15 @@ function DriverContent() {
             setNotifications(response.data);
         } catch (err) {
             console.error('Lỗi fetch notification:', err);
+        }
+    };
+
+    const fetchStopByRouteId = async (route_id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/stops?route_id=${route_id}`);
+            return response.data[0].stop_id;
+        } catch (err) {
+            console.error('Lỗi fetch stops:', err);
         }
     };
 

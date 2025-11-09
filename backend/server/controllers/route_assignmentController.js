@@ -103,13 +103,17 @@ exports.updateRouteAssignment = async (req, res) => {
 exports.startRouteAssignment = async (req, res) => {
   try {
     const id = req.params.id;
-    const { status } = req.body;
+    const { status, current_stop_id } = req.body;
     if (!status) {
       return res
         .status(400)
         .json({ error: "Tất cả các trường bắt buộc phải được cung cấp" });
     }
-    const updatedRouteAssignment = await RouteAssignment.start(id, status);
+    const updatedRouteAssignment = await RouteAssignment.start(
+      id,
+      status,
+      current_stop_id
+    );
     res.json(updatedRouteAssignment);
   } catch (err) {
     console.error(err);

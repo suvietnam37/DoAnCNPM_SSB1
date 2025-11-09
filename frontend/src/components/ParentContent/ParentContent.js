@@ -17,7 +17,6 @@ function ParentContent() {
     const authContext = useContext(AuthContext);
     const ACCOUNT_ID = authContext.auth.user.account_id;
 
-    // Chỉ tạo socket 1 lần
     const socketRef = useRef(null);
 
     const [students, setStudents] = useState([]);
@@ -29,16 +28,11 @@ function ParentContent() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log('Parent thay đổi:', parent);
-    }, [parent]);
-
-    useEffect(() => {
         socketRef.current = io('http://localhost:5000');
 
         socketRef.current.emit('register', ACCOUNT_ID);
 
         return () => {
-            socketRef.current.off('startRoute');
             socketRef.current.disconnect();
         };
     }, []);
@@ -97,7 +91,6 @@ function ParentContent() {
     }, [parent]);
 
     const fetchParentData = async (PARENT_ID, ACCOUNT_ID) => {
-        console.log('hihi');
         setLoading(true);
         const date = new Date().toISOString().split('T')[0];
 

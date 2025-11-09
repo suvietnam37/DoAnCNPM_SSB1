@@ -72,9 +72,9 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
 
     useEffect(() => {
         if (currentAssignment) {
-            fetchBusByBusId(currentAssignment.bus_id);
-            fetchDriverByDriverId(currentAssignment.driver_id);
-            fetchStopByRouteId(currentAssignment.route_id);
+            if (currentAssignment.bus_id) fetchBusByBusId(currentAssignment.bus_id);
+            if (currentAssignment.driver_id) fetchDriverByDriverId(currentAssignment.driver_id);
+            if (currentAssignment.route_id) fetchStopByRouteId(currentAssignment.route_id);
         }
     }, [currentAssignment]);
 

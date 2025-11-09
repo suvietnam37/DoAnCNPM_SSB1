@@ -184,25 +184,26 @@ async function getStopCountByAssignmentId(assignmentId) {
   return rows[0]?.stop_count || 0;
 }
 
-async function start(id, status) {
+async function start(id, status, current_stop_id) {
   const assignment_id = id;
   const newstatus = status;
+  const csi = current_stop_id;
 
   const [result] = await db.query(
     `
     UPDATE route_assignment 
-    SET  status = ?
+    SET  status = ? , current_stop_id = ?
     WHERE assignment_id = ? 
       AND is_deleted = 0
     `,
-    [newstatus, assignment_id]
+    [newstatus, csi, assignment_id]
   );
 
   if (result.affectedRows === 0) {
     throw new Error("Route assignment not found or already deleted");
   }
 
-  return { assignment_id: id, status };
+  return { assignment_id: id, status, current_stop_id };
 }
 
 async function updateStops(id, current_stop_id, next_stop_id) {
