@@ -38,6 +38,19 @@ exports.getParentByAccId = async (req, res) => {
   }
 };
 
+exports.getParentByRouteId = async (req, res) => {
+  try {
+    const id = req.params.routeId;
+    const parent = await Parent.getByRouteId(id);
+    if (!parent)
+      return res.status(404).json({ error: "Phụ huynh không tồn tại" });
+    res.json(parent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi lấy phụ huynh" });
+  }
+};
+
 // Thêm phụ huynh mới
 exports.createParent = async (req, res) => {
   try {

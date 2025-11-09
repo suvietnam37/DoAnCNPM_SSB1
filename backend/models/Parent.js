@@ -25,6 +25,18 @@ async function getByAccId(id) {
   return rows[0] || null;
 }
 
+async function getByRouteId(id) {
+  const [rows] = await db.query(
+    `SELECT * 
+     FROM parent p
+     JOIN student st ON st.parent_id = p.parent_id
+     JOIN stop s ON s.stop_id = st.stop_id
+     WHERE s.route_id = ? AND p.is_deleted = 0`,
+    [id]
+  );
+  return rows || null;
+}
+
 // Thêm phụ huynh mới
 async function create(parent) {
   const { parent_name, phone, email, account_id } = parent;
@@ -81,4 +93,5 @@ module.exports = {
   update,
   softDelete,
   assignAccount,
+  getByRouteId,
 };

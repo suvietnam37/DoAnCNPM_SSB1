@@ -54,6 +54,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
 
         return () => {
             socketRef.current.off('notification');
+            socketRef.current.off('changeRoute');
             socketRef.current.disconnect();
         };
     }, []);
@@ -112,9 +113,9 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
         }
     };
 
-    const handleChangeStop = async () => {
+    const handleChangeStop = async (route_id) => {
         showConfirm('Bạn xác nhận đã đến?', 'Xác nhận', async () => {
-            // Lấy index của current stop
+            // Lấy vị trí của current stop trong mảng stops
             const currentIndex = stops.findIndex((s) => s.stop_name === currentStop);
 
             if (currentIndex === -1) return;
@@ -139,6 +140,9 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
 
             // Gửi về backend để đồng bộ
             try {
+                const res = await axios.get(`http://localhost:5000/api/parents/route_id/${currentAssignment.route_id}`);
+                const parent = res.data;
+
                 await axios.put(
                     `http://localhost:5000/api/route_assignments/update-stop/${currentAssignment.assignment_id}`,
                     {
@@ -147,7 +151,22 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                     },
                 );
 
+                parent.forEach(async (i) => {
+                    try {
+                        await axios.post('http://localhost:5000/api/notifications/create', {
+                            accountId: i.account_id,
+                            content: `Đã đến trạm ${currentStop} `,
+                        });
+                    } catch (error) {
+                        console.log(error, 'Lỗi khi thêm notification');
+                    }
+                });
+
                 showToast('Xác nhận đến trạm thành công');
+                socketRef.current.emit('changeRoute', {
+                    message: `Đã đến trạm ${currentStop} `,
+                    route_id: route_id,
+                });
             } catch (err) {
                 console.error('Error updating stop:', err);
             }
@@ -181,7 +200,10 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                         </button>
                     )}
                     {endRoute === false && (
-                        <button className={cx('doing-realtime-details')} onClick={() => handleChangeStop()}>
+                        <button
+                            className={cx('doing-realtime-details')}
+                            onClick={() => handleChangeStop(currentAssignment.route_id)}
+                        >
                             Đến Trạm Dừng
                         </button>
                     )}

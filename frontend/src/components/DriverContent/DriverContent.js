@@ -76,7 +76,6 @@ function DriverContent() {
         });
 
         if (runningAssignment) {
-            console.log('runningAssignment:', runningAssignment);
             fetchStudentsForRoute(runningAssignment.route_id);
             setCurrentAssignment(runningAssignment);
         }
@@ -170,24 +169,28 @@ function DriverContent() {
     };
 
     const handleConfirmStudent = async (newStatus, student_id, student_name, parent_id) => {
-        var userId = null;
         showConfirm('Xác nhận học sinh đã lên xe', 'Xác nhận', async () => {
             try {
                 const res = await axios.get(`http://localhost:5000/api/parents/${parent_id}`);
-                userId = res.data.account_id;
+                const account_id = res.data.account_id;
+
+                await axios.post('http://localhost:5000/api/notifications/create', {
+                    accountId: account_id,
+                    content: `Học sinh ${student_name} đã lên xe`,
+                });
             } catch (error) {
-                console.error('Lỗi :', error);
+                console.log(error, 'Lỗi khi thêm notification');
             }
+
             try {
                 const { data } = await axios.put('http://localhost:5000/api/students/status', {
                     status: newStatus,
                     student_id,
                 });
 
-                if (data.success && userId) {
+                if (data.success) {
                     showToast('Xác nhận thành công');
                     socketRef.current.emit('confirmStudent', {
-                        toUserIds: userId,
                         message: `Học sinh ${student_name} đã lên xe`,
                         student_id: student_id,
                     });

@@ -40,8 +40,8 @@ function ParentContent() {
     useEffect(() => {
         if (!parent) return;
 
-        const handleStartRoute = (data) => {
-            showToast(data.message);
+        const handleStartRoute = (message) => {
+            showToast(message);
             fetchParentData(parent.parent_id, ACCOUNT_ID);
         };
 
@@ -57,9 +57,19 @@ function ParentContent() {
 
         socketRef.current.on('confirmStudent', handleConfirmStudent);
 
+        const handleChangeRoute = (data) => {
+            if (routeStatus?.route_id === data.route_id) {
+                showToast(data.message);
+                fetchParentData(parent.parent_id, ACCOUNT_ID);
+            }
+        };
+
+        socketRef.current.on('changeRoute', handleChangeRoute);
+
         return () => {
             socketRef.current.off('startRoute', handleStartRoute);
             socketRef.current.off('confirmStudent', handleConfirmStudent);
+            socketRef.current.off('changeRoute', handleChangeRoute);
         };
     }, [parent, students]);
 

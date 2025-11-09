@@ -162,7 +162,6 @@
 //---------------------------------------------------------------------------------------
 
 const { Server } = require("socket.io");
-const Notification = require("../models/Notification");
 
 function initSocket(server) {
   const io = new Server(server, {
@@ -178,87 +177,29 @@ function initSocket(server) {
       onlineUsers.set(userId, socket.id);
     });
 
-    // socket.on("sendNotification", ({ toUserIds, message }) => {
-    //   if (!Array.isArray(toUserIds)) toUserIds = [toUserIds];
-    //   toUserIds.forEach((userId) => {
-    //     const targetSocketId = onlineUsers.get(userId);
-    //     if (targetSocketId) {
-    //       io.to(targetSocketId).emit("notification", { message });
-    //     }
-    //   });
-    // });
-
-    socket.on("sendNotification", async ({ toUserIds, message }) => {
-      if (!Array.isArray(toUserIds)) {
-        toUserIds = [toUserIds];
-      }
-
-      for (const userId of toUserIds) {
-        try {
-          await Notification.createNotification(userId, message);
-
-          const targetSocket = onlineUsers.get(userId);
-          if (targetSocket) {
-            io.to(targetSocket).emit("notification", {
-              account_id: userId,
-              message: message,
-            });
-          }
-        } catch (error) {
-          console.error("Lỗi khi tạo notification:", error);
+    socket.on("sendNotification", ({ toUserIds, message }) => {
+      console.log("Online Users:", onlineUsers);
+      console.log("Sending to:", toUserIds);
+      console.log("message: ", message);
+      if (!Array.isArray(toUserIds)) toUserIds = [toUserIds]; // bien du chi la so thanh mang
+      toUserIds.forEach((userId) => {
+        const targetSocketId = onlineUsers.get(userId);
+        if (targetSocketId) {
+          io.to(targetSocketId).emit("notification", { message });
         }
-      }
+      });
     });
 
     socket.on("startRoute", (message) => {
       io.emit("startRoute", message);
     });
 
-    // socket.on("confirmStudent", ({ message, student_id }) => {
-    //   io.emit("confirmStudent", { message, student_id });
-    // });
-
-    socket.on("confirmStudent", async ({ toUserIds, message, student_id }) => {
-      if (!Array.isArray(toUserIds)) {
-        toUserIds = [toUserIds];
-      }
-
-      for (const userId of toUserIds) {
-        try {
-          await Notification.createNotification(userId, message);
-
-          const targetSocket = onlineUsers.get(userId);
-          if (targetSocket) {
-            console.log(targetSocket);
-            io.to(targetSocket).emit("confirmStudent", {
-              message,
-              student_id,
-            });
-          }
-        } catch (error) {
-          console.error("Lỗi confirmStudent:", error);
-        }
-      }
+    socket.on("confirmStudent", ({ message, student_id }) => {
+      io.emit("confirmStudent", { message, student_id });
     });
 
-    // socket.on("changeRoute", ({ message }) => {
-    //   io.emit("changeRoute", { message });
-    // });
-    socket.on("changeRoute", async ({ toUserIds, message }) => {
-      if (!Array.isArray(toUserIds)) toUserIds = [toUserIds];
-
-      for (const userId of toUserIds) {
-        try {
-          await Notification.createNotification(userId, message);
-
-          const targetSocket = onlineUsers.get(userId);
-          if (targetSocket) {
-            io.to(targetSocket).emit("changeRoute", { message });
-          }
-        } catch (error) {
-          console.error("Lỗi changeRoute:", error);
-        }
-      }
+    socket.on("changeRoute", ({ message, route_id }) => {
+      io.emit("changeRoute", { message, route_id });
     });
     // Ngắt kết nối
     socket.on("disconnect", () => {
