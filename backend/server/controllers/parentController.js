@@ -84,9 +84,9 @@ exports.updateParent = async (req, res) => {
     // 3. Lấy thông tin phụ huynh hiện tại để không làm mất account_id đã liên kết.
     const existingParent = await Parent.getById(id);
     if (!existingParent) {
-        return res.status(404).json({ error: "Phụ huynh không tồn tại" });
+      return res.status(404).json({ error: "Phụ huynh không tồn tại" });
     }
-    
+
     // 4. Tạo object cập nhật với thông tin mới và account_id cũ.
     const updatedParentData = {
       parent_name,

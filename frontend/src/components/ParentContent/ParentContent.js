@@ -40,8 +40,8 @@ function ParentContent() {
     useEffect(() => {
         if (!parent) return;
 
-        const handleStartRoute = (message) => {
-            showToast(message);
+        const handleStartRoute = (data) => {
+            showToast(data.message);
             fetchParentData(parent.parent_id, ACCOUNT_ID);
         };
 

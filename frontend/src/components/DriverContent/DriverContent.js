@@ -169,17 +169,25 @@ function DriverContent() {
         });
     };
 
-    const handleConfirmStudent = async (newStatus, student_id, student_name) => {
+    const handleConfirmStudent = async (newStatus, student_id, student_name, parent_id) => {
+        var userId = null;
         showConfirm('Xác nhận học sinh đã lên xe', 'Xác nhận', async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/api/parents/${parent_id}`);
+                userId = res.data.account_id;
+            } catch (error) {
+                console.error('Lỗi :', error);
+            }
             try {
                 const { data } = await axios.put('http://localhost:5000/api/students/status', {
                     status: newStatus,
                     student_id,
                 });
 
-                if (data.success) {
+                if (data.success && userId) {
                     showToast('Xác nhận thành công');
                     socketRef.current.emit('confirmStudent', {
+                        toUserIds: userId,
                         message: `Học sinh ${student_name} đã lên xe`,
                         student_id: student_id,
                     });

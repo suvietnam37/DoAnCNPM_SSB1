@@ -20,9 +20,11 @@ function RouteStatus({ routeStatus }) {
             }
             if (routeStatus.next_stop_id) {
                 fetchNameCurrentNextStop(routeStatus.next_stop_id, 'next');
+            } else {
+                setNextStop(stops[1]?.stop_name);
             }
         }
-    }, [routeStatus]);
+    }, [routeStatus, stops]);
 
     const fetchStopByRouteId = async (ROUTE_ID) => {
         try {

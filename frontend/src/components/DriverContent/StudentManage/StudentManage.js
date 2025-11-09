@@ -49,7 +49,12 @@ function StudentManage({ students, handleConfirmStudent }) {
                                             {st.status == 0 && (
                                                 <button
                                                     onClick={() => {
-                                                        handleConfirmStudent(1, st.student_id, st.student_name);
+                                                        handleConfirmStudent(
+                                                            1,
+                                                            st.student_id,
+                                                            st.student_name,
+                                                            st.parent_id,
+                                                        );
                                                     }}
                                                 >
                                                     Xác nhận đã lên xe

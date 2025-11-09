@@ -47,20 +47,10 @@ function Report() {
         };
     }, []);
 
-    const send = async () => {
+    const send = () => {
         const toUserIds = isOpenModalOpen === 'driver' ? selectedDrivers : selectedParents;
-        toUserIds.forEach(async (i) => {
-            try {
-                await axios.post('http://localhost:5000/api/notifications/create', {
-                    accountId: i,
-                    content: noti,
-                });
-            } catch (error) {
-                console.log(error, 'Lỗi khi thêm notification');
-            }
-        });
 
-        if (!noti.trim() || toUserIds.length < 1) {
+        if (!noti.trim() || toUserIds.length === 0) {
             showToast('Vui lòng nhập thông báo hoặc chọn người nhận', false);
             return;
         }
@@ -71,6 +61,7 @@ function Report() {
         });
 
         showToast('Gửi thông báo thành công');
+
         setNoti('');
         setSelectedDrivers([]);
         setSelectedParents([]);
