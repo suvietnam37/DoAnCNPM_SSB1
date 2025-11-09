@@ -7,7 +7,17 @@ const db = require("../config/db");
 async function getAll() {
   const [rows] = await db.query(
     `
-    SELECT ra.*
+    SELECT 
+      ra.assignment_id,
+      ra.route_id,
+      ra.driver_id,
+      ra.bus_id,
+      DATE_FORMAT(ra.run_date, '%Y-%m-%d') AS run_date,
+      ra.status,
+      ra.departure_time,
+      ra.is_deleted,
+      ra.current_stop_id,
+      ra.next_stop_id
     FROM route_assignment ra
     WHERE ra.is_deleted = 0
     ORDER BY ra.run_date DESC, ra.departure_time DESC
@@ -22,7 +32,17 @@ async function getAll() {
 async function getById(id) {
   const [rows] = await db.query(
     `
-    SELECT ra.*
+    SELECT 
+      ra.assignment_id,
+      ra.route_id,
+      ra.driver_id,
+      ra.bus_id,
+      DATE_FORMAT(ra.run_date, '%Y-%m-%d') AS run_date,
+      ra.status,
+      ra.departure_time,
+      ra.is_deleted,
+      ra.current_stop_id,
+      ra.next_stop_id
     FROM route_assignment ra
     WHERE ra.assignment_id = ?
       AND ra.is_deleted = 0
@@ -104,7 +124,17 @@ async function softDelete(id) {
 async function getByDriverId(driverId) {
   const [rows] = await db.query(
     `
-    SELECT ra.*
+    SELECT 
+      ra.assignment_id,
+      ra.route_id,
+      ra.driver_id,
+      ra.bus_id,
+      DATE_FORMAT(ra.run_date, '%Y-%m-%d') AS run_date,
+      ra.status,
+      ra.departure_time,
+      ra.is_deleted,
+      ra.current_stop_id,
+      ra.next_stop_id
     FROM route_assignment ra
     WHERE ra.driver_id = ?
       AND ra.is_deleted = 0
@@ -123,7 +153,15 @@ async function getCurrentByDriverId(driverId) {
   const [rows] = await db.query(
     `
     SELECT 
-      ra.*,
+      ra.assignment_id,
+      ra.route_id,
+      ra.driver_id,
+      ra.bus_id,
+      DATE_FORMAT(ra.run_date, '%Y-%m-%d') AS run_date,
+      ra.status,
+      ra.departure_time,
+      ra.current_stop_id,
+      ra.next_stop_id,
       r.route_name,
       d.driver_name,
       b.license_plate
@@ -141,6 +179,7 @@ async function getCurrentByDriverId(driverId) {
   return rows[0] || null;
 }
 
+
 // -------------------------
 // Lấy phân công đang chạy theo routeId
 // -------------------------
@@ -148,7 +187,15 @@ async function getCurrentByRouteId(routeId) {
   const [rows] = await db.query(
     `
     SELECT 
-      ra.*,
+      ra.assignment_id,
+      ra.route_id,
+      ra.driver_id,
+      ra.bus_id,
+      DATE_FORMAT(ra.run_date, '%Y-%m-%d') AS run_date,
+      ra.status,
+      ra.departure_time,
+      ra.current_stop_id,
+      ra.next_stop_id,
       r.route_name,
       d.driver_name,
       b.license_plate

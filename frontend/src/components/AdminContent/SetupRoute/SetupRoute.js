@@ -67,7 +67,7 @@ function SetupRoute() {
                 setRouteId(assignment.route_id);
                 setDriverId(assignment.driver_id);
                 setBusId(assignment.bus_id);
-                setRunDate(assignment.run_date ? new Date(assignment.run_date).toISOString().split('T')[0] : '');
+                setRunDate(assignment.run_date || ''); 
                 setStatus(assignment.status);
                 setDepartureTime(assignment.departure_time);
             }
