@@ -47,10 +47,21 @@ function ParentContent() {
 
         socketRef.current.on('startRoute', handleStartRoute);
 
+        const handleConfirmStudent = (data) => {
+            var check = students.some((st) => st.student_id === data.student_id);
+            if (check) {
+                showToast(data.message);
+                fetchParentData(parent.parent_id, ACCOUNT_ID);
+            }
+        };
+
+        socketRef.current.on('confirmStudent', handleConfirmStudent);
+
         return () => {
             socketRef.current.off('startRoute', handleStartRoute);
+            socketRef.current.off('confirmStudent', handleConfirmStudent);
         };
-    }, [parent]);
+    }, [parent, students]);
 
     //  //lắng nghe sự kiện socket theo routeStatus
     // useEffect(() => {
@@ -97,7 +108,7 @@ function ParentContent() {
         try {
             const [studentsRes, notificationsRes] = await Promise.all([
                 axios.get(`http://localhost:5000/api/students?parent_id=${PARENT_ID}`),
-                axios.get(`http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}?date=${date}`),
+                axios.get(`http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}&date=${date}`),
             ]);
 
             const studentList = studentsRes.data;
@@ -169,7 +180,7 @@ function ParentContent() {
             <NavMenu menus={menus} role={'Parent'} />
             <div className={cx('content-position')}>
                 <RouteStatus routeStatus={routeStatus} />
-                <StudentManage students={students} />
+                <StudentManage students={students} setStudents={setStudents} />
                 <Notification
                     setNotifications={setNotifications}
                     notifications={notifications}

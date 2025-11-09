@@ -37,6 +37,7 @@ function DriverContent() {
 
         return () => {
             socketRef.current.off('startRoute');
+            socketRef.current.off('confirmStudent');
             socketRef.current.disconnect();
         };
     }, []);
@@ -168,7 +169,7 @@ function DriverContent() {
         });
     };
 
-    const handleConfirmStudent = async (newStatus, student_id) => {
+    const handleConfirmStudent = async (newStatus, student_id, student_name) => {
         showConfirm('Xác nhận học sinh đã lên xe', 'Xác nhận', async () => {
             try {
                 const { data } = await axios.put('http://localhost:5000/api/students/status', {
@@ -178,6 +179,11 @@ function DriverContent() {
 
                 if (data.success) {
                     showToast('Xác nhận thành công');
+                    socketRef.current.emit('confirmStudent', {
+                        message: `Học sinh ${student_name} đã lên xe`,
+                        student_id: student_id,
+                    });
+
                     setStudentsOnRoute(
                         //ghi lai thuoc tinh cu va ghi de status
                         (prev) => prev.map((st) => (st.student_id === student_id ? { ...st, status: newStatus } : st)),

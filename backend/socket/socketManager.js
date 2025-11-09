@@ -193,6 +193,10 @@ function initSocket(server) {
     socket.on("startRoute", (message) => {
       io.emit("startRoute", message);
     });
+
+    socket.on("confirmStudent", ({ message, student_id }) => {
+      io.emit("confirmStudent", { message, student_id });
+    });
     // Ngắt kết nối
     socket.on("disconnect", () => {
       for (let [userId, sid] of onlineUsers.entries()) {
