@@ -15,8 +15,6 @@ import { io } from 'socket.io-client';
 
 const cx = classNames.bind(styles);
 
-// Giả định ID của tài xế đã đăng nhập
-
 function DriverContent() {
     const socketRef = useRef(null);
     const authContext = useContext(AuthContext);
@@ -37,6 +35,7 @@ function DriverContent() {
 
         return () => {
             socketRef.current.off('startRoute');
+            socketRef.current.off('endRoute');
             socketRef.current.off('confirmStudent');
             socketRef.current.disconnect();
         };
@@ -156,11 +155,12 @@ function DriverContent() {
                 await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Completed',
                 });
+                socketRef.current.emit('endRoute', 'Tuyến xe đã kết thúc');
                 setCurrentAssignment(null);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
                 setStudentsOnRoute([]);
-                showToast('Tuyến xe đã kết thúc chúc bác tài làm việc vui vẻ');
+                showToast('Tuyến xe đã kết thúc thành công');
             } catch (error) {
                 console.error('Lỗi khi kết thúc tuyến:', error);
                 showToast('Không thể kết thúc tuyến. Vui lòng thử lại.', false);

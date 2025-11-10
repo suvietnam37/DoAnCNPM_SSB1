@@ -68,7 +68,7 @@ function Notification({ notifications, routeStatus, setNotifications }) {
     }, [routeStatus]);
 
     useEffect(() => {
-        setNoti(notifications[0].content);
+        setNoti(notifications[0]?.content);
     }, [notifications, setNotifications]);
 
     const fetchNameCurrentStop = async (STOP_ID) => {

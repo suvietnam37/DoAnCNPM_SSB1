@@ -58,6 +58,7 @@ function ParentContent() {
         socketRef.current.on('confirmStudent', handleConfirmStudent);
 
         const handleChangeRoute = (data) => {
+            console.log(routeStatus?.route_id, data.route_id);
             if (routeStatus?.route_id === data.route_id) {
                 showToast(data.message);
                 fetchParentData(parent.parent_id, ACCOUNT_ID);
@@ -66,12 +67,21 @@ function ParentContent() {
 
         socketRef.current.on('changeRoute', handleChangeRoute);
 
+        const handleEndRoute = (message) => {
+            console.log(message);
+            showToast(message);
+            fetchParentData(parent.parent_id, ACCOUNT_ID);
+        };
+
+        socketRef.current.on('endRoute', handleEndRoute);
+
         return () => {
             socketRef.current.off('startRoute', handleStartRoute);
             socketRef.current.off('confirmStudent', handleConfirmStudent);
+            socketRef.current.off('endRoute', handleEndRoute);
             socketRef.current.off('changeRoute', handleChangeRoute);
         };
-    }, [parent, students]);
+    }, [parent, students, routeStatus]);
 
     //  //lắng nghe sự kiện socket theo routeStatus
     // useEffect(() => {
