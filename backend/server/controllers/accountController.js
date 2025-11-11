@@ -50,6 +50,17 @@ const getAllAccounts = async (req, res) => {
   }
 };
 
+const getAllAccountsByRoleId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const accounts = await Account.getByRoleId(id);
+    res.json(accounts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Lỗi khi lấy danh sách tài khoản" });
+  }
+};
+
 const getAccount = async (req, res) => {
   res.status(200).json(req.user);
 };
@@ -153,4 +164,5 @@ module.exports = {
   deleteAccount,
   updateStatusAccount,
   getAccount,
+  getAllAccountsByRoleId,
 };

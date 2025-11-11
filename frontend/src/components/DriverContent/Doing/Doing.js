@@ -140,8 +140,14 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
 
             // Gửi về backend để đồng bộ
             try {
-                const res = await axios.get(`http://localhost:5000/api/parents/route_id/${currentAssignment.route_id}`);
-                const parent = res.data;
+                const pRes = await axios.get(
+                    `http://localhost:5000/api/parents/route_id/${currentAssignment.route_id}`,
+                );
+                const parent = pRes.data;
+
+                const aRes = await axios.get(`http://localhost:5000/api/accounts/role/1`);
+
+                const admin = aRes.data;
 
                 await axios.put(
                     `http://localhost:5000/api/route_assignments/update-stop/${currentAssignment.assignment_id}`,
@@ -162,11 +168,24 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                     }
                 });
 
+                admin.forEach(async (i) => {
+                    try {
+                        await axios.post('http://localhost:5000/api/notifications/create', {
+                            accountId: i.account_id,
+                            content: `Xe bus số ${bus.bus_id} đã đến trạm ${currentStop} `,
+                        });
+                    } catch (error) {
+                        console.log(error, 'Lỗi khi thêm notification');
+                    }
+                });
+
                 showToast('Xác nhận đến trạm thành công');
                 socketRef.current.emit('changeRoute', {
                     message: `Đã đến trạm ${currentStop} `,
                     route_id: route_id,
                 });
+
+                socketRef.current.emit('report', `Xe bus số ${bus.bus_id} đã đến trạm ${currentStop} `);
             } catch (err) {
                 console.error('Error updating stop:', err);
             }

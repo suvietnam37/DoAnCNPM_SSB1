@@ -118,7 +118,7 @@ function initSocket(server) {
       console.log("Online Users:", onlineUsers);
       console.log("Sending to:", toUserIds);
       console.log("message: ", message);
-      if (!Array.isArray(toUserIds)) toUserIds = [toUserIds]; // bien du chi la so thanh mang
+      if (!Array.isArray(toUserIds)) toUserIds = [toUserIds];
       toUserIds.forEach((userId) => {
         const targetSocketId = onlineUsers.get(userId);
         if (targetSocketId) {
@@ -140,8 +140,12 @@ function initSocket(server) {
     });
 
     socket.on("changeRoute", ({ message, route_id }) => {
-      console.log(message);
       io.emit("changeRoute", { message, route_id });
+    });
+
+    socket.on("report", (message) => {
+      console.log(message);
+      io.emit("report", message);
     });
     // Ngắt kết nối
     socket.on("disconnect", () => {

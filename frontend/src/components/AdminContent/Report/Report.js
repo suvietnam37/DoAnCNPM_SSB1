@@ -22,16 +22,6 @@ function Report() {
 
     const authContext = useContext(AuthContext);
 
-    useEffect(() => {
-        console.log('selectedParents: ', selectedParents);
-        console.log('selectedDrivers: ', selectedDrivers);
-    }, [selectedParents, selectedDrivers]);
-
-    // useEffect(() => {
-    //     console.log('studentParents: ', studentParents);
-    //     console.log('drivers: ', drivers);
-    // }, [studentParents, drivers]);
-
     const handleOpenModal = (type) => {
         setIsOpenModalOpen(type);
     };

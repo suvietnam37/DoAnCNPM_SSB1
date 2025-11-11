@@ -26,15 +26,6 @@
 html {
     font-size: 62.5%;
     scroll-behavior: smooth;
-
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: #bdbdbd;
-        border-radius: 3px;
-    }
 }
 
 body {
@@ -46,6 +37,15 @@ body {
     text-rendering: optimizeSpeed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #bdbdbd;
+        border-radius: 3px;
+    }
 }
 
 /* Liên kết */

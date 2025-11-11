@@ -5,7 +5,9 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from '../../../untils/CustomAxios/axios.customize';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
+import { io } from 'socket.io-client';
+import { AuthContext } from '../../../context/auth.context';
 
 const cx = classNames.bind(styles);
 
@@ -16,26 +18,57 @@ const busIcon = L.icon({
 // L.Marker.prototype.options.icon = busIcon;
 
 function DashBoard() {
+    const authContext = useContext(AuthContext);
+    const ACCOUNT_ID = authContext.auth.user.account_id;
+    const date = new Date().toISOString().split('T')[0];
+    const [report, setReport] = useState([]);
+    const [noti, setNoti] = useState([]);
     const [numStudents, setNumStudents] = useState([]);
     const [numDrivers, setNumDrivers] = useState([]);
     const [numBuses, setNumBuses] = useState([]);
     const [numRoutes, setNumRoutes] = useState([]);
     const [message, setMessage] = useState('');
+    const socketRef = useRef(null);
+    const listRef = useRef(null);
+
+    useEffect(() => {
+        socketRef.current = io('http://localhost:5000');
+
+        socketRef.current.on('report', (message) => {
+            setNoti((prev) => [...prev, message]);
+        });
+
+        return () => {
+            socketRef.current.off('report');
+            socketRef.current.disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (listRef.current) {
+            listRef.current.scrollTo({
+                top: listRef.current.scrollHeight,
+                behavior: 'smooth',
+            });
+        }
+    }, [noti]);
 
     // Lấy dữ liệu từ API
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [studentsResp, driversResp, busesResp, routesResp] = await Promise.all([
+                const [studentsResp, driversResp, busesResp, routesResp, notisResp] = await Promise.all([
                     axios.get('http://localhost:5000/api/students'),
                     axios.get('http://localhost:5000/api/drivers'),
                     axios.get('http://localhost:5000/api/buses'),
                     axios.get('http://localhost:5000/api/routes'),
+                    axios.get(`http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}&date=${date}`),
                 ]);
                 setNumStudents(studentsResp.data);
                 setNumDrivers(driversResp.data);
                 setNumBuses(busesResp.data);
                 setNumRoutes(routesResp.data);
+                setNoti(notisResp.data.map((item) => item.content));
             } catch (error) {
                 setMessage('Lỗi khi tải dữ liệu dashboard!');
                 console.error('Fetch error:', error);
@@ -43,6 +76,10 @@ function DashBoard() {
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        console.log(noti);
+    }, [noti, setNoti]);
 
     const waypoints = [
         { lat: 21.028511, lng: 105.804817 }, // Hà Nội
@@ -78,10 +115,10 @@ function DashBoard() {
                 <div className={cx('content-notification')}>
                     <h1>Thông báo hệ thống</h1>
                     <div className={cx('content-notification-content')}>
-                        <ul>
-                            <li>Xe 01 sẽ đến trạm A trong 5 phút nữa</li>
-                            <li>Xe 02 đã đến trạm B dừng trong 5 phút</li>
-                            <li>Xe 03 sẽ đến trạm A trễ 5 phút lý do "kẹt xe"</li>
+                        <ul ref={listRef}>
+                            {noti.map((content, index) => (
+                                <li key={index}>{content}</li>
+                            ))}
                         </ul>
                     </div>
                 </div>

@@ -8,6 +8,8 @@ router.post("/login", accountController.handleLogin);
 
 // Tạo tài khoản
 router.post("/create", accountController.createAccount);
+router.get("/role/:id", accountController.getAllAccountsByRoleId);
+
 router.all(/.*/, auth);
 
 // Lấy tất cả tài khoản

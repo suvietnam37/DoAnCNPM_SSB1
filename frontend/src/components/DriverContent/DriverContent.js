@@ -27,6 +27,8 @@ function DriverContent() {
     const [studentsOnRoute, setStudentsOnRoute] = useState(null);
     const [loading, setLoading] = useState(true);
     const [driver, setDriver] = useState(null);
+    const [route, setRoute] = useState(null);
+    const [admin, setAdmin] = useState(null);
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
@@ -52,11 +54,25 @@ function DriverContent() {
         }
     };
 
+    const fetchAdmin = async () => {
+        try {
+            const aRes = await axios.get(`http://localhost:5000/api/accounts/role/1`);
+            setAdmin(aRes.data);
+        } catch (error) {
+            console.log(error, 'Lỗi khi lay admin');
+        }
+    };
+
     // Lấy tài xế từ account_id
     useEffect(() => {
         fetchDriverByAcountId(ACCOUNT_ID);
         fetchNotifications(ACCOUNT_ID);
+        fetchAdmin();
     }, []);
+
+    useEffect(() => {
+        console.log(route);
+    }, [route]);
 
     // Khi driver đã có -> load toàn bộ dữ liệu
     useEffect(() => {
@@ -80,6 +96,26 @@ function DriverContent() {
         }
     }, [assignments]);
 
+    useEffect(() => {
+        if (currentAssignment) fetchRouteByRouteId(currentAssignment?.route_id);
+    }, [currentAssignment]);
+
+    useEffect(() => {
+        if (route) {
+            admin.forEach(async (i) => {
+                try {
+                    await axios.post('http://localhost:5000/api/notifications/create', {
+                        accountId: i.account_id,
+                        content: `Tuyến xe ${route.route_name} đã bắt đầu`,
+                    });
+                } catch (error) {
+                    console.log(error, 'Lỗi khi thêm notification');
+                }
+            });
+            socketRef.current.emit('report', `Tuyến xe ${route.route_name} đã bắt đầu`);
+        }
+    }, [route]);
+
     // Hàm lấy tài xế theo account_id
     const fetchDriverByAcountId = async (ACCOUNT_ID) => {
         try {
@@ -101,6 +137,15 @@ function DriverContent() {
             console.error('Lỗi khi tải dữ liệu cho tài xế:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchRouteByRouteId = async (route_id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/routes/${route_id}`);
+            setRoute(response.data);
+        } catch (err) {
+            console.error('Lỗi fetch routes:', err);
         }
     };
 
@@ -136,6 +181,7 @@ function DriverContent() {
                     status: 'Running',
                     current_stop_id: firstStopId,
                 });
+
                 socketRef.current.emit('startRoute', 'Tuyến xe đã bắt đầu');
                 setCurrentAssignment(response.data);
                 fetchAssignmentByDriverId(driver.driver_id);
@@ -155,7 +201,19 @@ function DriverContent() {
                 await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Completed',
                 });
+
+                admin.forEach(async (i) => {
+                    try {
+                        await axios.post('http://localhost:5000/api/notifications/create', {
+                            accountId: i.account_id,
+                            content: `Tuyến xe ${route.route_name} đã kết thúc`,
+                        });
+                    } catch (error) {
+                        console.log(error, 'Lỗi khi thêm notification');
+                    }
+                });
                 socketRef.current.emit('endRoute', 'Tuyến xe đã kết thúc');
+                socketRef.current.emit('report', `Tuyến xe ${route.route_name} đã kết thúc`);
                 setCurrentAssignment(null);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
@@ -182,6 +240,17 @@ function DriverContent() {
                 console.log(error, 'Lỗi khi thêm notification');
             }
 
+            admin.forEach(async (i) => {
+                try {
+                    await axios.post('http://localhost:5000/api/notifications/create', {
+                        accountId: i.account_id,
+                        content: `Học sinh ${student_name} đã lên xe thuộc tuyến ${route.route_name}`,
+                    });
+                } catch (error) {
+                    console.log(error, 'Lỗi khi thêm notification');
+                }
+            });
+
             try {
                 const { data } = await axios.put('http://localhost:5000/api/students/status', {
                     status: newStatus,
@@ -194,6 +263,10 @@ function DriverContent() {
                         message: `Học sinh ${student_name} đã lên xe`,
                         student_id: student_id,
                     });
+                    socketRef.current.emit(
+                        'report',
+                        `Học sinh ${student_name} đã lên xe thuộc tuyến ${route.route_name}`,
+                    );
 
                     setStudentsOnRoute(
                         //ghi lai thuoc tinh cu va ghi de status
@@ -212,7 +285,7 @@ function DriverContent() {
         const date = new Date().toISOString().split('T')[0];
         try {
             const response = await axios.get(
-                `http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}?date=${date}`,
+                `http://localhost:5000/api/notifications?account_id=${ACCOUNT_ID}&date=${date}`,
             );
             setNotifications(response.data);
         } catch (err) {
@@ -252,7 +325,7 @@ function DriverContent() {
                     handleEndRoute={handleEndRoute}
                     setNotifications={setNotifications}
                 />
-                <Report />
+                <Report driver_name={driver.driver_name} />
             </div>
         </div>
     );

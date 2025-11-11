@@ -22,6 +22,16 @@ const Account = {
     return rows[0];
   },
 
+  async getByRoleId(id) {
+    const [rows] = await db.query(
+      `SELECT a.*
+       FROM account a 
+       WHERE a.role_id = ? AND a.is_deleted = 0`,
+      [id]
+    );
+    return rows;
+  },
+
   async create(data) {
     const { username, password, role_id } = data;
     const [result] = await db.query(
