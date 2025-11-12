@@ -30,6 +30,43 @@ function DriverContent() {
     const [route, setRoute] = useState(null);
     const [admin, setAdmin] = useState(null);
 
+    // //lay vi tri bang geolocation
+    // const [position, setPosition] = useState(null);
+    // const watchIdRef = useRef(null);
+
+    // useEffect(() => {
+    //     const options = {
+    //         enableHighAccuracy: true, // cố gắng dùng gps
+    //         maximumAge: 1000, // sau 1s đo lại vị trí
+    //         timeout: 10000, // tối đa 10s mỗi lần lấy vị trí
+    //     };
+
+    //     if (!('geolocation' in navigator)) {
+    //         showToast('Trình duyệt không hỗ trợ geolocation', false);
+    //         return;
+    //     }
+
+    //     watchIdRef.current = navigator.geolocation.watchPosition(
+    //         (pos) => {
+    //             setPosition(pos);
+    //         },
+    //         (err) => {
+    //             showToast('Lỗi: ' + err.message);
+    //         },
+    //         options,
+    //     );
+
+    //     return () => {
+    //         if (watchIdRef.current !== null) {
+    //             navigator.geolocation.clearWatch(watchIdRef.current);
+    //         }
+    //     };
+    // }, []);
+
+    // useEffect(() => {
+    //     console.log(position);
+    // }, [position]);
+
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
 
