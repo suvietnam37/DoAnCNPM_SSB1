@@ -75,11 +75,19 @@ function ParentContent() {
 
         socketRef.current.on('endRoute', handleEndRoute);
 
+        const handleGetLocation = (data) => {
+            if (data.route_id === routeStatus.route_id) {
+                setBusLocation(data.location);
+            }
+        };
+        socketRef.current.on('location', handleGetLocation);
+
         return () => {
             socketRef.current.off('startRoute', handleStartRoute);
             socketRef.current.off('confirmStudent', handleConfirmStudent);
             socketRef.current.off('endRoute', handleEndRoute);
             socketRef.current.off('changeRoute', handleChangeRoute);
+            socketRef.current.off('location', handleGetLocation);
         };
     }, [parent, students, routeStatus]);
 

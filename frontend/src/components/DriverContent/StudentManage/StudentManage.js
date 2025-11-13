@@ -64,6 +64,34 @@ function StudentManage({ students, handleConfirmStudent }) {
                                     </td>
                                 </tr>
                             ))}
+                            {students.map((st) => (
+                                <tr key={st.student_id}>
+                                    <td>
+                                        <span>{st.student_id}</span>
+                                    </td>
+                                    <td>{st.student_name}</td>
+                                    <td>{st.class_name}</td>
+                                    <td>
+                                        <div className={cx('student-manage-table-btn')}>
+                                            {st.status == 1 ? 'Đã lên xe' : 'Chưa lên xe'}
+                                            {st.status == 0 && (
+                                                <button
+                                                    onClick={() => {
+                                                        handleConfirmStudent(
+                                                            1,
+                                                            st.student_id,
+                                                            st.student_name,
+                                                            st.parent_id,
+                                                        );
+                                                    }}
+                                                >
+                                                    Xác nhận đã lên xe
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>

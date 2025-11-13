@@ -26,5 +26,33 @@
         width: 80%;
         height: 450px;
         margin: 15px 10px 50px 10px;
+        position: relative;
+
+        .btn-focus {
+            position: absolute;
+            top: 18%;
+            left: 1.4%;
+            z-index: 1200;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            // border-radius: 24px;
+            width: 30px;
+            height: 30px;
+            font-size: 70%;
+
+            &.unfocus {
+                background: #e74c3c;
+            }
+
+            &.focus {
+                background: #27ae60;
+            }
+
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
     }
 }

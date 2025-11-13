@@ -67,6 +67,58 @@ function DriverContent() {
     //     console.log(position);
     // }, [position]);
 
+    const route1 = [
+        { lat: 10.762622, lng: 106.682199 },
+        { lat: 10.764015, lng: 106.682646 },
+        { lat: 10.765408, lng: 106.683093 },
+        { lat: 10.766801, lng: 106.683539 },
+        { lat: 10.768194, lng: 106.683985 },
+        { lat: 10.769587, lng: 106.684432 },
+        { lat: 10.77098, lng: 106.684878 },
+        { lat: 10.772373, lng: 106.685324 },
+        { lat: 10.773766, lng: 106.685771 },
+        { lat: 10.775159, lng: 106.686217 },
+        { lat: 10.776552, lng: 106.686664 },
+        { lat: 10.777945, lng: 106.68711 },
+        { lat: 10.779338, lng: 106.687556 },
+        { lat: 10.780731, lng: 106.688003 },
+        { lat: 10.782124, lng: 106.688449 },
+        { lat: 10.783517, lng: 106.688896 },
+        { lat: 10.78491, lng: 106.689342 },
+        { lat: 10.786303, lng: 106.689788 },
+        { lat: 10.787696, lng: 106.690235 },
+        { lat: 10.789089, lng: 106.690681 },
+        { lat: 10.790482, lng: 106.691128 },
+        { lat: 10.791875, lng: 106.691574 },
+        { lat: 10.793268, lng: 106.69202 },
+        { lat: 10.794661, lng: 106.692467 },
+        { lat: 10.796054, lng: 106.692913 },
+        { lat: 10.797447, lng: 106.693359 },
+        { lat: 10.79884, lng: 106.693806 },
+        { lat: 10.800233, lng: 106.694252 },
+        { lat: 10.801626, lng: 106.694699 },
+        { lat: 10.803019, lng: 106.695145 },
+        { lat: 10.804412, lng: 106.695591 },
+        { lat: 10.805805, lng: 106.696038 },
+        { lat: 10.807198, lng: 106.696484 },
+        { lat: 10.808591, lng: 106.696931 },
+        { lat: 10.809984, lng: 106.697377 },
+        { lat: 10.811377, lng: 106.697823 },
+        { lat: 10.81277, lng: 106.69827 },
+        { lat: 10.814163, lng: 106.698716 },
+        { lat: 10.815556, lng: 106.699162 },
+        { lat: 10.816949, lng: 106.699609 },
+        { lat: 10.818342, lng: 106.700055 },
+        { lat: 10.819735, lng: 106.700501 },
+        { lat: 10.821128, lng: 106.700948 },
+        { lat: 10.822521, lng: 106.701394 },
+        { lat: 10.823099, lng: 106.693221 }, // Bến xe Miền Đông
+        { lat: 10.812, lng: 106.68 }, // ví dụ điểm trung gian về Công viên Hoàng Văn Thụ
+        { lat: 10.8016, lng: 106.6648 }, // Công viên Hoàng Văn Thụ
+        { lat: 10.782, lng: 106.672 }, // ví dụ điểm trung gian quay về ĐH Sài Gòn
+        { lat: 10.762622, lng: 106.682199 }, // Quay lại Trường ĐH Sài Gòn
+    ];
+
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
 
@@ -79,6 +131,23 @@ function DriverContent() {
             socketRef.current.disconnect();
         };
     }, []);
+
+    useEffect(() => {
+        if (route) handleSendLocation();
+    }, [route]);
+
+    const handleSendLocation = () => {
+        let i = 0;
+        const interval = setInterval(() => {
+            console.log(i + ': ' + route1[i]);
+            socketRef.current.emit('location', { location: route1[i], route_id: route.route_id });
+
+            i++;
+            if (i >= route1.length) {
+                clearInterval(interval);
+            }
+        }, 1000);
+    };
 
     // Hàm gọi API lấy danh sách học sinh khi một tuyến bắt đầu
     const fetchStudentsForRoute = async (routeId) => {
@@ -106,10 +175,6 @@ function DriverContent() {
         fetchNotifications(ACCOUNT_ID);
         fetchAdmin();
     }, []);
-
-    useEffect(() => {
-        console.log(route);
-    }, [route]);
 
     // Khi driver đã có -> load toàn bộ dữ liệu
     useEffect(() => {
