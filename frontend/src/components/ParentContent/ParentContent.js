@@ -76,7 +76,7 @@ function ParentContent() {
         socketRef.current.on('endRoute', handleEndRoute);
 
         const handleGetLocation = (data) => {
-            if (data.route_id === routeStatus.route_id) {
+            if (data.route_id === routeStatus?.route_id) {
                 setBusLocation(data.location);
             }
         };
@@ -208,7 +208,7 @@ function ParentContent() {
             <NavMenu menus={menus} role={'Parent'} />
             <div className={cx('content-position')}>
                 <RouteStatus routeStatus={routeStatus} />
-                <StudentManage students={students} setStudents={setStudents} />
+                <StudentManage routeStatus={routeStatus} students={students} setStudents={setStudents} />
                 <Notification
                     setNotifications={setNotifications}
                     notifications={notifications}

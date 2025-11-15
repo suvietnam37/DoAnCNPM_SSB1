@@ -46,3 +46,24 @@
         }
     }
 }
+.btn {
+    background-color: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+
+    &:hover {
+        background-color: var(--red-hover);
+        box-shadow: var(--shadow);
+    }
+
+    &.disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+}

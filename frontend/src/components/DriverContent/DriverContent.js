@@ -132,9 +132,9 @@ function DriverContent() {
         };
     }, []);
 
-    useEffect(() => {
-        if (route) handleSendLocation();
-    }, [route]);
+    // useEffect(() => {
+    //     if (route) handleSendLocation();
+    // }, [route]);
 
     const handleSendLocation = () => {
         let i = 0;
@@ -199,7 +199,9 @@ function DriverContent() {
     }, [assignments]);
 
     useEffect(() => {
-        if (currentAssignment) fetchRouteByRouteId(currentAssignment?.route_id);
+        if (currentAssignment) {
+            fetchRouteByRouteId(currentAssignment?.route_id);
+        }
     }, [currentAssignment]);
 
     useEffect(() => {

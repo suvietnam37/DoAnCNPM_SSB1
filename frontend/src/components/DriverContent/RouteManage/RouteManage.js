@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRoute } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +14,7 @@ function RouteManage({ assignments, onStartRoute }) {
     const [modalStops, setModalStops] = useState([]);
 
     useEffect(() => {
+        assignments.sort((a, b) => a.departure_time.localeCompare(b.departure_time));
         async function fetchStopCounts() {
             const result = {};
             for (const asm of assignments) {
@@ -47,6 +49,24 @@ function RouteManage({ assignments, onStartRoute }) {
     const handleCloseModal = () => {
         setModalOpen(false);
         setModalStops([]);
+    };
+
+    const handleCheck = async (Id) => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/route_assignments/${Id}`);
+            const departure_time_start = res.data.departure_time;
+            for (const a of assignments) {
+                if (departure_time_start.localeCompare(a.departure_time) > 0 && a.status !== 'Completed') {
+                    console.log('hihi');
+                    showToast('Vui lòng hoàn thành chuyến xe trước đó', false);
+                    return false;
+                }
+            }
+            return true;
+        } catch (error) {
+            console.log('Lỗi: ', error);
+            return false;
+        }
     };
 
     return (
@@ -91,7 +111,12 @@ function RouteManage({ assignments, onStartRoute }) {
                                         <td>
                                             {asm.status === 'Not Started' && (
                                                 <button
-                                                    onClick={() => onStartRoute(asm.assignment_id, asm.route_id)}
+                                                    onClick={async () => {
+                                                        const c = await handleCheck(asm.assignment_id);
+                                                        if (c) {
+                                                            onStartRoute(asm.assignment_id, asm.route_id);
+                                                        }
+                                                    }}
                                                     className={cx('btn', 'add')}
                                                 >
                                                     Bắt đầu

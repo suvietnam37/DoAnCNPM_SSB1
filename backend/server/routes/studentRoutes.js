@@ -11,6 +11,7 @@ router.get("/:id", studentController.getStudentById); // GET /api/students/:id
 router.get("/route/:routeId", studentController.getStudentsByRoute); // GET /api/students/route/:routeId
 router.post("/", studentController.createStudent); // POST /api/students
 router.put("/status", studentController.updateStatus);
+router.put("/absent", studentController.updateAbsentStudent);
 router.put("/:id", studentController.updateStudent); // PUT /api/students/:id
 router.delete("/:id", studentController.deleteStudent); // DELETE /api/students/:id
 

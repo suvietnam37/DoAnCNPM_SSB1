@@ -94,6 +94,21 @@ exports.updateStudent = async (req, res) => {
   }
 };
 
+exports.updateAbsentStudent = async (req, res) => {
+  try {
+    const { id, is_absent } = req.body;
+
+    const updatedAbsentStudent = await Student.updatedAbsentStudent(
+      id,
+      is_absent
+    );
+    res.json(updatedAbsentStudent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi cập nhật học sinh" });
+  }
+};
+
 // Xóa học sinh
 exports.deleteStudent = async (req, res) => {
   try {

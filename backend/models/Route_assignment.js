@@ -169,16 +169,15 @@ async function getCurrentByDriverId(driverId) {
     JOIN route r ON ra.route_id = r.route_id AND r.is_deleted = 0
     JOIN driver d ON ra.driver_id = d.driver_id AND d.is_deleted = 0
     JOIN bus b ON ra.bus_id = b.bus_id AND b.is_deleted = 0
-    WHERE ra.driver_id = ?
-      AND ra.status = 'Running'
-      AND ra.is_deleted = 0
+    WHERE ra.driver_id = ? AND ra.is_deleted = 0
+    ORDER BY ra.departure_time ASC;
+      
     `,
     [driverId]
   );
 
   return rows[0] || null;
 }
-
 
 // -------------------------
 // Lấy phân công đang chạy theo routeId

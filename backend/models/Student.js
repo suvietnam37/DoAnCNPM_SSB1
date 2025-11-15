@@ -138,6 +138,25 @@ async function update(id, student) {
   };
 }
 
+async function updatedAbsentStudent(id, is_absent) {
+  const [result] = await db.query(
+    `UPDATE student 
+     SET is_absent = ? 
+     WHERE student_id = ? AND is_deleted = 0`,
+    [is_absent, id]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Student not found or already deleted");
+  }
+
+  return {
+    student_id: id,
+
+    is_absent,
+  };
+}
+
 // Xóa mềm học sinh
 async function softDelete(id) {
   const [result] = await db.query(
@@ -202,4 +221,5 @@ module.exports = {
   updateStatusById,
   updateStatusAll,
   getStudentAndParent,
+  updatedAbsentStudent,
 };
