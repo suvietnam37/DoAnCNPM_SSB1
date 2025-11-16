@@ -12,6 +12,9 @@ import showToast from '../../untils/ShowToast/showToast';
 import showConfirm from '../../untils/ShowConfirm/showConfirm';
 import { AuthContext } from '../../context/auth.context';
 import { io } from 'socket.io-client';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import Routing from '../../untils/Routing/Routing';
+import getDistance from '../../untils/getDistance/getDistance';
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +32,13 @@ function DriverContent() {
     const [driver, setDriver] = useState(null);
     const [route, setRoute] = useState(null);
     const [admin, setAdmin] = useState(null);
+    const [waypoints, setWaypoints] = useState([]);
+    const [routeCoords, setRouteCoords] = useState([]);
+
+    const [isRunning, setIsRunning] = useState(false);
+    const intervalRef = useRef(null);
+    const currentIndexRef = useRef(0);
+    const stopIndexRef = useRef(0);
 
     // //lay vi tri bang geolocation
     // const [position, setPosition] = useState(null);
@@ -67,57 +77,9 @@ function DriverContent() {
     //     console.log(position);
     // }, [position]);
 
-    const route1 = [
-        { lat: 10.762622, lng: 106.682199 },
-        { lat: 10.764015, lng: 106.682646 },
-        { lat: 10.765408, lng: 106.683093 },
-        { lat: 10.766801, lng: 106.683539 },
-        { lat: 10.768194, lng: 106.683985 },
-        { lat: 10.769587, lng: 106.684432 },
-        { lat: 10.77098, lng: 106.684878 },
-        { lat: 10.772373, lng: 106.685324 },
-        { lat: 10.773766, lng: 106.685771 },
-        { lat: 10.775159, lng: 106.686217 },
-        { lat: 10.776552, lng: 106.686664 },
-        { lat: 10.777945, lng: 106.68711 },
-        { lat: 10.779338, lng: 106.687556 },
-        { lat: 10.780731, lng: 106.688003 },
-        { lat: 10.782124, lng: 106.688449 },
-        { lat: 10.783517, lng: 106.688896 },
-        { lat: 10.78491, lng: 106.689342 },
-        { lat: 10.786303, lng: 106.689788 },
-        { lat: 10.787696, lng: 106.690235 },
-        { lat: 10.789089, lng: 106.690681 },
-        { lat: 10.790482, lng: 106.691128 },
-        { lat: 10.791875, lng: 106.691574 },
-        { lat: 10.793268, lng: 106.69202 },
-        { lat: 10.794661, lng: 106.692467 },
-        { lat: 10.796054, lng: 106.692913 },
-        { lat: 10.797447, lng: 106.693359 },
-        { lat: 10.79884, lng: 106.693806 },
-        { lat: 10.800233, lng: 106.694252 },
-        { lat: 10.801626, lng: 106.694699 },
-        { lat: 10.803019, lng: 106.695145 },
-        { lat: 10.804412, lng: 106.695591 },
-        { lat: 10.805805, lng: 106.696038 },
-        { lat: 10.807198, lng: 106.696484 },
-        { lat: 10.808591, lng: 106.696931 },
-        { lat: 10.809984, lng: 106.697377 },
-        { lat: 10.811377, lng: 106.697823 },
-        { lat: 10.81277, lng: 106.69827 },
-        { lat: 10.814163, lng: 106.698716 },
-        { lat: 10.815556, lng: 106.699162 },
-        { lat: 10.816949, lng: 106.699609 },
-        { lat: 10.818342, lng: 106.700055 },
-        { lat: 10.819735, lng: 106.700501 },
-        { lat: 10.821128, lng: 106.700948 },
-        { lat: 10.822521, lng: 106.701394 },
-        { lat: 10.823099, lng: 106.693221 }, // Bến xe Miền Đông
-        { lat: 10.812, lng: 106.68 }, // ví dụ điểm trung gian về Công viên Hoàng Văn Thụ
-        { lat: 10.8016, lng: 106.6648 }, // Công viên Hoàng Văn Thụ
-        { lat: 10.782, lng: 106.672 }, // ví dụ điểm trung gian quay về ĐH Sài Gòn
-        { lat: 10.762622, lng: 106.682199 }, // Quay lại Trường ĐH Sài Gòn
-    ];
+    useEffect(() => {
+        console.log('currentAssignment: ', currentAssignment);
+    }, [currentAssignment]);
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
@@ -131,22 +93,105 @@ function DriverContent() {
             socketRef.current.disconnect();
         };
     }, []);
+    useEffect(() => {
+        if (waypoints) {
+            socketRef.current.emit('waypoints', { waypoints: waypoints, route_id: route?.route_id });
+        }
+    }, [waypoints, route]);
+
+    useEffect(() => {
+        if (route) handleSendLocation();
+    }, [route, routeCoords]);
 
     // useEffect(() => {
-    //     if (route) handleSendLocation();
-    // }, [route]);
+    //     if (route && routeCoords.length > 0 && !isRunning) {
+    //         currentIndexRef.current = 0; // reset index trước
+    //         handleSendLocation(); // rồi mới chạy gửi dữ liệu
+    //     }
+    // }, [route, routeCoords]);
 
     const handleSendLocation = () => {
-        let i = 0;
-        const interval = setInterval(() => {
-            console.log(i + ': ' + route1[i]);
-            socketRef.current.emit('location', { location: route1[i], route_id: route.route_id });
+        if (intervalRef.current) return;
 
-            i++;
-            if (i >= route1.length) {
-                clearInterval(interval);
+        setIsRunning(true);
+
+        intervalRef.current = setInterval(() => {
+            if (currentIndexRef.current >= routeCoords.length) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+                setIsRunning(false);
+                return;
             }
-        }, 1000);
+
+            const loc = routeCoords[currentIndexRef.current];
+            console.log(currentIndexRef.current + ':', loc);
+
+            let dis = getDistance(
+                loc.lat,
+                loc.lng,
+                waypoints[stopIndexRef.current].lat,
+                waypoints[stopIndexRef.current].lng,
+            );
+
+            if (dis < 500) {
+                socketRef.current.emit('location', {
+                    location: loc,
+                    route_id: route.route_id,
+                    message: `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo` + Math.round(dis) + ' m',
+                });
+
+                (async () => {
+                    const roleId = 1;
+                    let toUserIds = [];
+
+                    try {
+                        const res = await axios.get(`http://localhost:5000/api/accounts/role/${roleId}`);
+                        toUserIds = res.data;
+                    } catch (error) {
+                        console.log(error, 'Lỗi khi thêm notification');
+                        return;
+                    }
+
+                    for (const i of toUserIds) {
+                        try {
+                            await axios.post('http://localhost:5000/api/notifications/create', {
+                                accountId: i.account_id,
+                                content:
+                                    `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo: ` +
+                                    Math.round(dis) +
+                                    ' m',
+                            });
+                        } catch (error) {
+                            console.log(error, 'Lỗi khi thêm notification');
+                            return;
+                        }
+                    }
+                })();
+
+                stopIndexRef.current++;
+            } else {
+                socketRef.current.emit('location', {
+                    location: loc,
+                    route_id: route.route_id,
+                });
+            }
+
+            currentIndexRef.current++;
+        }, 200);
+    };
+
+    const pauseTest = () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            setIsRunning(false);
+        }
+        // console.log('pause');
+    };
+
+    const resumeTest = () => {
+        handleSendLocation(); // sẽ tiếp tục từ currentIndexRef hiện tại
+        // console.log('resume');
     };
 
     // Hàm gọi API lấy danh sách học sinh khi một tuyến bắt đầu
@@ -277,7 +322,8 @@ function DriverContent() {
             return;
         }
 
-        const firstStopId = await fetchStopByRouteId(routeId);
+        const stops = await fetchStopByRouteId(routeId);
+        const firstStopId = stops[0].stop_id;
 
         showConfirm('Bạn có chắc muốn bắt đầu tuyến?', 'Bắt đầu', async () => {
             try {
@@ -287,6 +333,7 @@ function DriverContent() {
                 });
 
                 socketRef.current.emit('startRoute', 'Tuyến xe đã bắt đầu');
+                setWaypoints(stops.map((stop) => ({ lat: stop.latitude, lng: stop.longitude })));
                 setCurrentAssignment(response.data);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
@@ -400,7 +447,7 @@ function DriverContent() {
     const fetchStopByRouteId = async (route_id) => {
         try {
             const response = await axios.get(`http://localhost:5000/api/stops?route_id=${route_id}`);
-            return response.data[0].stop_id;
+            return response.data;
         } catch (err) {
             console.error('Lỗi fetch stops:', err);
         }
@@ -421,7 +468,12 @@ function DriverContent() {
         <div className={cx('header-position')}>
             <NavMenu menus={menus} role={'Driver'} />
             <div className={cx('content-position')}>
-                <RouteManage assignments={assignments} onStartRoute={handleStartRoute} />
+                <RouteManage
+                    assignments={assignments}
+                    onStartRoute={handleStartRoute}
+                    pauseTest={pauseTest}
+                    resumeTest={resumeTest}
+                />
                 <StudentManage students={studentsOnRoute} handleConfirmStudent={handleConfirmStudent} />
                 <Doing
                     notifications={notifications}
@@ -431,6 +483,12 @@ function DriverContent() {
                 />
                 <Report driver_name={driver.driver_name} />
             </div>
+            {waypoints.length > 0 && (
+                <MapContainer style={{ display: 'none' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Routing waypoints={waypoints} setRouteCoords={setRouteCoords} setC={true} />
+                </MapContainer>
+            )}
         </div>
     );
 }

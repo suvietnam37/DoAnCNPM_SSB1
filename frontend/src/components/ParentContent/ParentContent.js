@@ -26,6 +26,7 @@ function ParentContent() {
     const [busLocation, setBusLocation] = useState(null);
     const [parent, setParent] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [waypoints, setWaypoints] = useState([]);
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
@@ -82,12 +83,20 @@ function ParentContent() {
         };
         socketRef.current.on('location', handleGetLocation);
 
+        const handleGetWaypoints = (data) => {
+            if (data.route_id === routeStatus?.route_id) {
+                setWaypoints(data.waypoints);
+            }
+        };
+        socketRef.current.on('waypoints', handleGetWaypoints);
+
         return () => {
             socketRef.current.off('startRoute', handleStartRoute);
             socketRef.current.off('confirmStudent', handleConfirmStudent);
             socketRef.current.off('endRoute', handleEndRoute);
             socketRef.current.off('changeRoute', handleChangeRoute);
             socketRef.current.off('location', handleGetLocation);
+            socketRef.current.off('waypoints', handleGetWaypoints);
         };
     }, [parent, students, routeStatus]);
 
@@ -214,7 +223,8 @@ function ParentContent() {
                     notifications={notifications}
                     routeStatus={routeStatus}
                 />
-                <MapRoute routeStatus={routeStatus} busLocation={busLocation} />
+                <MapRoute routeStatus={routeStatus} busLocation={busLocation} waypoints={waypoints} />
+                {/* <MapRoute routeStatus={routeStatus} busLocation={busLocation} /> */}
             </div>
         </div>
     );

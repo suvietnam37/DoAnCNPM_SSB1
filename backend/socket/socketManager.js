@@ -143,15 +143,21 @@ function initSocket(server) {
       io.emit("changeRoute", { message, route_id });
     });
 
-    socket.on("location", ({ location, route_id }) => {
-      console.log({ location, route_id });
-      io.emit("location", { location, route_id });
+    socket.on("location", ({ location, route_id, message }) => {
+      console.log("message: ", message);
+      io.emit("location", { location, route_id, message });
+    });
+
+    socket.on("waypoints", ({ waypoints, route_id }) => {
+      console.log("waypoints: ", waypoints);
+      io.emit("waypoints", { waypoints, route_id });
     });
 
     socket.on("report", (message) => {
       console.log(message);
       io.emit("report", message);
     });
+
     // Ngắt kết nối
     socket.on("disconnect", () => {
       for (let [userId, sid] of onlineUsers.entries()) {

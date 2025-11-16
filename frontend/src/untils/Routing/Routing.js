@@ -3,11 +3,11 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 
-function Routing({ waypoints, setRouteCoords }) {
+function Routing({ waypoints, setRouteCoords, setC = false }) {
     const map = useMap(); // lấy map từ MapContainer
 
     useEffect(() => {
-        if (!map || waypoints.length < 2) return;
+        if (!map || waypoints.length < 1) return;
 
         const routingControl = L.Routing.control({
             waypoints: waypoints.map((p) => L.latLng(p.lat, p.lng)), // thêm waypoints các trạm và điểm đầu cuối
@@ -21,7 +21,7 @@ function Routing({ waypoints, setRouteCoords }) {
         })
             .on('routesfound', function (e) {
                 const coords = e.routes[0].coordinates; // trả về khi tìm thấy routesfound, e.routes[0] là đường ngắn nhất .coordinates là list tọa
-                // setRouteCoords(coords);
+                if (setC) setRouteCoords(coords);
             })
             .addTo(map); // add đường vẽ vào
 
@@ -36,7 +36,7 @@ function Routing({ waypoints, setRouteCoords }) {
                 }
             }
         };
-    }, []);
+    }, [map, waypoints]);
 
     return null;
 }

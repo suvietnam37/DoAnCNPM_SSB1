@@ -20,9 +20,22 @@
         height: 50px;
         color: burlywood;
         font-size: 22px;
+        align-items: center;
+        display: flex;
+        gap: 10px;
 
         span {
             margin-left: 15px;
+            color: black;
+        }
+    }
+    .simulator {
+        margin-left: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        label {
             color: black;
         }
     }
@@ -71,6 +84,10 @@
     }
     &.danger {
         background: #e74c3c;
+        color: white;
+        &:hover {
+            background: #c53f30;
+        }
     }
     &.add {
         background: #27ae5fc2;

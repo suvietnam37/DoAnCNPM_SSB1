@@ -8,6 +8,7 @@ import L from 'leaflet';
 import { useEffect, useState, useRef } from 'react';
 import FocusBus from './FocusBus/FocusBus';
 import Routing from '../../../untils/Routing/Routing';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
@@ -18,17 +19,24 @@ const busIcon = new L.Icon({
     popupAnchor: [0, -40],
 });
 
-function MapRoute({ routeStatus, busLocation }) {
+function MapRoute({ routeStatus, busLocation, waypoints }) {
     // Nếu có vị trí xe thì dùng, không thì dùng vị trí mặc định
     const [focus, setFocus] = useState(false);
     const initialPosition = busLocation ? [busLocation.lat, busLocation.lng] : [10.762622, 106.682199];
 
-    const waypoints = [
-        { lat: 10.762622, lng: 106.682199 }, // Trường Đại học Sài Gòn, Quận 5
-        { lat: 10.823099, lng: 106.693221 }, // Bến xe Miền Đông, Quận Bình Thạnh
-        { lat: 10.8016, lng: 106.6648 }, // Công viên Hoàng Văn Thụ, Quận Tân Bình
-        { lat: 10.762622, lng: 106.682199 }, // Trường Đại học Sài Gòn, Quận 5 (lặp lại)
-    ];
+    useEffect(() => {
+        console.log('busLocation: ', busLocation);
+    }, [busLocation]);
+
+    useEffect(() => {
+        console.log('waypoints: ', waypoints);
+    }, [waypoints]);
+    // const waypoints = [
+    //     { lat: 10.762622, lng: 106.682199 }, // Trường Đại học Sài Gòn, Quận 5
+    //     { lat: 10.823099, lng: 106.693221 }, // Bến xe Miền Đông, Quận Bình Thạnh
+    //     { lat: 10.8016, lng: 106.6648 }, // Công viên Hoàng Văn Thụ, Quận Tân Bình
+    //     { lat: 10.762622, lng: 106.682199 }, // Trường Đại học Sài Gòn, Quận 5 (lặp lại)
+    // ];
 
     return (
         <div className={cx('map-route')} id="map-route">
@@ -52,8 +60,7 @@ function MapRoute({ routeStatus, busLocation }) {
                         url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
                         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
                     />
-                    {/* <Routing waypoints={waypoints}></Routing> */}
-                    {/* <Marker position={initialPosition} icon={busIcon}></Marker> */}
+                    <Routing waypoints={waypoints}></Routing>
                     <Marker
                         position={busLocation ? [busLocation.lat, busLocation.lng] : initialPosition}
                         icon={busIcon}

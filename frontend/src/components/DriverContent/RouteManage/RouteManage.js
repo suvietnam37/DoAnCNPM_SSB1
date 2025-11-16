@@ -8,10 +8,14 @@ import showToast from '../../../untils/ShowToast/showToast';
 
 const cx = classNames.bind(styles);
 
-function RouteManage({ assignments, onStartRoute }) {
+function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
     const [stopCounts, setStopCounts] = useState({});
     const [modalOpen, setModalOpen] = useState(false);
     const [modalStops, setModalStops] = useState([]);
+    const [checked, setChecked] = useState(false);
+    const handleCheckboxChange = (e) => {
+        setChecked(e.target.checked);
+    };
 
     useEffect(() => {
         assignments.sort((a, b) => a.departure_time.localeCompare(b.departure_time));
@@ -74,6 +78,32 @@ function RouteManage({ assignments, onStartRoute }) {
             <div className={cx('route-manage-title')}>
                 <FontAwesomeIcon icon={faRoute} />
                 <span>Danh Sách Tuyến Xe Cần Thực Hiện Ngày: {todayDisplay}</span>
+                <div className={cx('simulator')}>
+                    <div>
+                        <input type="checkbox" value="test" checked={checked} onChange={handleCheckboxChange} />
+                        <label>Test</label>
+                    </div>
+                    {checked && (
+                        <>
+                            <button
+                                className={cx('btn', 'danger')}
+                                onClick={() => {
+                                    pauseTest();
+                                }}
+                            >
+                                Tam dung
+                            </button>
+                            <button
+                                className={cx('btn', 'add')}
+                                onClick={() => {
+                                    resumeTest();
+                                }}
+                            >
+                                Tiep tuc
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
 
             {todayAssignments.length > 0 ? (

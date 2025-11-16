@@ -6,7 +6,7 @@ function FocusBus({ busLocation }) {
     useEffect(() => {
         if (busLocation) {
             // map.flyTo([busLocation.lat, busLocation.lng], 16, { duration: 1.5 });
-            map.setView([busLocation.lat, busLocation.lng], 16); // focus
+            map.setView([busLocation.lat, busLocation.lng]); // focus
         }
     }, [busLocation, map]);
 
