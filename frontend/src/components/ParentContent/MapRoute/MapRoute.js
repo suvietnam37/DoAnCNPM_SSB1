@@ -28,9 +28,10 @@ function MapRoute({ routeStatus, busLocation, waypoints }) {
     //     console.log('busLocation: ', busLocation);
     // }, [busLocation]);
 
-    useEffect(() => {
-        console.log('waypoints: ', waypoints);
-    }, [waypoints]);
+    // useEffect(() => {
+    //     console.log('waypoints: ', waypoints);
+    // }, [waypoints]);
+
     // const waypoints = [
     //     { lat: 10.762622, lng: 106.682199 }, // Trường Đại học Sài Gòn, Quận 5
     //     { lat: 10.823099, lng: 106.693221 }, // Bến xe Miền Đông, Quận Bình Thạnh

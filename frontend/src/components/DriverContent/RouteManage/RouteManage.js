@@ -61,7 +61,6 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
             const departure_time_start = res.data.departure_time;
             for (const a of assignments) {
                 if (departure_time_start.localeCompare(a.departure_time) > 0 && a.status !== 'Completed') {
-                    console.log('hihi');
                     showToast('Vui lòng hoàn thành chuyến xe trước đó', false);
                     return false;
                 }

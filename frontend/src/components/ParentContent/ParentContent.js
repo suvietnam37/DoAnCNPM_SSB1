@@ -39,11 +39,22 @@ function ParentContent() {
     }, []);
 
     useEffect(() => {
+        console.log('busLocation: ', busLocation);
+    }, [busLocation]);
+
+    useEffect(() => {
+        console.log('waypoints: ', waypoints);
+    }, [waypoints]);
+
+    useEffect(() => {
         if (!parent) return;
 
-        const handleStartRoute = (message) => {
-            showToast(message);
-            fetchParentData(parent.parent_id, ACCOUNT_ID);
+        const handleStartRoute = (data) => {
+            // console.log('routes.route_id: ', routes.route_id);
+            if (data.route_id === routes?.route_id) {
+                showToast(data.message);
+                fetchParentData(parent.parent_id, ACCOUNT_ID);
+            }
         };
 
         socketRef.current.on('startRoute', handleStartRoute);
@@ -59,7 +70,6 @@ function ParentContent() {
         socketRef.current.on('confirmStudent', handleConfirmStudent);
 
         const handleChangeRoute = (data) => {
-            console.log(routeStatus?.route_id, data.route_id);
             if (routeStatus?.route_id === data.route_id) {
                 showToast(data.message);
                 fetchParentData(parent.parent_id, ACCOUNT_ID);
@@ -68,15 +78,19 @@ function ParentContent() {
 
         socketRef.current.on('changeRoute', handleChangeRoute);
 
-        const handleEndRoute = (message) => {
-            console.log(message);
-            showToast(message);
-            fetchParentData(parent.parent_id, ACCOUNT_ID);
+        const handleEndRoute = (data) => {
+            if (data.route_id === routes?.route_id) {
+                showToast(data.message);
+                fetchParentData(parent.parent_id, ACCOUNT_ID);
+            }
         };
 
         socketRef.current.on('endRoute', handleEndRoute);
 
         const handleGetLocation = (data) => {
+            console.log('data.route_id: ', data.route_id);
+            console.log('routeStatus?.route_id: ', routeStatus?.route_id);
+
             if (data.route_id === routeStatus?.route_id) {
                 setBusLocation(data.location);
             }
@@ -84,15 +98,16 @@ function ParentContent() {
         socketRef.current.on('location', handleGetLocation);
 
         const handleGetWaypoints = (data) => {
-            if (data.route_id === routeStatus?.route_id) {
+            if (routeStatus && data.route_id === routeStatus?.route_id) {
                 setWaypoints(data.waypoints);
             }
         };
         socketRef.current.on('waypoints', handleGetWaypoints);
 
-        const handleGetMessageNearStops = (message) => {
-            console.log(message);
-            showToast(message);
+        const handleGetMessageNearStops = (data) => {
+            if (data.route_id === routeStatus?.route_id) {
+                showToast(data.message);
+            }
         };
         socketRef.current.on('nearStop', handleGetMessageNearStops);
 
@@ -105,36 +120,7 @@ function ParentContent() {
             socketRef.current.off('waypoints', handleGetWaypoints);
             socketRef.current.off('nearStop', handleGetMessageNearStops);
         };
-    }, [parent, students, routeStatus]);
-
-    //  //lắng nghe sự kiện socket theo routeStatus
-    // useEffect(() => {
-    //     if (!routeStatus) return;
-
-    //     const socket = socketRef.current;
-    //     const routeId = routeStatus.route_id;
-
-    //     console.log(`Join room route: ${routeId}`);
-    //     socket.emit('join_route_room', routeId);
-
-    //     const handleNewLocation = (data) => {
-    //         setBusLocation({ lat: data.lat, lng: data.lng });
-    //     };
-
-    //     const handleApproachingStop = (data) => {
-    //         showToast(`Xe sắp đến trạm "${data.stopName}" (còn ${data.distance}m)!`);
-    //     };
-
-    //     socket.on('new_location', handleNewLocation);
-    //     socket.on('approaching_stop', handleApproachingStop);
-
-    //     return () => {
-    //         console.log(`Leave room route: ${routeId}`);
-    //         socket.off('new_location', handleNewLocation);
-    //         socket.off('approaching_stop', handleApproachingStop);
-    //         socket.emit('leave_route_room', routeId);
-    //     };
-    // }, [routeStatus]);
+    }, [parent, students, routeStatus, routes]);
 
     //lấy parent từ account
     useEffect(() => {
@@ -168,6 +154,7 @@ function ParentContent() {
 
             try {
                 const routeRes = await axios.get(`http://localhost:5000/api/routes/stop/${stopId}`);
+                setRoutes(routeRes.data);
                 fetchRouteAssignmentsByRouteId(routeRes.data.route_id);
             } catch (e) {
                 console.log('Không có tuyến chạy hiện tại.');

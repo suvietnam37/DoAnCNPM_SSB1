@@ -38,7 +38,7 @@ function DriverContent() {
     const [isRunning, setIsRunning] = useState(false);
     const intervalRef = useRef(null);
     const currentIndexRef = useRef(0);
-    const stopIndexRef = useRef(0);
+    const stopIndexRef = useRef(1);
 
     // //lay vi tri bang geolocation
     // const [position, setPosition] = useState(null);
@@ -91,6 +91,7 @@ function DriverContent() {
     }, []);
     useEffect(() => {
         if (waypoints) {
+            console.log('waypoints: ', waypoints);
             socketRef.current.emit('waypoints', { waypoints: waypoints, route_id: route?.route_id });
         }
     }, [waypoints, route]);
@@ -122,66 +123,68 @@ function DriverContent() {
             const loc = routeCoords[currentIndexRef.current];
             // console.log(currentIndexRef.current + ':', loc);
 
-            let dis = getDistance(
-                loc.lat,
-                loc.lng,
-                waypoints[stopIndexRef.current].lat,
-                waypoints[stopIndexRef.current].lng,
-            );
-
-            if (dis < 500) {
-                console.log(`Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo ` + Math.round(dis) + ' m');
-
-                socketRef.current.emit(
-                    'nearStop',
-                    `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo ` + Math.round(dis) + ' m',
+            let dis;
+            if (stopIndexRef.current < waypoints.length) {
+                dis = getDistance(
+                    loc.lat,
+                    loc.lng,
+                    waypoints[stopIndexRef.current].lat,
+                    waypoints[stopIndexRef.current].lng,
                 );
-
-                (async () => {
-                    const pRes = await axios.get(
-                        `http://localhost:5000/api/parents/route_id/${currentAssignment.route_id}`,
-                    );
-                    const parent = pRes.data;
-
-                    const aRes = await axios.get(`http://localhost:5000/api/accounts/role/1`);
-
-                    const admin = aRes.data;
-
-                    parent.forEach(async (i) => {
-                        try {
-                            await axios.post('http://localhost:5000/api/notifications/create', {
-                                accountId: i.account_id,
-                                content:
-                                    `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo: ` +
-                                    Math.round(dis) +
-                                    ' m',
-                            });
-                        } catch (error) {
-                            console.log(error, 'Lỗi khi thêm notification');
-                        }
-                    });
-
-                    admin.forEach(async (i) => {
-                        try {
-                            await axios.post('http://localhost:5000/api/notifications/create', {
-                                accountId: i.account_id,
-                                content:
-                                    `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo: ` +
-                                    Math.round(dis) +
-                                    ' m',
-                            });
-                        } catch (error) {
-                            console.log(error, 'Lỗi khi thêm notification');
-                        }
-                    });
-                })();
-
-                stopIndexRef.current++;
-            } else {
+            }
+            if (currentAssignment) {
                 socketRef.current.emit('location', {
                     location: loc,
-                    route_id: route.route_id,
+                    route_id: currentAssignment.route_id,
                 });
+
+                if (dis < 500) {
+                    socketRef.current.emit('nearStop', {
+                        message: `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo ` + Math.round(dis) + ' m',
+                        route_id: route.route_id,
+                    });
+
+                    (async () => {
+                        const pRes = await axios.get(
+                            `http://localhost:5000/api/parents/route_id/${currentAssignment.route_id}`,
+                        );
+                        const parent = pRes.data;
+
+                        const aRes = await axios.get(`http://localhost:5000/api/accounts/role/1`);
+
+                        const admin = aRes.data;
+
+                        parent.forEach(async (i) => {
+                            try {
+                                await axios.post('http://localhost:5000/api/notifications/create', {
+                                    accountId: i.account_id,
+                                    content:
+                                        `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo: ` +
+                                        Math.round(dis) +
+                                        ' m',
+                                });
+                            } catch (error) {
+                                console.log(error, 'Lỗi khi thêm notification');
+                            }
+                        });
+
+                        admin.forEach(async (i) => {
+                            try {
+                                await axios.post('http://localhost:5000/api/notifications/create', {
+                                    accountId: i.account_id,
+                                    content:
+                                        `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo: ` +
+                                        Math.round(dis) +
+                                        ' m',
+                                });
+                            } catch (error) {
+                                console.log(error, 'Lỗi khi thêm notification');
+                            }
+                        });
+                    })();
+
+                    stopIndexRef.current++;
+                }
             }
 
             currentIndexRef.current++;
@@ -200,6 +203,26 @@ function DriverContent() {
     const resumeTest = () => {
         handleSendLocation(); // sẽ tiếp tục từ currentIndexRef hiện tại
         // console.log('resume');
+    };
+
+    const stopTest = () => {
+        // Dừng interval nếu đang chạy
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
+        // Reset trạng thái
+        setIsRunning(false);
+
+        currentIndexRef.current = 0; // reset lại điểm bắt đầu
+        stopIndexRef.current = 1; // reset waypoint tiếp theo
+
+        socketRef.current.emit('location', {
+            location: null,
+            route_id: route.route_id,
+        });
+        socketRef.current.emit('waypoints', { waypoints: [], route_id: route.route_id });
     };
 
     // Hàm gọi API lấy danh sách học sinh khi một tuyến bắt đầu
@@ -252,7 +275,7 @@ function DriverContent() {
     }, [assignments]);
 
     useEffect(() => {
-        if (currentAssignment) {
+        if (currentAssignment && currentAssignment.route_id) {
             fetchRouteByRouteId(currentAssignment?.route_id);
         }
     }, [currentAssignment]);
@@ -340,7 +363,8 @@ function DriverContent() {
                     current_stop_id: firstStopId,
                 });
 
-                socketRef.current.emit('startRoute', 'Tuyến xe đã bắt đầu');
+                console.log('routeId: ', routeId);
+                socketRef.current.emit('startRoute', { message: 'Tuyến xe đã bắt đầu', route_id: routeId });
                 setWaypoints(stops.map((stop) => ({ lat: stop.latitude, lng: stop.longitude })));
                 setCurrentAssignment(response.data);
                 fetchAssignmentByDriverId(driver.driver_id);
@@ -371,13 +395,14 @@ function DriverContent() {
                         console.log(error, 'Lỗi khi thêm notification');
                     }
                 });
-                socketRef.current.emit('endRoute', 'Tuyến xe đã kết thúc');
+                socketRef.current.emit('endRoute', { message: 'Tuyến xe đã kết thúc', route_id: route?.route_id });
                 socketRef.current.emit('report', `Tuyến xe ${route.route_name} đã kết thúc`);
                 setCurrentAssignment(null);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
                 setStudentsOnRoute([]);
                 showToast('Tuyến xe đã kết thúc thành công');
+                stopTest();
             } catch (error) {
                 console.error('Lỗi khi kết thúc tuyến:', error);
                 showToast('Không thể kết thúc tuyến. Vui lòng thử lại.', false);
