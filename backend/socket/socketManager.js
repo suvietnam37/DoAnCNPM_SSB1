@@ -143,9 +143,12 @@ function initSocket(server) {
       io.emit("changeRoute", { message, route_id });
     });
 
-    socket.on("location", ({ location, route_id, message }) => {
-      console.log("message: ", message);
-      io.emit("location", { location, route_id, message });
+    socket.on("location", ({ location, route_id }) => {
+      io.emit("location", { location, route_id });
+    });
+
+    socket.on("nearStop", (message) => {
+      io.emit("nearStop", message);
     });
 
     socket.on("waypoints", ({ waypoints, route_id }) => {

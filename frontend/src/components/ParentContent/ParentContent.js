@@ -90,6 +90,12 @@ function ParentContent() {
         };
         socketRef.current.on('waypoints', handleGetWaypoints);
 
+        const handleGetMessageNearStops = (message) => {
+            console.log(message);
+            showToast(message);
+        };
+        socketRef.current.on('nearStop', handleGetMessageNearStops);
+
         return () => {
             socketRef.current.off('startRoute', handleStartRoute);
             socketRef.current.off('confirmStudent', handleConfirmStudent);
@@ -97,6 +103,7 @@ function ParentContent() {
             socketRef.current.off('changeRoute', handleChangeRoute);
             socketRef.current.off('location', handleGetLocation);
             socketRef.current.off('waypoints', handleGetWaypoints);
+            socketRef.current.off('nearStop', handleGetMessageNearStops);
         };
     }, [parent, students, routeStatus]);
 

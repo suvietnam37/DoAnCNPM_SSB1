@@ -78,10 +78,6 @@ function DriverContent() {
     // }, [position]);
 
     useEffect(() => {
-        console.log('currentAssignment: ', currentAssignment);
-    }, [currentAssignment]);
-
-    useEffect(() => {
         socketRef.current = io('http://localhost:5000');
 
         socketRef.current.emit('register', ACCOUNT_ID);
@@ -124,7 +120,7 @@ function DriverContent() {
             }
 
             const loc = routeCoords[currentIndexRef.current];
-            console.log(currentIndexRef.current + ':', loc);
+            // console.log(currentIndexRef.current + ':', loc);
 
             let dis = getDistance(
                 loc.lat,
@@ -134,25 +130,24 @@ function DriverContent() {
             );
 
             if (dis < 500) {
-                socketRef.current.emit('location', {
-                    location: loc,
-                    route_id: route.route_id,
-                    message: `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo` + Math.round(dis) + ' m',
-                });
+                console.log(`Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo ` + Math.round(dis) + ' m');
+
+                socketRef.current.emit(
+                    'nearStop',
+                    `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo ` + Math.round(dis) + ' m',
+                );
 
                 (async () => {
-                    const roleId = 1;
-                    let toUserIds = [];
+                    const pRes = await axios.get(
+                        `http://localhost:5000/api/parents/route_id/${currentAssignment.route_id}`,
+                    );
+                    const parent = pRes.data;
 
-                    try {
-                        const res = await axios.get(`http://localhost:5000/api/accounts/role/${roleId}`);
-                        toUserIds = res.data;
-                    } catch (error) {
-                        console.log(error, 'Lỗi khi thêm notification');
-                        return;
-                    }
+                    const aRes = await axios.get(`http://localhost:5000/api/accounts/role/1`);
 
-                    for (const i of toUserIds) {
+                    const admin = aRes.data;
+
+                    parent.forEach(async (i) => {
                         try {
                             await axios.post('http://localhost:5000/api/notifications/create', {
                                 accountId: i.account_id,
@@ -163,9 +158,22 @@ function DriverContent() {
                             });
                         } catch (error) {
                             console.log(error, 'Lỗi khi thêm notification');
-                            return;
                         }
-                    }
+                    });
+
+                    admin.forEach(async (i) => {
+                        try {
+                            await axios.post('http://localhost:5000/api/notifications/create', {
+                                accountId: i.account_id,
+                                content:
+                                    `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo: ` +
+                                    Math.round(dis) +
+                                    ' m',
+                            });
+                        } catch (error) {
+                            console.log(error, 'Lỗi khi thêm notification');
+                        }
+                    });
                 })();
 
                 stopIndexRef.current++;

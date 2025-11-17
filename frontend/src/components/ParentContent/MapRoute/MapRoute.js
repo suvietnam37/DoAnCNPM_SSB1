@@ -24,9 +24,9 @@ function MapRoute({ routeStatus, busLocation, waypoints }) {
     const [focus, setFocus] = useState(false);
     const initialPosition = busLocation ? [busLocation.lat, busLocation.lng] : [10.762622, 106.682199];
 
-    useEffect(() => {
-        console.log('busLocation: ', busLocation);
-    }, [busLocation]);
+    // useEffect(() => {
+    //     console.log('busLocation: ', busLocation);
+    // }, [busLocation]);
 
     useEffect(() => {
         console.log('waypoints: ', waypoints);
