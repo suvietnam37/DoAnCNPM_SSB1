@@ -53,7 +53,8 @@ function ParentContent() {
             // console.log('routes.route_id: ', routes.route_id);
             if (data.route_id === routes?.route_id) {
                 showToast(data.message);
-                fetchParentData(parent.parent_id, ACCOUNT_ID);
+                // fetchParentData(parent.parent_id, ACCOUNT_ID);
+                fetchRouteByStopId(students[0].stop_id);
             }
         };
 
@@ -63,7 +64,8 @@ function ParentContent() {
             var check = students.some((st) => st.student_id === data.student_id);
             if (check) {
                 showToast(data.message);
-                fetchParentData(parent.parent_id, ACCOUNT_ID);
+                // fetchParentData(parent.parent_id, ACCOUNT_ID);
+                fetchStudentByParentId(parent.parent_id);
             }
         };
 
@@ -72,7 +74,8 @@ function ParentContent() {
         const handleChangeRoute = (data) => {
             if (routeStatus?.route_id === data.route_id) {
                 showToast(data.message);
-                fetchParentData(parent.parent_id, ACCOUNT_ID);
+                // fetchParentData(parent.parent_id, ACCOUNT_ID);
+                fetchRouteByStopId(students[0].stop_id);
             }
         };
 
@@ -81,7 +84,8 @@ function ParentContent() {
         const handleEndRoute = (data) => {
             if (data.route_id === routes?.route_id) {
                 showToast(data.message);
-                fetchParentData(parent.parent_id, ACCOUNT_ID);
+                // fetchParentData(parent.parent_id, ACCOUNT_ID);
+                fetchRouteByStopId(students[0].stop_id);
             }
         };
 
@@ -152,20 +156,34 @@ function ParentContent() {
 
             const stopId = studentList[0].stop_id;
 
-            try {
-                const routeRes = await axios.get(`http://localhost:5000/api/routes/stop/${stopId}`);
-                setRoutes(routeRes.data);
-                fetchRouteAssignmentsByRouteId(routeRes.data.route_id);
-            } catch (e) {
-                console.log('Không có tuyến chạy hiện tại.');
-                setRouteStatus(null);
-            }
-            // const today = new Date().toISOString().split('T')[0];
-            // fetchRoutes(today, stopId);
+            fetchRouteByStopId(stopId);
         } catch (error) {
             console.error('Lỗi fetch dữ liệu phụ huynh:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchStudentByParentId = async (PARENT_ID) => {
+        try {
+            const studentsRes = await axios.get(`http://localhost:5000/api/students?parent_id=${PARENT_ID}`);
+            setStudents(studentsRes.data);
+        } catch (error) {
+            console.error('Lỗi fetch dữ liệu học sinh:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (routes && routes.route_id) fetchRouteAssignmentsByRouteId(routes.route_id);
+    }, [routes]);
+
+    const fetchRouteByStopId = async (stopId) => {
+        try {
+            const routeRes = await axios.get(`http://localhost:5000/api/routes/stop/${stopId}`);
+            setRoutes(routeRes.data);
+        } catch (e) {
+            console.log('Không có tuyến chạy hiện tại.');
+            setRouteStatus(null);
         }
     };
 
