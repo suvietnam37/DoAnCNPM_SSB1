@@ -54,3 +54,65 @@
     font-weight: 500;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+.content-map {
+    position: relative;
+
+    .btn-focus {
+        position: absolute;
+        top: 21%;
+        left: 1.6%;
+        z-index: 1200;
+        border-radius: 5px;
+        color: #fff;
+        cursor: pointer;
+        border: none;
+        // border-radius: 24px;
+        width: 30px;
+        height: 30px;
+        font-size: 70%;
+
+        &.unfocus {
+            background: #e74c3c;
+        }
+
+        &.focus {
+            background: #27ae60;
+        }
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+}
+:global(.bus-custom-icon) {
+    background: none !important;
+    border: none !important;
+}
+
+:global(.bus-icon-wrapper) {
+    position: relative;
+    width: 35px;
+    height: 35px;
+}
+
+:global(.bus-number-circle) {
+    position: absolute;
+    top: -18px;
+    left: 6px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 99px;
+    background-color: black;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+:global(.bus-icon-wrapper:hover .bus-number-circle) {
+    background-color: var(--primary);
+    box-shadow: 0 0 8px rgba(255, 61, 0, 0.7);
+}

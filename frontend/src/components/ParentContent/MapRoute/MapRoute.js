@@ -6,7 +6,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect, useState, useRef } from 'react';
-import FocusBus from './FocusBus/FocusBus';
+import FocusBus from '../../../untils/FocusBus/FocusBus';
 import Routing from '../../../untils/Routing/Routing';
 import axios from 'axios';
 
@@ -14,7 +14,7 @@ const cx = classNames.bind(styles);
 
 const busIcon = new L.Icon({
     iconUrl: '/bus.png',
-    iconSize: [40, 40],
+    iconSize: [35, 35],
     iconAnchor: [20, 40],
     popupAnchor: [0, -40],
 });
@@ -22,7 +22,7 @@ const busIcon = new L.Icon({
 function MapRoute({ routeStatus, busLocation, waypoints }) {
     // Nếu có vị trí xe thì dùng, không thì dùng vị trí mặc định
     const [focus, setFocus] = useState(false);
-    const initialPosition = busLocation ? [busLocation.lat, busLocation.lng] : [10.762622, 106.682199];
+    const initialPosition = busLocation ? [busLocation.lat, busLocation.lng] : [10.7597031, 106.6817595];
 
     // useEffect(() => {
     //     console.log('busLocation: ', busLocation);
@@ -64,7 +64,7 @@ function MapRoute({ routeStatus, busLocation, waypoints }) {
                     <Routing waypoints={waypoints}></Routing>
                     <Marker
                         position={busLocation ? [busLocation.lat, busLocation.lng] : initialPosition}
-                        icon={busIcon}
+                        icon={busIcon(1)}
                     />
                     {focus && <FocusBus busLocation={busLocation}></FocusBus>}
                 </MapContainer>

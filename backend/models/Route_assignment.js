@@ -7,7 +7,7 @@ const db = require("../config/db");
 async function getAll() {
   const [rows] = await db.query(
     `
-    SELECT 
+    SELECT  
       ra.assignment_id,
       ra.route_id,
       ra.driver_id,
@@ -20,7 +20,7 @@ async function getAll() {
       ra.next_stop_id
     FROM route_assignment ra
     WHERE ra.is_deleted = 0
-    ORDER BY ra.run_date DESC, ra.departure_time DESC
+    ORDER BY ra.assignment_id ASC, ra.run_date DESC, ra.departure_time DESC
     `
   );
   return rows;

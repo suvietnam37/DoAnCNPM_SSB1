@@ -3,7 +3,8 @@ import styles from './showToast.module.scss';
 function showToast(message, isSuccess = true, position = 'top-end') {
     Swal.fire({
         icon: isSuccess ? 'success' : 'error',
-        title: isSuccess ? 'Thành công!' : 'Lỗi!',
+        title: 'Thông báo',
+        // title: isSuccess ? 'Thành công!' : 'Lỗi!',
         text: message,
         toast: true,
         position: position,

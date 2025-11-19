@@ -14,7 +14,7 @@ async function getAll() {
     JOIN route r ON st.route_id = r.route_id AND r.is_deleted = 0
     JOIN parent p ON s.parent_id = p.parent_id AND p.is_deleted = 0
     WHERE s.is_deleted = 0
-    ORDER BY p.parent_name, s.student_name
+    ORDER BY s.student_id ASC
   `);
   return rows;
 }

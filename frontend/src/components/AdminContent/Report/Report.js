@@ -145,7 +145,7 @@ function Report() {
                     <option value="driver">Tài xế</option>
                 </select>
 
-                <input type="text" placeholder="tìm kiếm ..." className={cx('input')} />
+                {/* <input type="text" placeholder="tìm kiếm ..." className={cx('input')} /> */}
 
                 {isOpenModalOpen && (
                     <div className={cx('select-all')}>

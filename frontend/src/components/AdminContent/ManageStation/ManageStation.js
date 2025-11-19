@@ -81,6 +81,11 @@ function ManageStation() {
             showToast('Vui lòng nhập đầy đủ thông tin!', false);
             return;
         }
+        if (!routeId || !address || !position[0] || !position[1]) {
+            showToast('Chưa có đầy đủ thông tin', false);
+            return;
+        }
+
         try {
             await axios.post('http://localhost:5000/api/stops', {
                 stop_name: stopName,

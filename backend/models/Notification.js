@@ -6,7 +6,7 @@ async function getByAccountId(accountId) {
   const [rows] = await db.query(
     `SELECT * FROM notification 
      WHERE account_id = ? AND is_deleted = 0 
-     ORDER BY created_at DESC`,
+     ORDER BY created_at ASC`,
     [accountId]
   );
   return rows;

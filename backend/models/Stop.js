@@ -8,7 +8,7 @@ async function getAll() {
     FROM stop s
     JOIN route r ON s.route_id = r.route_id AND r.is_deleted = 0
     WHERE s.is_deleted = 0
-    ORDER BY r.route_name, s.stop_name
+    ORDER BY s.stop_id ASC
   `);
   return rows;
 }
