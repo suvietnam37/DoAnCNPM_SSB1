@@ -34,6 +34,7 @@ function DriverContent() {
     const [admin, setAdmin] = useState(null);
     const [waypoints, setWaypoints] = useState([]);
     const [routeCoords, setRouteCoords] = useState([]);
+    const [stops, setStops] = useState([]);
 
     const [isRunning, setIsRunning] = useState(false);
     const intervalRef = useRef(null);
@@ -91,7 +92,7 @@ function DriverContent() {
     }, []);
     useEffect(() => {
         if (waypoints) {
-            console.log('waypoints: ', waypoints);
+            // console.log('waypoints: ', waypoints);
             socketRef.current.emit('waypoints', { waypoints: waypoints, route_id: route?.route_id });
         }
     }, [waypoints, route]);
@@ -100,12 +101,9 @@ function DriverContent() {
         if (route) handleSendLocation();
     }, [route, routeCoords]);
 
-    // useEffect(() => {
-    //     if (route && routeCoords.length > 0 && !isRunning) {
-    //         currentIndexRef.current = 0; // reset index trước
-    //         handleSendLocation(); // rồi mới chạy gửi dữ liệu
-    //     }
-    // }, [route, routeCoords]);
+    useEffect(() => {
+        setWaypoints(stops.map((stop) => ({ lat: stop.latitude, lng: stop.longitude })));
+    }, [stops]);
 
     const handleSendLocation = () => {
         if (intervalRef.current) return;
@@ -121,7 +119,7 @@ function DriverContent() {
             }
 
             const loc = routeCoords[currentIndexRef.current];
-            // console.log(currentIndexRef.current + ':', loc);
+            console.log(currentIndexRef.current + ':', loc);
 
             let dis;
             if (stopIndexRef.current < waypoints.length) {
@@ -269,6 +267,7 @@ function DriverContent() {
         });
 
         if (runningAssignment) {
+            fetchStopByRouteId(runningAssignment.route_id);
             fetchStudentsForRoute(runningAssignment.route_id);
             setCurrentAssignment(runningAssignment);
         }
@@ -353,8 +352,8 @@ function DriverContent() {
             return;
         }
 
-        const stops = await fetchStopByRouteId(routeId);
-        const firstStopId = stops[0].stop_id;
+        const stopsData = await fetchStopByRouteId(routeId);
+        const firstStopId = stopsData[0].stop_id;
 
         showConfirm('Bạn có chắc muốn bắt đầu tuyến?', 'Bắt đầu', async () => {
             try {
@@ -363,9 +362,9 @@ function DriverContent() {
                     current_stop_id: firstStopId,
                 });
 
-                console.log('routeId: ', routeId);
+                // console.log('routeId: ', routeId);
                 socketRef.current.emit('startRoute', { message: 'Tuyến xe đã bắt đầu', route_id: routeId });
-                setWaypoints(stops.map((stop) => ({ lat: stop.latitude, lng: stop.longitude })));
+                setWaypoints(stopsData.map((stop) => ({ lat: stop.latitude, lng: stop.longitude })));
                 setCurrentAssignment(response.data);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
@@ -480,6 +479,7 @@ function DriverContent() {
     const fetchStopByRouteId = async (route_id) => {
         try {
             const response = await axios.get(`http://localhost:5000/api/stops?route_id=${route_id}`);
+            setStops(response.data);
             return response.data;
         } catch (err) {
             console.error('Lỗi fetch stops:', err);

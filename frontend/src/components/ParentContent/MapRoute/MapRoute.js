@@ -64,7 +64,7 @@ function MapRoute({ routeStatus, busLocation, waypoints }) {
                     <Routing waypoints={waypoints}></Routing>
                     <Marker
                         position={busLocation ? [busLocation.lat, busLocation.lng] : initialPosition}
-                        icon={busIcon(1)}
+                        icon={busIcon}
                     />
                     {focus && <FocusBus busLocation={busLocation}></FocusBus>}
                 </MapContainer>

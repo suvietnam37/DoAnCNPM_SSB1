@@ -6,6 +6,7 @@ function initSocket(server) {
   });
 
   const onlineUsers = new Map();
+  const currentWaypoints = new Map();
 
   io.on("connection", (socket) => {
     console.log("Client connected:", socket.id);
@@ -45,6 +46,7 @@ function initSocket(server) {
     });
 
     socket.on("location", ({ location, route_id }) => {
+      // console.log(location);
       io.emit("location", { location, route_id });
     });
 
@@ -53,7 +55,16 @@ function initSocket(server) {
     });
 
     socket.on("waypoints", ({ waypoints, route_id }) => {
+      currentWaypoints.set(route_id, waypoints);
+      console.log(waypoints);
       io.emit("waypoints", { waypoints, route_id });
+    });
+
+    socket.on("requestWaypoints", ({ route_id }) => {
+      const wp = currentWaypoints.get(route_id);
+      if (wp) {
+        socket.emit("waypoints", { waypoints: wp, route_id });
+      }
     });
 
     socket.on("report", (message) => {

@@ -42,9 +42,9 @@ function ParentContent() {
         console.log('busLocation: ', busLocation);
     }, [busLocation]);
 
-    useEffect(() => {
-        console.log('waypoints: ', waypoints);
-    }, [waypoints]);
+    // useEffect(() => {
+    //     console.log('waypoints: ', waypoints);
+    // }, [waypoints]);
 
     useEffect(() => {
         if (!parent) return;
@@ -92,8 +92,8 @@ function ParentContent() {
         socketRef.current.on('endRoute', handleEndRoute);
 
         const handleGetLocation = (data) => {
-            console.log('data.route_id: ', data.route_id);
-            console.log('routeStatus?.route_id: ', routeStatus?.route_id);
+            // console.log('data.route_id: ', data.route_id);
+            // console.log('routeStatus?.route_id: ', routeStatus?.route_id);
 
             if (data.route_id === routeStatus?.route_id) {
                 setBusLocation(data.location);
@@ -125,6 +125,14 @@ function ParentContent() {
             socketRef.current.off('nearStop', handleGetMessageNearStops);
         };
     }, [parent, students, routeStatus, routes]);
+
+    useEffect(() => {
+        if (routeStatus?.route_id && socketRef.current) {
+            socketRef.current.emit('requestWaypoints', {
+                route_id: routeStatus.route_id,
+            });
+        }
+    }, [routeStatus]);
 
     //lấy parent từ account
     useEffect(() => {
