@@ -7,6 +7,27 @@ import showToast from '../../../untils/ShowToast/showToast';
 import axios from 'axios';
 const cx = classNames.bind(styles);
 function StudentManage({ students, handleConfirmStudent }) {
+    const [stopNames, setStopNames] = useState({});
+
+    const fetchStopByStopId = async (stop_id) => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/stops/${stop_id}`);
+            setStopNames((prev) => ({ ...prev, [stop_id]: res.data.stop_name }));
+        } catch (error) {
+            console.log('Lỗi fetchStopByStopId: ', error);
+        }
+    };
+
+    useEffect(() => {
+        if (!students) return;
+
+        students.forEach(async (st) => {
+            if (!stopNames[st.stop_id]) {
+                fetchStopByStopId(st.stop_id);
+            }
+        });
+    }, [students]);
+
     if (!students) {
         return (
             <div className={cx('student-manage')} id="student-manage">
@@ -32,6 +53,7 @@ function StudentManage({ students, handleConfirmStudent }) {
                                 <th>Mã học sinh</th>
                                 <th>Họ tên</th>
                                 <th>Lớp</th>
+                                <th>Trạm đón trả</th>
                                 <th>Trạng thái</th>
                             </tr>
                         </thead>
@@ -43,10 +65,11 @@ function StudentManage({ students, handleConfirmStudent }) {
                                     </td>
                                     <td>{st.student_name}</td>
                                     <td>{st.class_name}</td>
+                                    <td>{stopNames[st.stop_id]}</td>
                                     <td>
                                         <div className={cx('student-manage-table-btn')}>
-                                            {st.status == 1 ? 'Đã lên xe' : 'Chưa lên xe'}
-                                            {st.status == 0 && (
+                                            {st.status === 1 ? 'Đã lên xe' : 'Chưa lên xe'}
+                                            {st.status === 0 && (
                                                 <button
                                                     onClick={() => {
                                                         handleConfirmStudent(

@@ -92,7 +92,7 @@ function DriverContent() {
     }, []);
     useEffect(() => {
         if (waypoints) {
-            // console.log('waypoints: ', waypoints);
+            console.log('waypoints: ', waypoints);
             socketRef.current.emit('waypoints', { waypoints: waypoints, route_id: route?.route_id });
         }
     }, [waypoints, route]);

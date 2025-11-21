@@ -120,6 +120,10 @@ function DashBoard() {
     }, []);
 
     useEffect(() => {
+        console.log(waypoints);
+    }, [waypoints]);
+
+    useEffect(() => {
         const handleStartRoute = (data) => {
             fetchRouteAssignments();
         };
@@ -161,6 +165,12 @@ function DashBoard() {
             });
         }
     }, [noti]);
+
+    useEffect(() => {
+        runningAssignment.forEach((a) => {
+            socketRef.current.emit('requestWaypoints', { route_id: a.route_id });
+        });
+    }, [runningAssignment]);
 
     // Lấy dữ liệu từ API
     useEffect(() => {
