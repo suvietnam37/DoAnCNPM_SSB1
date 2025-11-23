@@ -1,17 +1,12 @@
 import Swal from 'sweetalert2';
+import i18n from '../ChangeLanguage/i18n';
 
-function showConfirm(
-    title = 'Vui lòng xác nhận?',
-    confirmButtonText = 'Xác nhận',
-    onConfirm = () => {},
-    onCancel = () => {},
-) {
+function showConfirm(titleKey = 'please_confirm', confirmKey = 'confirm', onConfirm = () => {}, onCancel = () => {}) {
     Swal.fire({
-        title,
-        // icon: 'warning',
+        title: i18n.t(titleKey),
         showCancelButton: true,
-        confirmButtonText,
-        cancelButtonText: 'Hủy',
+        confirmButtonText: i18n.t(confirmKey),
+        cancelButtonText: i18n.t('cancel'),
         reverseButtons: true,
     }).then((result) => {
         if (result.isConfirmed) {

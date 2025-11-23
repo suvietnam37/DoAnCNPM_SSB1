@@ -5,10 +5,14 @@ import { useState, useEffect } from 'react';
 // import axios from 'axios';
 import axios from '../../../untils/CustomAxios/axios.customize';
 import showToast from '../../../untils/ShowToast/showToast';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function ManageStudent() {
+    const { t } = useTranslation();
+
     const [students, setStudents] = useState([]);
     const [parents, setParents] = useState([]);
     const [routes, setRoutes] = useState([]);
@@ -39,7 +43,7 @@ function ManageStudent() {
             setAllStops(stopsRes.data);
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu:', error);
-            showToast('Không thể tải dữ liệu trang.', false);
+            showToast('load_student_failed', false);
         }
     };
 
@@ -95,7 +99,7 @@ function ManageStudent() {
 
     const handleAddStudent = async () => {
         if (!studentName.trim() || !className.trim() || !selectedParentId || !selectedStopId) {
-            showToast('Vui lòng điền đủ thông tin và chọn tuyến, trạm, phụ huynh!', false);
+            showToast('please_enter_student_full_info', false);
             return;
         }
         try {
@@ -106,18 +110,18 @@ function ManageStudent() {
                 stop_id: selectedStopId,
                 is_absent: isAbsent,
             });
-            showToast('Thêm học sinh thành công!', true);
+            showToast('add_student_success');
             handleCloseModal();
             fetchData();
         } catch (error) {
             console.error('Add student error:', error);
-            showToast('Lỗi khi thêm học sinh.', false);
+            showToast('add_student_failed', false);
         }
     };
 
     const handleEditStudent = async () => {
         if (!studentName.trim() || !className.trim() || !selectedParentId || !selectedStopId) {
-            showToast('Vui lòng điền đủ thông tin!', false);
+            showToast('please_enter_student_full_info', false);
             return;
         }
         try {
@@ -128,88 +132,90 @@ function ManageStudent() {
                 stop_id: selectedStopId,
                 is_absent: isAbsent,
             });
-            showToast('Cập nhật học sinh thành công!', true);
+            showToast('update_student_success');
+
             handleCloseModal();
             fetchData();
         } catch (error) {
             console.error('Edit student error:', error);
-            showToast('Lỗi khi cập nhật học sinh.', false);
+            showToast('update_student_failed', false);
         }
     };
 
     const handleDeleteStudent = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/students/${selectedStudent.student_id}`);
-            showToast('Xóa học sinh thành công!', true);
+            showToast('delete_student_success');
             handleCloseModal();
             fetchData();
         } catch (error) {
             console.error('Delete student error:', error);
-            showToast('Lỗi khi xóa học sinh.', false);
+            showToast('delete_student_failed', false);
         }
     };
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản lý học sinh</h2>
+                <h2 className={cx('title')}>{t('student_management')}</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm học sinh
+                    {t('add_student')}
                 </button>
             </div>
-
-            <table className={cx('table')}>
-                <thead>
-                    <tr>
-                        <th>Mã HS</th>
-                        <th>Tên học sinh</th>
-                        <th>Lớp</th>
-
-                        <th>Vắng mặt</th>
-                        <th>Hành động</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.map((student) => (
-                        <tr key={student.student_id}>
-                            <td>{student.student_id}</td>
-                            <td>{student.student_name}</td>
-                            <td>{student.class_name}</td>
-                            <td>{student.is_absent ? 'Có' : 'Không'}</td>
-                            <td>
-                                <button
-                                    className={cx('btn', 'change')}
-                                    onClick={() => handleOpenModal('edit', student)}
-                                >
-                                    Sửa
-                                </button>
-                                <button
-                                    className={cx('btn', 'danger')}
-                                    onClick={() => handleOpenModal('delete', student)}
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                            <td>
-                                <button
-                                    className={cx('btn', 'details')}
-                                    onClick={() => handleOpenModal('details', student)}
-                                >
-                                    ...
-                                </button>
-                            </td>
+            <div className={cx('table-wrapper')}>
+                <table className={cx('table')}>
+                    <thead>
+                        <tr>
+                            <th>{t('student_code')}</th>
+                            <th>{t('student_name')}</th>
+                            <th>{t('class')}</th>
+                            <th>{t('absent_status')}</th>
+                            <th>{t('action')}</th>
+                            <th>{t('details')}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {students.map((student) => (
+                            <tr key={student.student_id}>
+                                <td>{student.student_id}</td>
+                                <td>{student.student_name}</td>
+                                <td>{student.class_name}</td>
+                                <td>{student.is_absent ? t('yes') : t('no')}</td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'change')}
+                                        onClick={() => handleOpenModal('edit', student)}
+                                    >
+                                        {t('edit')}
+                                    </button>
+                                    <button
+                                        className={cx('btn', 'danger')}
+                                        onClick={() => handleOpenModal('delete', student)}
+                                    >
+                                        {t('delete')}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'details')}
+                                        onClick={() => handleOpenModal('details', student)}
+                                    >
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* MODAL THÊM */}
             {isOpenModal === 'add' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content-large')}>
                         <div className={cx('modal-header')}>
-                            <h3>Thêm học sinh mới</h3>
+                            <h3>{t('add_student_title')}</h3>
+
                             <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
@@ -219,14 +225,14 @@ function ManageStudent() {
                             <div className={cx('input-group')}>
                                 <input
                                     type="text"
-                                    placeholder="Tên học sinh"
+                                    placeholder={t('student_name')}
                                     className={cx('input')}
                                     value={studentName}
                                     onChange={(e) => setStudentName(e.target.value)}
                                 />
                                 <input
                                     type="text"
-                                    placeholder="Lớp"
+                                    placeholder={t('class_name')}
                                     className={cx('input')}
                                     value={className}
                                     onChange={(e) => setClassName(e.target.value)}
@@ -234,15 +240,15 @@ function ManageStudent() {
                             </div>
 
                             <div className={cx('selection-container')}>
-                                {/* Tuyến xe */}
+                                {/* Bus Route */}
                                 <div className={cx('selection-table-wrapper')}>
-                                    <h4>Chọn Tuyến Xe</h4>
+                                    <h4>{t('select_route')}</h4>
                                     <table className={cx('selection-table')}>
                                         <thead>
                                             <tr>
-                                                <th>Mã tuyến</th>
-                                                <th>Tên tuyến</th>
-                                                <th>Chọn</th>
+                                                <th>{t('route_id')}</th>
+                                                <th>{t('route_name')}</th>
+                                                <th>{t('select')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -275,15 +281,15 @@ function ManageStudent() {
                                     </table>
                                 </div>
 
-                                {/* Trạm dừng */}
+                                {/* Stop */}
                                 <div className={cx('selection-table-wrapper')}>
-                                    <h4>Chọn Trạm Dừng</h4>
+                                    <h4>{t('select_stop')}</h4>
                                     <table className={cx('selection-table')}>
                                         <thead>
                                             <tr>
-                                                <th>Mã trạm</th>
-                                                <th>Tên trạm</th>
-                                                <th>Chọn</th>
+                                                <th>{t('stop_id')}</th>
+                                                <th>{t('stop_name')}</th>
+                                                <th>{t('select')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -312,22 +318,22 @@ function ManageStudent() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="3">Vui lòng chọn một tuyến xe để xem trạm dừng.</td>
+                                                    <td colSpan="3">{t('select_route_to_view_stop')}</td>
                                                 </tr>
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
 
-                                {/* Phụ huynh */}
+                                {/* Parents */}
                                 <div className={cx('selection-table-wrapper')}>
-                                    <h4>Chọn Phụ Huynh</h4>
+                                    <h4>{t('select_parent')}</h4>
                                     <table className={cx('selection-table')}>
                                         <thead>
                                             <tr>
-                                                <th>Mã PH</th>
-                                                <th>Tên Phụ huynh</th>
-                                                <th>Chọn</th>
+                                                <th>{t('parent_id')}</th>
+                                                <th>{t('parent_name')}</th>
+                                                <th>{t('select')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -360,7 +366,7 @@ function ManageStudent() {
 
                             <div className={cx('buttons')} style={{ justifyContent: 'center', marginTop: '20px' }}>
                                 <button className={cx('btn', 'add')} onClick={handleAddStudent}>
-                                    Thêm Học Sinh
+                                    {t('add_student_button')}
                                 </button>
                             </div>
                         </div>
@@ -373,7 +379,7 @@ function ManageStudent() {
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content-large')}>
                         <div className={cx('modal-header')}>
-                            <h3>Sửa thông tin học sinh: {selectedStudent.student_name}</h3>
+                            <h3>{t('edit_student_title', { name: selectedStudent.student_name })}</h3>
                             <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
@@ -382,20 +388,20 @@ function ManageStudent() {
                         <div className={cx('form')}>
                             <div className={cx('input-group')}>
                                 <div className={cx('flex-input')}>
-                                    <label>Tên: </label>
+                                    <label>{t('student_name_label')}: </label>
                                     <input
                                         type="text"
-                                        placeholder="Tên học sinh"
+                                        placeholder={t('student_name_placeholder')}
                                         className={cx('input')}
                                         value={studentName}
                                         onChange={(e) => setStudentName(e.target.value)}
                                     />
                                 </div>
                                 <div className={cx('flex-input')}>
-                                    <label>Lớp: </label>
+                                    <label>{t('class_name_label')}: </label>
                                     <input
                                         type="text"
-                                        placeholder="Lớp"
+                                        placeholder={t('class_name_placeholder')}
                                         className={cx('input')}
                                         value={className}
                                         onChange={(e) => setClassName(e.target.value)}
@@ -406,13 +412,13 @@ function ManageStudent() {
                             <div className={cx('selection-container')}>
                                 {/* Tuyến xe */}
                                 <div className={cx('selection-table-wrapper')}>
-                                    <h4>Chọn Tuyến Xe</h4>
+                                    <h4>{t('select_route')}</h4>
                                     <table className={cx('selection-table')}>
                                         <thead>
                                             <tr>
-                                                <th>Mã tuyến</th>
-                                                <th>Tên tuyến</th>
-                                                <th>Chọn</th>
+                                                <th>{t('route_id')}</th>
+                                                <th>{t('route_name')}</th>
+                                                <th>{t('select')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -447,13 +453,13 @@ function ManageStudent() {
 
                                 {/* Trạm dừng */}
                                 <div className={cx('selection-table-wrapper')}>
-                                    <h4>Chọn Trạm Dừng</h4>
+                                    <h4>{t('select_stop')}</h4>
                                     <table className={cx('selection-table')}>
                                         <thead>
                                             <tr>
-                                                <th>Mã trạm</th>
-                                                <th>Tên trạm</th>
-                                                <th>Chọn</th>
+                                                <th>{t('stop_id')}</th>
+                                                <th>{t('stop_name')}</th>
+                                                <th>{t('select')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -482,7 +488,7 @@ function ManageStudent() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="3">Vui lòng chọn một tuyến xe để xem trạm dừng.</td>
+                                                    <td colSpan="3">{t('select_route_to_view_stop')}</td>
                                                 </tr>
                                             )}
                                         </tbody>
@@ -491,13 +497,13 @@ function ManageStudent() {
 
                                 {/* Phụ huynh */}
                                 <div className={cx('selection-table-wrapper')}>
-                                    <h4>Chọn Phụ Huynh</h4>
+                                    <h4>{t('select_parent')}</h4>
                                     <table className={cx('selection-table')}>
                                         <thead>
                                             <tr>
-                                                <th>Mã PH</th>
-                                                <th>Tên Phụ huynh</th>
-                                                <th>Chọn</th>
+                                                <th>{t('parent_id')}</th>
+                                                <th>{t('parent_name')}</th>
+                                                <th>{t('select')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -530,7 +536,7 @@ function ManageStudent() {
 
                             <div className={cx('buttons')} style={{ justifyContent: 'center', marginTop: '20px' }}>
                                 <button className={cx('btn', 'add')} onClick={handleEditStudent}>
-                                    Cập nhật
+                                    {t('update')}
                                 </button>
                             </div>
                         </div>
@@ -547,10 +553,11 @@ function ManageStudent() {
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết học sinh</h3>
+                        <h3>{t('student_details_title')}</h3>
+
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Mã học sinh: </label>
+                                <label>{t('student_code_label')}: </label>
                                 <input
                                     type="text"
                                     value={selectedStudent.student_id}
@@ -559,7 +566,7 @@ function ManageStudent() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Tên học sinh: </label>
+                                <label>{t('student_name_label')}: </label>
                                 <input
                                     type="text"
                                     value={selectedStudent.student_name}
@@ -568,7 +575,7 @@ function ManageStudent() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Lớp: </label>
+                                <label>{t('class_name_label')}: </label>
                                 <input
                                     type="text"
                                     value={selectedStudent.class_name}
@@ -577,19 +584,18 @@ function ManageStudent() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Mã phụ huynh: </label>
+                                <label>{t('parent_id_label')}: </label>
                                 <input type="text" value={selectedStudent.parent_id} readOnly className={cx('input')} />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Mã trạm: </label>
+                                <label>{t('stop_id_label')}: </label>
                                 <input type="text" value={selectedStudent.stop_id} readOnly className={cx('input')} />
                             </div>
-
                             <div className={cx('flex-input')}>
-                                <label>Vắng mặt: </label>
+                                <label>{t('absent_status_label')}: </label>
                                 <input
                                     type="text"
-                                    value={selectedStudent.is_absent ? 'Có' : 'Không'}
+                                    value={selectedStudent.is_absent ? t('yes') : t('no')}
                                     readOnly
                                     className={cx('input')}
                                 />
@@ -608,16 +614,16 @@ function ManageStudent() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa</h3>
-                        <p>
-                            Bạn có chắc muốn xóa học sinh "<strong>{selectedStudent.student_name}</strong>"?
-                        </p>
+
+                        <h3>{t('confirm_delete_title')}</h3>
+                        <p>{t('confirm_delete_message', { name: selectedStudent.student_name })}</p>
+
                         <div className={cx('buttons')}>
                             <button className={cx('btn', 'cancel')} onClick={handleCloseModal}>
-                                Hủy
+                                {t('cancel')}
                             </button>
                             <button className={cx('btn', 'danger')} onClick={handleDeleteStudent}>
-                                Xác nhận Xóa
+                                {t('confirm_delete')}
                             </button>
                         </div>
                     </div>

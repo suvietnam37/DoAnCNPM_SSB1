@@ -56,7 +56,7 @@
 }
 
 .table-wrapper {
-    max-height: 200px; // chiều cao tối đa, table dài quá sẽ scroll
+    max-height: 480px; // chiều cao tối đa, table dài quá sẽ scroll
     overflow-y: auto; // scroll dọc
     border-radius: 8px;
     border: 1px solid #eee;
@@ -222,6 +222,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
 
     p {
         width: 100px;

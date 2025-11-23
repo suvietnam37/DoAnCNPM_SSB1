@@ -11,6 +11,9 @@ import MapRoute from './MapRoute/MapRoute';
 import { AuthContext } from '../../context/auth.context';
 import showToast from '../../untils/ShowToast/showToast';
 
+import { useTranslation } from 'react-i18next';
+import '../../untils/ChangeLanguage/i18n';
+
 const cx = classNames.bind(styles);
 
 function ParentContent() {
@@ -27,6 +30,8 @@ function ParentContent() {
     const [parent, setParent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [waypoints, setWaypoints] = useState([]);
+
+    const { t } = useTranslation();
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
@@ -224,10 +229,10 @@ function ParentContent() {
     };
 
     const menus = [
-        { name: 'Trạng Thái Tuyến Xe', id: 'route-status', offset: -300 },
-        { name: 'Quản Lý Con Em', id: 'student-manage', offset: -280 },
-        { name: 'Thông Báo Hệ Thống', id: 'notification', offset: -250 },
-        { name: 'Theo Dõi Tuyến Đường', id: 'map-route', offset: -190 },
+        { name: 'route_status', id: 'route-status', offset: -300 },
+        { name: 'student_manage', id: 'student-manage', offset: -280 },
+        { name: 'notification', id: 'notification', offset: -250 },
+        { name: 'map_route', id: 'map-route', offset: -190 },
     ];
 
     if (loading) return <div>Đang tải thông tin...</div>;

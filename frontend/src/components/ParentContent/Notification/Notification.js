@@ -15,9 +15,13 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import showToast from '../../../untils/ShowToast/showToast';
 import { AuthContext } from '../../../context/auth.context';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 const cx = classNames.bind(styles);
 
 function Notification({ notifications, routeStatus, setNotifications }) {
+    const { t } = useTranslation();
+
     const socketRef = useRef(null);
     const [bus, setBus] = useState([]);
     const [driver, setDriver] = useState([]);
@@ -44,7 +48,7 @@ function Notification({ notifications, routeStatus, setNotifications }) {
 
         socketRef.current.on('notification', (data) => {
             setNoti(data.message);
-            showToast('Có thông báo mới');
+            showToast('new_notification');
         });
 
         return () => {
@@ -123,20 +127,20 @@ function Notification({ notifications, routeStatus, setNotifications }) {
         <div className={cx('notification')} id="notification">
             <div className={cx('notification-title')}>
                 <FontAwesomeIcon icon={faBell} />
-                <span>Thông Báo Hệ Thống</span>
+                <span>{t('notification')}</span>
             </div>
 
             {routeStatus ? (
                 <>
                     <div className={cx('notification-realtime')}>
-                        <p>{noti || 'Chưa có thông báo mới từ hệ thống '}</p>
+                        <p>{noti || t('no_new_notifications')}</p>
                         <button
                             className={cx('notification-realtime-details')}
                             onClick={() => {
                                 handleOpenModal();
                             }}
                         >
-                            Xem chi tiết
+                            {t('view_detail')}
                         </button>
                     </div>
 
@@ -144,7 +148,9 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                         <div className={cx('route-num')}>
                             <div className={cx('route-num-title')}>
                                 <FontAwesomeIcon icon={faBus} className={cx('route-num-title-icon')} />
-                                <span>Xe số {bus?.bus_id}</span>
+                                <span>
+                                    {t('vehicle_number')} {bus?.bus_id}
+                                </span>
                             </div>
                             <div className={cx('route-num-name')}>{bus?.license_plate}</div>
                         </div>
@@ -152,7 +158,7 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                         <div className={cx('driver-infor')}>
                             <div className={cx('driver-infor-title')}>
                                 <FontAwesomeIcon icon={faIdCard} className={cx('driver-infor-title-icon')} />
-                                <span>Tài xế</span>
+                                <span>{t('Driver')}</span>
                             </div>
                             <div className={cx('driver-infor-name')}>{driver?.driver_name}</div>
                         </div>
@@ -160,10 +166,10 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                         <div className={cx('bus-active')}>
                             <div className={cx('bus-active-title')}>
                                 <FontAwesomeIcon icon={faSignal} className={cx('bus-active-title-icon')} />
-                                <span>Trạng thái</span>
+                                <span>{t('status')}</span>
                             </div>
                             <div className={cx('bus-active-name')}>
-                                {routeStatus?.status === 'Running' ? 'Đang hoạt động' : 'Chưa hoạt động'}
+                                {routeStatus?.status === 'Running' ? t('active') : t('inactive')}
                             </div>
                         </div>
                     </div>
@@ -171,7 +177,7 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                     <div className={cx('notification-route')}>
                         <div className={cx('notification-route-title')}>
                             <FontAwesomeIcon icon={faMapLocationDot} className={cx('notification-route-title-icon')} />
-                            <span>Tuyến đường</span>
+                            <span>{t('route_name')}</span>
                         </div>
 
                         <div className={cx('notification-route-name')}>
@@ -186,13 +192,13 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                         <div className={cx('notification-route-location')}>
                             <FontAwesomeIcon icon={faMapPin} className={cx('notification-route-title-icon')} />
                             <span>
-                                Vị trí hiện tại / đã qua : <p>{currentStop}</p>
+                                {t('location_passed')} : <p>{currentStop}</p>
                             </span>
                         </div>
                     </div>
                 </>
             ) : (
-                <h2>Chưa có chuyến xe bắt đầu</h2>
+                <h2>{t('no_trip_started')}</h2>
             )}
             {modalOpen && (
                 <div className={cx('modal-overlay')} onClick={handleCloseModal}>
@@ -200,13 +206,13 @@ function Notification({ notifications, routeStatus, setNotifications }) {
                         <button className={cx('modal-close')} onClick={handleCloseModal}>
                             &times;
                         </button>
-                        <h3>Chi tiết thông báo</h3>
+                        <h3>{t('notification_detail')}</h3>
                         <div className={cx('table-wrapper')}>
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Nội dung</th>
-                                        <th>Thời gian gửi</th>
+                                        <th>{t('content')}</th>
+                                        <th>{t('sent_time')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

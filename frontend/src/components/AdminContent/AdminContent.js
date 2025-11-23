@@ -5,9 +5,15 @@ import showToast from '../../untils/ShowToast/showToast';
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '../../context/auth.context';
 import axios from '../../untils/CustomAxios/axios.customize';
+import { useTranslation } from 'react-i18next';
+import '../../untils/ChangeLanguage/i18n';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+
 const cx = classNames.bind(styles);
 
 function AdminContent() {
+    const { t } = useTranslation();
+
     const authContext = useContext(AuthContext);
     const username = authContext.auth.user.username;
     const navigate = useNavigate();
@@ -24,10 +30,10 @@ function AdminContent() {
         });
         if (role === 'Admin') {
             navigate('/admin');
-            showToast('Đăng xuất thành công');
+            showToast('logout_success');
         } else {
             navigate('/');
-            showToast('Đăng xuất thành công');
+            showToast('logout_success');
         }
     };
 
@@ -54,16 +60,21 @@ function AdminContent() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('header')}>
-                Admin Dashboard
+                <div className={cx('header-infor-logo')}>
+                    {t('admin_dashboard')}
+                    <LanguageSwitcher />
+                </div>
                 <div className={cx('header-infor-acc')}>
-                    <span>Welcome {username}</span>
+                    <span>
+                        {t('welcome')} {username}
+                    </span>
                     <button
                         className={cx('header-logout-btn')}
                         onClick={() => {
                             handleLogout();
                         }}
                     >
-                        <span>Đăng Xuất</span>
+                        <span>{t('Logout')}</span>
                     </button>
                 </div>
             </div>
@@ -74,61 +85,61 @@ function AdminContent() {
                         to="dashboard"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Dashboard
+                        {t('dashboard')}
                     </NavLink>
                     <NavLink
                         to="manage-driver"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý tài xế
+                        {t('driver_management')}
                     </NavLink>
                     <NavLink
                         to="manage-student"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý học sinh
+                        {t('student_management')}
                     </NavLink>
                     <NavLink
                         to="manage-parent"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý phụ huynh
+                        {t('parent_management')}
                     </NavLink>
                     <NavLink
                         to="manage-station"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý trạm
+                        {t('stop_management')}
                     </NavLink>
                     <NavLink
                         to="manage-route"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý tuyến
+                        {t('route_management')}
                     </NavLink>
                     <NavLink
                         to="manage-bus"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý xe
+                        {t('bus_management')}
                     </NavLink>
                     <NavLink
                         to="manage-account"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Quản lý tài khoản
+                        {t('account_management')}
                     </NavLink>
                     <NavLink
                         to="setup-route"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Setup tuyến
+                        {t('route_assignment')}
                     </NavLink>
                     <NavLink
                         to="report"
                         className={({ isActive }) => (isActive ? cx('sidebar-item', 'active') : cx('sidebar-item'))}
                     >
-                        Báo cáo
+                        {t('reports')}
                     </NavLink>
                 </div>
 

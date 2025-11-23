@@ -9,6 +9,8 @@ import { useEffect, useState, useRef } from 'react';
 import FocusBus from '../../../untils/FocusBus/FocusBus';
 import Routing from '../../../untils/Routing/Routing';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +22,8 @@ const busIcon = new L.Icon({
 });
 
 function MapRoute({ routeStatus, busLocation, waypoints }) {
+    const { t } = useTranslation();
+
     // Nếu có vị trí xe thì dùng, không thì dùng vị trí mặc định
     const [focus, setFocus] = useState(false);
     const initialPosition = busLocation ? [busLocation.lat, busLocation.lng] : [10.7597031, 106.6817595];
@@ -43,7 +47,7 @@ function MapRoute({ routeStatus, busLocation, waypoints }) {
         <div className={cx('map-route')} id="map-route">
             <div className={cx('map-route-title')}>
                 <FontAwesomeIcon icon={faMap} className={cx('map-route-title-icon')} />
-                <span>Bản Đồ Theo Dõi Lộ Trình Xe</span>
+                <span>{t('route_tracking_map')}</span>
             </div>
 
             <div className={cx('map-route-location')}>

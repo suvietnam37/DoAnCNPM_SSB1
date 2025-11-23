@@ -4,10 +4,14 @@ import { useState, useEffect } from 'react';
 // import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
 import axios from '../../../untils/CustomAxios/axios.customize';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function ManageAccount() {
+    const { t } = useTranslation();
+
     const [accounts, setAccounts] = useState([]);
     const [accountEdit, setAccountEdit] = useState({});
     const [drivers, setDrivers] = useState([]);
@@ -92,7 +96,7 @@ function ManageAccount() {
                 roleid: role_id,
                 related_id: relatedId, // parent_id hoặc driver_id
             });
-            showToast('Thêm tài khoản thành công');
+            showToast('add_account_success');
             fetchAccounts(); // reload danh sách
             fetchDrivers();
             fetchParents();
@@ -106,7 +110,7 @@ function ManageAccount() {
             setSelectedDriverId(null);
         } catch (error) {
             console.error(error);
-            showToast('Lỗi khi tạo tài khoản', false);
+            showToast('add_account_failed', false);
         }
     };
 
@@ -122,7 +126,7 @@ function ManageAccount() {
 
             fetchAccounts(); // Cập nhật lại danh sách
         } catch (error) {
-            showToast('Không thể cập nhật trạng thái', false);
+            showToast('update_status_failed', false);
         } finally {
             handleCloseModal();
         }
@@ -132,11 +136,11 @@ function ManageAccount() {
         try {
             await axios.delete(`http://localhost:5000/api/accounts/${account.account_id}`);
 
-            showToast('Xóa tài khoản thành công');
+            showToast('delete_account_success');
 
             fetchAccounts();
         } catch (error) {
-            showToast('Không thể cập nhật trạng thái', false);
+            showToast('update_status_failed', false);
         } finally {
             handleCloseModal();
         }
@@ -175,7 +179,7 @@ function ManageAccount() {
                 related_id: relatedId,
             });
 
-            showToast('Cập nhật tài khoản thành công', true);
+            showToast('update_account_success');
             fetchAccounts();
             handleCloseModal();
 
@@ -187,7 +191,7 @@ function ManageAccount() {
             setSelectedDriverId(null);
         } catch (error) {
             console.error(error);
-            showToast('Lỗi khi cập nhật tài khoản', false);
+            showToast('update_account_failed', false);
         }
     };
 
@@ -231,96 +235,98 @@ function ManageAccount() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản lý tài khoản</h2>
+                <h2 className={cx('title')}>{t('account_management')}</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm tài khoản
+                    {t('add_account')}
                 </button>
             </div>
-            <table className={cx('table')}>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên đăng nhập</th>
-                        <th>Vai trò</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {accounts.map((acc) => {
-                        return (
-                            <tr key={acc.account_id}>
-                                <td>{acc.account_id}</td>
-                                <td>{acc.username}</td>
-                                <td>{acc.role_name}</td>
-                                <td>
-                                    {acc.status === 'Active' ? (
-                                        <div className={cx('status-container')}>
-                                            <p>Hoạt động</p>
-                                            <button
-                                                className={cx('btn', 'lock')}
-                                                onClick={() => {
-                                                    setSelectedAccount(acc);
-                                                    handleOpenModal('lock');
-                                                }}
-                                            >
-                                                Khóa
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className={cx('status-container')}>
-                                            <p>Đã khóa</p>
-                                            <button
-                                                className={cx('btn', 'unlock')}
-                                                onClick={() => {
-                                                    setSelectedAccount(acc);
-                                                    handleOpenModal('lock');
-                                                }}
-                                            >
-                                                Mở khóa
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                                <td>
-                                    <button
-                                        className={cx('btn', 'change')}
-                                        onClick={() => {
-                                            setSelectedAccount(acc);
-                                            setSelectedRole(acc.role_name);
-                                            setUsername(acc.username);
-                                            handleOpenModal('edit');
-                                        }}
-                                    >
-                                        Sửa
-                                    </button>
-                                    <button
-                                        className={cx('btn', 'danger')}
-                                        onClick={() => {
-                                            setSelectedAccount(acc);
-                                            handleOpenModal('delete');
-                                        }}
-                                    >
-                                        Xóa
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className={cx('btn', 'details')}
-                                        onClick={() => {
-                                            setSelectedAccount(acc);
-                                            handleOpenModal('details');
-                                        }}
-                                    >
-                                        ...
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+            <div className={cx('table-wrapper')}>
+                <table className={cx('table')}>
+                    <thead>
+                        <tr>
+                            <th>{t('acc_id')}</th>
+                            <th>{t('Username')}</th>
+                            <th>{t('role')}</th>
+                            <th>{t('status')}</th>
+                            <th>{t('actions')}</th>
+                            <th>{t('details')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {accounts.map((acc) => {
+                            return (
+                                <tr key={acc.account_id}>
+                                    <td>{acc.account_id}</td>
+                                    <td>{acc.username}</td>
+                                    <td>{acc.role_name}</td>
+                                    <td>
+                                        {acc.status === 'Active' ? (
+                                            <div className={cx('status-container')}>
+                                                <p>{t('active')}</p>
+                                                <button
+                                                    className={cx('btn', 'lock')}
+                                                    onClick={() => {
+                                                        setSelectedAccount(acc);
+                                                        handleOpenModal('lock');
+                                                    }}
+                                                >
+                                                    {t('lock')}
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className={cx('status-container')}>
+                                                <p>{t('locked')}</p>
+                                                <button
+                                                    className={cx('btn', 'unlock')}
+                                                    onClick={() => {
+                                                        setSelectedAccount(acc);
+                                                        handleOpenModal('lock');
+                                                    }}
+                                                >
+                                                    {t('unlock')}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <button
+                                            className={cx('btn', 'change')}
+                                            onClick={() => {
+                                                setSelectedAccount(acc);
+                                                setSelectedRole(acc.role_name);
+                                                setUsername(acc.username);
+                                                handleOpenModal('edit');
+                                            }}
+                                        >
+                                            {t('edit')}
+                                        </button>
+                                        <button
+                                            className={cx('btn', 'danger')}
+                                            onClick={() => {
+                                                setSelectedAccount(acc);
+                                                handleOpenModal('delete');
+                                            }}
+                                        >
+                                            {t('delete')}
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button
+                                            className={cx('btn', 'details')}
+                                            onClick={() => {
+                                                setSelectedAccount(acc);
+                                                handleOpenModal('details');
+                                            }}
+                                        >
+                                            ...
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
 
             {isOpenModalOpen === 'edit' && (
                 <div className={cx('modal-overlay')}>
@@ -333,36 +339,36 @@ function ManageAccount() {
                                     setUsername('');
                                 }}
                             >
-                                X
+                                {t('close')} {/* X */}
                             </button>
                         </div>
-                        <h3>Sửa tài khoản</h3>
+                        <h3>{t('edit_account')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Tên tài khoản: </label>
+                                <label>{t('Username')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Tên tài khoản"
+                                    placeholder={t('Username')}
                                     className={cx('input')}
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Mật khẩu cũ: </label>
+                                <label>{t('old_password')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Mật khẩu cũ"
+                                    placeholder={t('old_password')}
                                     className={cx('input')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Mật khẩu mới: </label>
+                                <label>{t('new_password')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Mật khẩu mới"
+                                    placeholder={t('new_password')}
                                     className={cx('input')}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
@@ -379,7 +385,7 @@ function ManageAccount() {
                                         checked={selectedRole === 'Parent'}
                                         onChange={(e) => setSelectedRole(e.target.value)}
                                     />
-                                    <span>Parent</span>
+                                    <span>{t('Parent')}</span>
                                 </label>
 
                                 <label className={cx('role-label')}>
@@ -391,7 +397,7 @@ function ManageAccount() {
                                         checked={selectedRole === 'Driver'}
                                         onChange={(e) => setSelectedRole(e.target.value)}
                                     />
-                                    <span>Driver</span>
+                                    <span>{t('Driver')}</span>
                                 </label>
 
                                 <label className={cx('role-label')}>
@@ -403,9 +409,10 @@ function ManageAccount() {
                                         checked={selectedRole === 'Admin'}
                                         onChange={(e) => setSelectedRole(e.target.value)}
                                     />
-                                    <span>Admin</span>
+                                    <span>{t('Admin')}</span>
                                 </label>
                             </div>
+
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
@@ -415,22 +422,21 @@ function ManageAccount() {
                                             <thead>
                                                 <tr>
                                                     <th>
-                                                        Mã{' '}
+                                                        {t('code')}{' '}
                                                         {selectedRole === 'Parent'
-                                                            ? 'Phụ huynh'
+                                                            ? t('Parent')
                                                             : selectedRole === 'Driver'
-                                                            ? 'Tài xế'
+                                                            ? t('Driver')
                                                             : ''}
                                                     </th>
                                                     <th>
-                                                        Tên{' '}
                                                         {selectedRole === 'Parent'
-                                                            ? 'Phụ huynh'
+                                                            ? t('Parent')
                                                             : selectedRole === 'Driver'
-                                                            ? 'Tài xế'
+                                                            ? t('Driver')
                                                             : ''}
                                                     </th>
-                                                    <th>Chọn</th>
+                                                    <th>{t('select')}</th>
                                                 </tr>
                                             </thead>
                                         )}
@@ -491,9 +497,10 @@ function ManageAccount() {
                                     </table>
                                 </div>
                             </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleUpdateAccount}>
-                                    Cập nhật
+                                    {t('update')}
                                 </button>
                             </div>
                         </div>
@@ -514,11 +521,11 @@ function ManageAccount() {
                                 X
                             </button>
                         </div>
-                        <h3>Thêm tài khoản</h3>
+                        <h3>{t('add_account')}</h3>
                         <div className={cx('form')}>
                             <input
                                 type="text"
-                                placeholder="Tên tài khoản"
+                                placeholder={t('username')}
                                 className={cx('input')}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
@@ -526,7 +533,7 @@ function ManageAccount() {
 
                             <input
                                 type="text"
-                                placeholder="Mật khẩu"
+                                placeholder={t('password')}
                                 className={cx('input')}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -542,7 +549,7 @@ function ManageAccount() {
                                         checked={selectedRole === 'Parent'}
                                         onChange={(e) => setSelectedRole(e.target.value)}
                                     />
-                                    <span>Parent</span>
+                                    <span>{t('Parent')}</span>
                                 </label>
 
                                 <label className={cx('role-label')}>
@@ -554,7 +561,7 @@ function ManageAccount() {
                                         checked={selectedRole === 'Driver'}
                                         onChange={(e) => setSelectedRole(e.target.value)}
                                     />
-                                    <span>Driver</span>
+                                    <span>{t('driver')}</span>
                                 </label>
 
                                 <label className={cx('role-label')}>
@@ -566,9 +573,10 @@ function ManageAccount() {
                                         checked={selectedRole === 'Admin'}
                                         onChange={(e) => setSelectedRole(e.target.value)}
                                     />
-                                    <span>Admin</span>
+                                    <span>{t('Admin')}</span>
                                 </label>
                             </div>
+
                             <div className={cx('form-container')}>
                                 <div className={cx('table-wrapper')}>
                                     <table className={cx('table')}>
@@ -578,22 +586,21 @@ function ManageAccount() {
                                             <thead>
                                                 <tr>
                                                     <th>
-                                                        Mã{' '}
+                                                        {t('code')}{' '}
                                                         {selectedRole === 'Parent'
-                                                            ? 'Phụ huynh'
+                                                            ? t('Parent')
                                                             : selectedRole === 'Driver'
-                                                            ? 'Tài xế'
+                                                            ? t('Driver')
                                                             : ''}
                                                     </th>
                                                     <th>
-                                                        Tên{' '}
                                                         {selectedRole === 'Parent'
-                                                            ? 'Phụ huynh'
+                                                            ? t('Parent')
                                                             : selectedRole === 'Driver'
-                                                            ? 'Tài xế'
+                                                            ? t('Driver')
                                                             : ''}
                                                     </th>
-                                                    <th>Chọn</th>
+                                                    <th>{t('select')}</th>
                                                 </tr>
                                             </thead>
                                         )}
@@ -643,15 +650,17 @@ function ManageAccount() {
                                     </table>
                                 </div>
                             </div>
+
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddAccount}>
-                                    Thêm
+                                    {t('add')}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
             {isOpenModalOpen === 'details' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
@@ -660,51 +669,52 @@ function ManageAccount() {
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết tài khoản</h3>
+                        <h3>{t('details')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('input-container')}>
-                                <label>Mã tài khoản: </label>
+                                <label>{t('acc_id')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Mã tài khoản"
+                                    placeholder={t('code')}
                                     className={cx('input')}
                                     value={selectedAccount.account_id}
                                 />
                             </div>
                             <div className={cx('input-container')}>
-                                <label>Tên tài khoản: </label>
+                                <label>{t('account_name')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Tên tài khoản"
+                                    placeholder={t('account_name')}
                                     className={cx('input')}
                                     value={selectedAccount.username}
                                 />
                             </div>
 
                             <div className={cx('input-container')}>
-                                <label>Mật khẩu: </label>
+                                <label>{t('Password')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Mật khẩu"
+                                    placeholder={t('password')}
                                     className={cx('input')}
                                     value={selectedAccount.password}
                                 />
                             </div>
 
                             <div className={cx('input-container')}>
-                                <label>Vai trò: </label>
+                                <label>{t('role')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Vai trò"
+                                    placeholder={t('role')}
                                     className={cx('input')}
                                     value={selectedAccount.role_name}
                                 />
                             </div>
+
                             <div className={cx('input-container')}>
-                                <label>Trạng thái: </label>
+                                <label>{t('status')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Trạng thái"
+                                    placeholder={t('status')}
                                     className={cx('input')}
                                     value={selectedAccount.status}
                                 />
@@ -713,6 +723,7 @@ function ManageAccount() {
                     </div>
                 </div>
             )}
+
             {isOpenModalOpen === 'delete' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
@@ -721,13 +732,16 @@ function ManageAccount() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa tài khoản ?</h3>
+                        <h3>
+                            {t('confirm_delete')} {t('account_name')}?
+                        </h3>
                         <button className={cx('btn', 'add')} onClick={() => handleSoftDelete(selectedAccount)}>
-                            Xác nhận
+                            {t('confirm_delete')}
                         </button>
                     </div>
                 </div>
             )}
+
             {isOpenModalOpen === 'lock' && selectedAccount && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
@@ -738,11 +752,11 @@ function ManageAccount() {
                         </div>
                         <h3>
                             {selectedAccount.status === 'Active'
-                                ? 'Xác nhận khóa tài khoản này?'
-                                : 'Xác nhận mở khóa tài khoản này?'}
+                                ? t('confirm_lock_account')
+                                : t('confirm_unlock_account')}
                         </h3>
                         <button className={cx('btn', 'add')} onClick={() => handleToggleStatus(selectedAccount)}>
-                            Xác nhận
+                            {t('confirm_action')}
                         </button>
                     </div>
                 </div>

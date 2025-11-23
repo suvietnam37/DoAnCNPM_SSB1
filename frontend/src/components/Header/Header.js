@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import showToast from '../../untils/ShowToast/showToast';
 import { AuthContext } from '../../context/auth.context';
 import axios from '../../untils/CustomAxios/axios.customize';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
+import '../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
@@ -14,6 +17,7 @@ function Header() {
     const authContext = useContext(AuthContext);
     const username = authContext.auth.user.username;
     const menuRef = useRef();
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
 
@@ -31,10 +35,10 @@ function Header() {
 
         if (role === 'Admin') {
             navigate('/admin');
-            showToast('Đăng xuất thành công');
+            showToast('logout_success');
         } else {
             navigate('/');
-            showToast('Đăng xuất thành công');
+            showToast('logout_success');
         }
     };
 
@@ -62,22 +66,23 @@ function Header() {
         <div className={cx('header')}>
             <div className={cx('header-logo-container')}>
                 <FontAwesomeIcon icon={faBus} className={cx('header-logo')} />
-                <span className={cx('header-title')}>Bus System Tracking</span>
+                <span className={cx('header-title')}>{t('Bus_System_Tracking')}</span>
+                <div className={cx('header-changeLG-btn')}>
+                    <LanguageSwitcher></LanguageSwitcher>
+                </div>
             </div>
-
             <div className={cx('header-login')} ref={menuRef}>
                 <div className={cx('header-acc-infor')}>
                     <span>{username}</span>
                     <FontAwesomeIcon icon={faUser} />
                 </div>
-
                 <button
                     className={cx('header-logout-btn')}
                     onClick={() => {
                         handleLogout();
                     }}
                 >
-                    <span>Đăng Xuất</span>
+                    <span>{t('Logout')}</span>
                 </button>
             </div>
         </div>

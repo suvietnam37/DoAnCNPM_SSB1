@@ -5,6 +5,8 @@ import { faRoute } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import showToast from '../../../untils/ShowToast/showToast';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +15,8 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalStops, setModalStops] = useState([]);
     const [checked, setChecked] = useState(false);
+    const { t } = useTranslation();
+
     const handleCheckboxChange = (e) => {
         setChecked(e.target.checked);
     };
@@ -61,7 +65,7 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
             const departure_time_start = res.data.departure_time;
             for (const a of assignments) {
                 if (departure_time_start.localeCompare(a.departure_time) > 0 && a.status !== 'Completed') {
-                    showToast('Vui lòng hoàn thành chuyến xe trước đó', false);
+                    showToast('finish_previous_trip', false);
                     return false;
                 }
             }
@@ -76,7 +80,9 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
         <div className={cx('route-manage')} id="route-manage">
             <div className={cx('route-manage-title')}>
                 <FontAwesomeIcon icon={faRoute} />
-                <span>Danh Sách Tuyến Xe Cần Thực Hiện Ngày: {todayDisplay}</span>
+                <span>
+                    {t('route_list_to_run')}: {todayDisplay}
+                </span>
                 <div className={cx('simulator')}>
                     <div>
                         <input type="checkbox" value="test" checked={checked} onChange={handleCheckboxChange} />
@@ -90,7 +96,7 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                                     pauseTest();
                                 }}
                             >
-                                Tam dung
+                                Pause
                             </button>
                             <button
                                 className={cx('btn', 'add')}
@@ -98,7 +104,7 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                                     resumeTest();
                                 }}
                             >
-                                Tiep tuc
+                                Continue
                             </button>
                         </>
                     )}
@@ -111,11 +117,11 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Ngày chạy</th>
-                                    <th>Giờ khởi hành</th>
-                                    <th>Số trạm</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hành động</th>
+                                    <th>{t('run_date')}</th>
+                                    <th>{t('departure_time')}</th>
+                                    <th>{t('stop_count')}</th>
+                                    <th>{t('status')}</th>
+                                    <th>{t('action')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -132,7 +138,7 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                                                     className={cx('btn', 'details')}
                                                     onClick={() => handleOpenModal(asm)}
                                                 >
-                                                    chi tiết
+                                                    {t('detail')}
                                                 </button>
                                             </div>
                                         </td>
@@ -148,11 +154,11 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                                                     }}
                                                     className={cx('btn', 'add')}
                                                 >
-                                                    Bắt đầu
+                                                    {t('start')}
                                                 </button>
                                             )}
-                                            {asm.status === 'Running' && <span>Đang thực hiện</span>}
-                                            {asm.status === 'Completed' && <span>Đã hoàn thành</span>}
+                                            {asm.status === 'Running' && <span>{t('in_progress')}</span>}
+                                            {asm.status === 'Completed' && <span>{t('completed')}</span>}
                                         </td>
                                     </tr>
                                 ))}
@@ -161,7 +167,7 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                     </div>
                 </div>
             ) : (
-                <h2>Không có tuyến xe cần thực hiện hôm nay</h2>
+                <h2>{t('no_route_today')}</h2>
             )}
 
             {modalOpen && (
@@ -175,9 +181,9 @@ function RouteManage({ assignments, onStartRoute, pauseTest, resumeTest }) {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Mã trạm</th>
-                                        <th>Tên trạm</th>
-                                        <th>Địa chỉ</th>
+                                        <th>{t('stop_id')}</th>
+                                        <th>{t('stop_name')}</th>
+                                        <th>{t('stop_address')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

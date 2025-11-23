@@ -4,10 +4,14 @@ import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function SetupRoute() {
+    const { t } = useTranslation();
+
     const [assignments, setAssignments] = useState([]);
     const [routes, setRoutes] = useState([]);
     const [drivers, setDrivers] = useState([]);
@@ -38,7 +42,7 @@ function SetupRoute() {
             setBuses(busesRes.data);
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu phân công:', error);
-            showToast('Không thể tải dữ liệu của trang.', false);
+            showToast('load_assignment_data_failed', false);
         }
     };
 
@@ -87,7 +91,7 @@ function SetupRoute() {
     // Thêm mới
     const handleAddAssignment = async () => {
         if (!validateForm()) {
-            showToast('Vui lòng điền đầy đủ thông tin!', false);
+            showToast('please_fill_all_info', false);
             return;
         }
         try {
@@ -99,18 +103,18 @@ function SetupRoute() {
                 status: 'Not Started', // Luôn mặc định là "Not Started"
                 departure_time: departureTime,
             });
-            showToast('Thêm phân công tuyến thành công!', true);
+            showToast('add_assignment_success');
             handleCloseModal();
             fetchData();
         } catch (error) {
-            showToast('Lỗi khi thêm phân công tuyến.', false);
+            showToast('add_assignment_failed', false);
         }
     };
 
     // Sửa phân công
     const handleEditAssignment = async () => {
         if (!validateForm()) {
-            showToast('Vui lòng điền đầy đủ thông tin!', false);
+            showToast('please_fill_all_info', false);
             return;
         }
         try {
@@ -122,11 +126,11 @@ function SetupRoute() {
                 status: status,
                 departure_time: departureTime,
             });
-            showToast('Cập nhật phân công thành công!', true);
+            showToast('update_assignment_success');
             handleCloseModal();
             fetchData();
         } catch (error) {
-            showToast('Lỗi khi cập nhật phân công.', false);
+            showToast('update_assignment_failed', false);
         }
     };
 
@@ -134,80 +138,87 @@ function SetupRoute() {
     const handleDeleteAssignment = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/route_assignments/${selectedAssignment.assignment_id}`);
-            showToast('Xóa phân công thành công!', true);
+            showToast('delete_assignment_success');
             handleCloseModal();
             fetchData();
         } catch (error) {
-            showToast('Lỗi khi xóa phân công.', false);
+            showToast('delete_assignment_failed', false);
         }
     };
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản Lý Phân Công Tuyến</h2>
+                <h2 className={cx('title')}>{t('assignment_management')}</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm Phân Công
+                    {t('add_assignment')}
                 </button>
             </div>
+            <div className={cx('table-wrapper')}>
+                <table className={cx('table')}>
+                    <thead>
+                        <tr>
+                            <th>{t('assignment_id')}</th>
+                            <th>{t('run_date')}</th>
+                            <th>{t('route_name')}</th>
+                            <th>{t('status')}</th>
+                            <th>{t('actions')}</th>
+                            <th>{t('details')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {assignments.map((assignment) => {
+                            const route = routes.find((r) => r.route_id === assignment.route_id);
+                            const driver = drivers.find((d) => d.driver_id === assignment.driver_id);
+                            const bus = buses.find((b) => b.bus_id === assignment.bus_id);
 
-            <table className={cx('table')}>
-                <thead>
-                    <tr>
-                        <th>Mã PC</th>
-                        <th>Ngày Chạy</th>
-                        <th>Tên Tuyến</th>
-                        <th>Trạng Thái</th>
-                        <th>Hành Động</th>
-                        <th>Chi Tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {assignments.map((assignment) => {
-                        const route = routes.find((r) => r.route_id === assignment.route_id);
-                        const driver = drivers.find((d) => d.driver_id === assignment.driver_id);
-                        const bus = buses.find((b) => b.bus_id === assignment.bus_id);
-
-                        return (
-                            <tr key={assignment.assignment_id}>
-                                <td>{assignment.assignment_id}</td>
-                                <td>{new Date(assignment.run_date).toLocaleDateString('vi-VN')}</td>
-                                <td>{route ? route.route_name : `(ID: ${assignment.route_id})`}</td>
-                                <td>{assignment.status}</td>
-                                <td>
-                                    <button
-                                        className={cx('btn', 'change')}
-                                        onClick={() => handleOpenModal('edit', assignment)}
-                                    >
-                                        Sửa
-                                    </button>
-                                    <button
-                                        className={cx('btn', 'danger')}
-                                        onClick={() => handleOpenModal('delete', assignment)}
-                                    >
-                                        Xóa
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        className={cx('btn', 'details')}
-                                        onClick={() => handleOpenModal('details', assignment)}
-                                    >
-                                        ...
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                            return (
+                                <tr key={assignment.assignment_id}>
+                                    <td>{assignment.assignment_id}</td>
+                                    <td>{new Date(assignment.run_date).toLocaleDateString('vi-VN')}</td>
+                                    <td>{route ? route.route_name : `(ID: ${assignment.route_id})`}</td>
+                                    <td>
+                                        {assignment.status === 'Running'
+                                            ? t('Running')
+                                            : assignment.status === 'Not Started'
+                                            ? t('NotStarted')
+                                            : t('Completed')}
+                                    </td>
+                                    <td>
+                                        <button
+                                            className={cx('btn', 'change')}
+                                            onClick={() => handleOpenModal('edit', assignment)}
+                                        >
+                                            {t('edit')}
+                                        </button>
+                                        <button
+                                            className={cx('btn', 'danger')}
+                                            onClick={() => handleOpenModal('delete', assignment)}
+                                        >
+                                            {t('delete')}
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button
+                                            className={cx('btn', 'details')}
+                                            onClick={() => handleOpenModal('details', assignment)}
+                                        >
+                                            ...
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
 
             {/* MODAL THÊM & SỬA */}
             {isOpenModal === 'add' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-header')}>
-                            <h3> Thêm Phân Công Mới </h3>
+                            <h3>{t('add_assignment')}</h3>
                             <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
@@ -215,7 +226,7 @@ function SetupRoute() {
 
                         <div className={cx('form')}>
                             <select value={routeId} onChange={(e) => setRouteId(e.target.value)}>
-                                <option value="">-- Chọn tuyến xe --</option>
+                                <option value="">{t('select_route')}</option>
                                 {routes.map((r) => (
                                     <option key={r.route_id} value={r.route_id}>
                                         {r.route_name}
@@ -224,7 +235,7 @@ function SetupRoute() {
                             </select>
 
                             <select value={driverId} onChange={(e) => setDriverId(e.target.value)}>
-                                <option value="">-- Chọn tài xế --</option>
+                                <option value="">{t('Driver')}</option>
                                 {drivers.map((d) => (
                                     <option key={d.driver_id} value={d.driver_id}>
                                         {d.driver_name}
@@ -233,7 +244,7 @@ function SetupRoute() {
                             </select>
 
                             <select value={busId} onChange={(e) => setBusId(e.target.value)}>
-                                <option value="">-- Chọn xe bus --</option>
+                                <option value="">{t('manage_bus')}</option>
                                 {buses.map((b) => (
                                     <option key={b.bus_id} value={b.bus_id}>
                                         {b.license_plate}
@@ -241,7 +252,7 @@ function SetupRoute() {
                                 ))}
                             </select>
 
-                            <input type="text" value="Not Started" readOnly />
+                            <input type="text" value={t('no_trip_started')} readOnly />
 
                             <input type="date" value={runDate} onChange={(e) => setRunDate(e.target.value)} />
                             <input
@@ -252,34 +263,28 @@ function SetupRoute() {
 
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleAddAssignment()}>
-                                    Thêm Mới
+                                    {t('add_assignment')}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-
             {isOpenModal === 'edit' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-header')}>
-                            <h3>Sửa Phân Công</h3>
-                            <button
-                                className={cx('btn', 'danger', 'radius')}
-                                onClick={() => {
-                                    handleCloseModal();
-                                }}
-                            >
+                            <h3>{t('edit_assignment')}</h3>
+                            <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
                                 X
                             </button>
                         </div>
 
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Tuyến xe: </label>
+                                <label>{t('route')}: </label>
                                 <select value={routeId} onChange={(e) => setRouteId(e.target.value)}>
-                                    <option value="">-- Chọn tuyến xe --</option>
+                                    <option value="">{t('select_route')}</option>
                                     {routes.map((r) => (
                                         <option key={r.route_id} value={r.route_id}>
                                             {r.route_name}
@@ -289,9 +294,9 @@ function SetupRoute() {
                             </div>
 
                             <div className={cx('flex-input')}>
-                                <label>Tài xế: </label>
+                                <label>{t('Driver')}: </label>
                                 <select value={driverId} onChange={(e) => setDriverId(e.target.value)}>
-                                    <option value="">-- Chọn tài xế --</option>
+                                    <option value="">{t('Driver')}</option>
                                     {drivers.map((d) => (
                                         <option key={d.driver_id} value={d.driver_id}>
                                             {d.driver_name}
@@ -299,10 +304,11 @@ function SetupRoute() {
                                     ))}
                                 </select>
                             </div>
+
                             <div className={cx('flex-input')}>
-                                <label>Xe bus: </label>
+                                <label>{t('manage_bus')}: </label>
                                 <select value={busId} onChange={(e) => setBusId(e.target.value)}>
-                                    <option value="">-- Chọn xe bus --</option>
+                                    <option value="">{t('manage_bus')}</option>
                                     {buses.map((b) => (
                                         <option key={b.bus_id} value={b.bus_id}>
                                             {b.license_plate}
@@ -310,30 +316,33 @@ function SetupRoute() {
                                     ))}
                                 </select>
                             </div>
+
                             <div className={cx('flex-input')}>
-                                <label>Ngày chạy: </label>
+                                <label>{t('run_date')}: </label>
                                 <input type="date" value={runDate} onChange={(e) => setRunDate(e.target.value)} />
                             </div>
+
                             <div className={cx('flex-input')}>
-                                <label>Giờ khởi hành: </label>
+                                <label>{t('departure_time')}: </label>
                                 <input
                                     type="time"
                                     value={departureTime}
                                     onChange={(e) => setDepartureTime(e.target.value)}
                                 />
                             </div>
+
                             <div className={cx('flex-input')}>
-                                <label>Trạng thái: </label>
+                                <label>{t('status')}: </label>
                                 <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                                    <option value="Not Started">Not Started</option>
-                                    <option value="Running">Running</option>
-                                    <option value="Completed">Completed</option>
+                                    <option value="Not Started">{t('no_trip_started')}</option>
+                                    <option value="Running">{t('in_progress')}</option>
+                                    <option value="Completed">{t('completed')}</option>
                                 </select>
                             </div>
 
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={() => handleEditAssignment()}>
-                                    Cập Nhật
+                                    {t('update')}
                                 </button>
                             </div>
                         </div>
@@ -346,14 +355,14 @@ function SetupRoute() {
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content', 'modal-content-details')}>
                         <div className={cx('modal-header')}>
-                            <h3>Chi Tiết Phân Công</h3>
+                            <h3>{t('assignment_details_title')}</h3>
                             <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
+                                {t('close')}
                             </button>
                         </div>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Mã phân công: </label>
+                                <label>{t('assignment_id_label')}: </label>
                                 <input
                                     type="text"
                                     value={selectedAssignment.assignment_id}
@@ -362,7 +371,7 @@ function SetupRoute() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Ngày chạy: </label>
+                                <label>{t('run_date')}: </label>
                                 <input
                                     type="text"
                                     value={new Date(selectedAssignment.run_date).toLocaleDateString('vi-VN')}
@@ -371,7 +380,7 @@ function SetupRoute() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Giờ khởi hành: </label>
+                                <label>{t('departure_time')}: </label>
                                 <input
                                     type="text"
                                     value={selectedAssignment.departure_time}
@@ -380,7 +389,7 @@ function SetupRoute() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Tên: </label>
+                                <label>{t('route')}: </label>
                                 <input
                                     type="text"
                                     value={
@@ -392,7 +401,7 @@ function SetupRoute() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Tài xế: </label>
+                                <label>{t('Driver')}: </label>
                                 <input
                                     type="text"
                                     value={
@@ -404,7 +413,7 @@ function SetupRoute() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Xe: </label>
+                                <label>{t('manage_bus')}: </label>
                                 <input
                                     type="text"
                                     value={
@@ -416,7 +425,7 @@ function SetupRoute() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Trạng thái: </label>
+                                <label>{t('status')}: </label>
                                 <input type="text" value={selectedAssignment.status} readOnly className={cx('input')} />
                             </div>
                         </div>
@@ -429,18 +438,18 @@ function SetupRoute() {
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-header')}>
-                            <h3>Xác nhận xóa</h3>
+                            <h3>{t('confirm_delete_title')}</h3>
                             <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                X
+                                {t('close')}
                             </button>
                         </div>
-                        <p>Bạn có chắc chắn muốn xóa phân công này không?</p>
+                        <p>{t('confirm_delete_message_assignment')}</p>
                         <div className={cx('buttons')}>
                             <button className={cx('btn', 'cancel')} onClick={handleCloseModal}>
-                                Hủy
+                                {t('cancel')}
                             </button>
                             <button className={cx('btn', 'danger')} onClick={handleDeleteAssignment}>
-                                Xác nhận Xóa
+                                {t('confirm_delete')}
                             </button>
                         </div>
                     </div>

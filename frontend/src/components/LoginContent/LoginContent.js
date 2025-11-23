@@ -6,6 +6,10 @@ import showToast from '../../untils/ShowToast/showToast';
 import axios from '../../untils/CustomAxios/axios.customize';
 import { AuthContext } from '../../context/auth.context';
 
+import { useTranslation } from 'react-i18next';
+import '../../untils/ChangeLanguage/i18n';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+
 const cx = classNames.bind(styles);
 
 function LoginContent() {
@@ -15,6 +19,7 @@ function LoginContent() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     // useEffect(() => {
     //     // Khi vào trang login => luôn xóa token cũ
@@ -52,7 +57,8 @@ function LoginContent() {
 
             if (data.EC !== 0 || (data.account.role !== 'Driver' && data.account.role !== 'Parent')) {
                 // Login thất bại
-                showToast('Đăng nhập thất bại', false);
+
+                showToast('login_failed', false);
                 return;
             }
 
@@ -67,7 +73,7 @@ function LoginContent() {
 
             // Login thành công
             localStorage.setItem('access_token', data.access_token);
-            showToast('Đăng nhập thành công');
+            showToast('login_success');
 
             // Điều hướng theo role
             if (role === 'parent' && data.account.role == 'Parent') navigate('/parent');
@@ -80,8 +86,11 @@ function LoginContent() {
     return (
         <div className={cx('container')}>
             <div className={cx('card')}>
-                <h2 className={cx('title')}>Welcome Back</h2>
-                <p className={cx('subtitle')}>Please login to continue</p>
+                <div className={cx('languageSwitcher')}>
+                    <LanguageSwitcher></LanguageSwitcher>
+                </div>
+                <h2 className={cx('title')}>{t('welcome_back')}</h2>
+                <p className={cx('subtitle')}>{t('Please_login_to_continue')}</p>
 
                 <div className={cx('roles')}>
                     <label className={cx('role-label')}>
@@ -93,7 +102,7 @@ function LoginContent() {
                             checked={role === 'parent'}
                             onChange={() => setRole('parent')}
                         />
-                        <span>Parent</span>
+                        <span>{t('Parent')}</span>
                     </label>
 
                     <label className={cx('role-label')}>
@@ -105,33 +114,31 @@ function LoginContent() {
                             checked={role === 'driver'}
                             onChange={() => setRole('driver')}
                         />
-                        <span>Driver</span>
+                        <span>{t('Driver')}</span>
                     </label>
                 </div>
 
                 <form className={cx('form')} onSubmit={onLogin}>
                     <input
                         type="text"
-                        placeholder="Username"
+                        placeholder={t('Username')}
                         className={cx('input')}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                     />
                     <input
                         type="password"
-                        placeholder="Password"
+                        placeholder={t('Password')}
                         className={cx('input')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <button type="submit" className={cx('login-btn')}>
-                        Login
+                        {t('Login')}
                     </button>
                 </form>
 
-                <div className={cx('divider')}>
-                    <span>or continue as</span>
-                </div>
+                <div className={cx('divider')}></div>
             </div>
         </div>
     );

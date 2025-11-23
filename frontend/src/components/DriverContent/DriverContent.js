@@ -335,12 +335,12 @@ function DriverContent() {
             });
 
             if (data.success) {
-                showToast('Xác nhận thành công');
+                showToast('confirm_success');
             } else {
-                showToast(data.message || 'Xác nhận thất bại', false);
+                showToast(data.message || 'confirm_failed', false);
             }
         } catch (error) {
-            showToast('Lỗi hệ thống', false);
+            showToast('system_error', false);
         }
     };
 
@@ -348,14 +348,14 @@ function DriverContent() {
     const handleStartRoute = async (assignmentId, routeId) => {
         const runningAssignment = assignments.find((a) => a.status === 'Running');
         if (runningAssignment) {
-            showToast('Vui lòng hoàn thành tuyến đã bắt đầu.', false);
+            showToast('please_finish_running_route', false);
             return;
         }
 
         const stopsData = await fetchStopByRouteId(routeId);
         const firstStopId = stopsData[0].stop_id;
 
-        showConfirm('Bạn có chắc muốn bắt đầu tuyến?', 'Bắt đầu', async () => {
+        showConfirm('route_start_confirm', 'start', async () => {
             try {
                 const response = await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Running',
@@ -369,16 +369,16 @@ function DriverContent() {
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
                 fetchStudentsForRoute(routeId);
-                showToast('Tuyến xe đã bắt đầu chúc bác tài làm việc vui vẻ');
+                showToast('route_started_success');
             } catch (error) {
                 console.error('Lỗi khi bắt đầu tuyến:', error);
-                showToast('Không thể bắt đầu tuyến. Vui lòng thử lại.', false);
+                showToast('route_start_failed', false);
             }
         });
     };
 
     const handleEndRoute = async (assignmentId) => {
-        showConfirm('Bạn có chắc muốn kết thúc tuyến ?', 'Kết thúc', async () => {
+        showConfirm('route_end_confirm', 'end', async () => {
             try {
                 await axios.put(`http://localhost:5000/api/route_assignments/start/${assignmentId}`, {
                     status: 'Completed',
@@ -399,18 +399,18 @@ function DriverContent() {
                 setCurrentAssignment(null);
                 fetchAssignmentByDriverId(driver.driver_id);
                 handleResetStatusStudent();
-                setStudentsOnRoute([]);
-                showToast('Tuyến xe đã kết thúc thành công');
+                setStudentsOnRoute(null);
+                showToast('route_ended_success');
                 stopTest();
             } catch (error) {
                 console.error('Lỗi khi kết thúc tuyến:', error);
-                showToast('Không thể kết thúc tuyến. Vui lòng thử lại.', false);
+                showToast('route_end_failed', false);
             }
         });
     };
 
     const handleConfirmStudent = async (newStatus, student_id, student_name, parent_id) => {
-        showConfirm('Xác nhận học sinh đã lên xe', 'Xác nhận', async () => {
+        showConfirm('student_confirm', 'confirm', async () => {
             try {
                 const res = await axios.get(`http://localhost:5000/api/parents/${parent_id}`);
                 const account_id = res.data.account_id;
@@ -441,7 +441,7 @@ function DriverContent() {
                 });
 
                 if (data.success) {
-                    showToast('Xác nhận thành công');
+                    showToast('confirm_success');
                     socketRef.current.emit('confirmStudent', {
                         message: `Học sinh ${student_name} đã lên xe`,
                         student_id: student_id,
@@ -456,10 +456,10 @@ function DriverContent() {
                         (prev) => prev.map((st) => (st.student_id === student_id ? { ...st, status: newStatus } : st)),
                     );
                 } else {
-                    showToast(data.message || 'Xác nhận thất bại', false);
+                    showToast(data.message || 'confirm_failed', false);
                 }
             } catch (error) {
-                showToast('Lỗi hệ thống', false);
+                showToast('system_error', false);
             }
         });
     };
@@ -487,10 +487,10 @@ function DriverContent() {
     };
 
     const menus = [
-        { name: 'Danh Sách Tuyến Xe', id: 'route-manage', offset: -300 },
-        { name: 'Quản Lý Học Sinh', id: 'student-manage', offset: -250 },
-        { name: 'Tuyến Xe Đang Thực Hiện', id: 'doing', offset: -200 },
-        { name: 'Báo Cáo Sự Cố', id: 'report', offset: -200 },
+        { name: 'route_list', id: 'route-manage', offset: -300 },
+        { name: 'student_management', id: 'student-manage', offset: -250 },
+        { name: 'route_doing', id: 'doing', offset: -200 },
+        { name: 'report_issue', id: 'report', offset: -200 },
     ];
 
     if (loading) {

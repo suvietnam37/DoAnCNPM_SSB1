@@ -6,9 +6,13 @@ import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import showToast from '../../../untils/ShowToast/showToast';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 function Report({ driver_name }) {
+    const { t } = useTranslation();
+
     const [txtReport, setTxtReport] = useState('');
     const socketRef = useRef(null);
 
@@ -46,7 +50,7 @@ function Report({ driver_name }) {
             }
         });
 
-        showToast('Báo cáo sự cố thành công');
+        showToast('report_success');
         setTxtReport('');
     };
 
@@ -54,10 +58,10 @@ function Report({ driver_name }) {
         <div className={cx('report')} id="report">
             <div className={cx('report-title')}>
                 <FontAwesomeIcon icon={faExclamation} />
-                <span>Báo Cáo Sự Cố</span>
+                <span>{t('report_issue')}</span>
             </div>
             <div className={cx('report-details')}>
-                <label>Mô Tả Sự Cố:</label>
+                <label>{t('incident_description')} :</label>
                 <textarea
                     value={txtReport}
                     onChange={(e) => {
@@ -71,7 +75,7 @@ function Report({ driver_name }) {
                         handleReport();
                     }}
                 >
-                    Gửi
+                    {t('send')}
                 </button>
             </div>
         </div>

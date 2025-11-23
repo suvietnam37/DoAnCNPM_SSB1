@@ -4,10 +4,14 @@ import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function ManageRoute() {
+    const { t } = useTranslation();
+
     const [routes, setRoutes] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState('');
     const [selectedRoute, setSelectedRoute] = useState(null);
@@ -44,38 +48,38 @@ function ManageRoute() {
     // Thêm tuyến
     const handleAddRoute = async () => {
         if (!routeName.trim()) {
-            showToast('Vui lòng nhập tên tuyến!', false);
+            showToast('please_enter_route_name', false);
             return;
         }
         try {
             await axios.post('http://localhost:5000/api/routes', {
                 route_name: routeName,
             });
-            showToast('Thêm tuyến thành công!');
+            showToast('add_route_success');
             handleCloseModal();
             fetchRoutes();
         } catch (error) {
             console.error('Add route error:', error);
-            showToast('Lỗi khi thêm tuyến.', false);
+            showToast('add_route_failed', false);
         }
     };
 
     // Sửa tuyến
     const handleEditRoute = async () => {
         if (!routeName.trim()) {
-            showToast('Vui lòng nhập tên tuyến!');
+            showToast('please_enter_route_name', false);
             return;
         }
         try {
             await axios.put(`http://localhost:5000/api/routes/${selectedRoute.route_id}`, {
                 route_name: routeName,
             });
-            showToast('Cập nhật tuyến thành công!');
+            showToast('update_route_success');
             handleCloseModal();
             fetchRoutes();
         } catch (error) {
             console.error('Edit route error:', error);
-            showToast('Lỗi khi sửa tuyến.', false);
+            showToast('update_route_failed', false);
         }
     };
 
@@ -83,60 +87,65 @@ function ManageRoute() {
     const handleDeleteRoute = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/routes/${selectedRoute.route_id}`);
-            showToast('Xóa tuyến thành công!');
+            showToast('delete_route_success');
             handleCloseModal();
             fetchRoutes();
         } catch (error) {
             console.error('Delete route error:', error);
-            showToast('Lỗi khi xóa tuyến.', false);
+            showToast('delete_route_failed', false);
         }
     };
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản lý tuyến</h2>
+                <h2 className={cx('title')}>{t('route_management')}</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm tuyến
+                    {t('add_route')}
                 </button>
             </div>
-            <table className={cx('table')}>
-                <thead>
-                    <tr>
-                        <th>Mã tuyến</th>
-                        <th>Tên tuyến</th>
-                        <th>Hành động</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {routes.map((route) => (
-                        <tr key={route.route_id}>
-                            <td>{route.route_id}</td>
-                            <td>{route.route_name}</td>
-                            <td>
-                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', route)}>
-                                    Sửa
-                                </button>
-                                <button
-                                    className={cx('btn', 'danger')}
-                                    onClick={() => handleOpenModal('delete', route)}
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                            <td>
-                                <button
-                                    className={cx('btn', 'details')}
-                                    onClick={() => handleOpenModal('details', route)}
-                                >
-                                    ...
-                                </button>
-                            </td>
+            <div className={cx('table-wrapper')}>
+                <table className={cx('table')}>
+                    <thead>
+                        <tr>
+                            <th>{t('route_id')}</th>
+                            <th>{t('route_name')}</th>
+                            <th>{t('actions')}</th>
+                            <th>{t('details')}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {routes.map((route) => (
+                            <tr key={route.route_id}>
+                                <td>{route.route_id}</td>
+                                <td>{route.route_name}</td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'change')}
+                                        onClick={() => handleOpenModal('edit', route)}
+                                    >
+                                        {t('edit')}
+                                    </button>
+                                    <button
+                                        className={cx('btn', 'danger')}
+                                        onClick={() => handleOpenModal('delete', route)}
+                                    >
+                                        {t('delete')}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'details')}
+                                        onClick={() => handleOpenModal('details', route)}
+                                    >
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Modal Sửa */}
             {isOpenModal === 'edit' && (
@@ -147,13 +156,13 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Sửa tuyến</h3>
+                        <h3>{t('edit_route')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Tên tuyến: </label>
+                                <label>{t('route_name')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Tên tuyến"
+                                    placeholder={t('route_name')}
                                     className={cx('input')}
                                     value={routeName}
                                     onChange={(e) => setRouteName(e.target.value)}
@@ -161,7 +170,7 @@ function ManageRoute() {
                             </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditRoute}>
-                                    Cập nhật
+                                    {t('update')}
                                 </button>
                             </div>
                         </div>
@@ -178,25 +187,24 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Thêm tuyến</h3>
+                        <h3>{t('add_route')}</h3>
                         <div className={cx('form')}>
                             <input
                                 type="text"
-                                placeholder="Tên tuyến"
+                                placeholder={t('route_name')}
                                 className={cx('input')}
                                 value={routeName}
                                 onChange={(e) => setRouteName(e.target.value)}
                             />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddRoute}>
-                                    Thêm
+                                    {t('add')}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-
             {/* Modal Chi tiết */}
             {isOpenModal === 'details' && selectedRoute && (
                 <div className={cx('modal-overlay')}>
@@ -206,14 +214,14 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết tuyến</h3>
+                        <h3>{t('route_details')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Mã tuyến: </label>
+                                <label>{t('route_id')}: </label>
                                 <input type="text" value={selectedRoute.route_id} readOnly className={cx('input')} />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Tên tuyến: </label>
+                                <label>{t('route_name')}: </label>
                                 <input type="text" value={selectedRoute.route_name} readOnly className={cx('input')} />
                             </div>
                             {/* Có thể thêm bảng trạm nếu cần */}
@@ -231,9 +239,9 @@ function ManageRoute() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa tuyến?</h3>
+                        <h3>{t('confirm_delete_route')}</h3>
                         <button className={cx('btn', 'add')} onClick={handleDeleteRoute}>
-                            Xác nhận
+                            {t('confirm')}
                         </button>
                     </div>
                 </div>

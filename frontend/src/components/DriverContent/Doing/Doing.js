@@ -16,11 +16,14 @@ import showConfirm from '../../../untils/ShowConfirm/showConfirm';
 import showToast from '../../../untils/ShowToast/showToast';
 import { AuthContext } from '../../../context/auth.context';
 import { io } from 'socket.io-client';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function Doing({ currentAssignment, handleEndRoute, notifications, setNotifications }) {
     const socketRef = useRef(null);
+    const { t } = useTranslation();
 
     const [bus, setBus] = useState([]);
     const [driver, setDriver] = useState([]);
@@ -49,7 +52,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
 
         socketRef.current.on('notification', (data) => {
             setNoti(data.message);
-            showToast('Có thông báo mới');
+            showToast('new_notification');
         });
 
         return () => {
@@ -114,7 +117,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
     };
 
     const handleChangeStop = async (route_id) => {
-        showConfirm('Bạn xác nhận đã đến?', 'Xác nhận', async () => {
+        showConfirm('arrive_stop_confirm', 'confirm', async () => {
             // Lấy vị trí của current stop trong mảng stops
             const currentIndex = stops.findIndex((s) => s.stop_name === currentStop);
 
@@ -179,7 +182,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                     }
                 });
 
-                showToast('Xác nhận đến trạm thành công');
+                showToast('arrive_stop_success');
                 socketRef.current.emit('changeRoute', {
                     message: `Đã đến trạm ${currentStop} `,
                     route_id: route_id,
@@ -197,9 +200,9 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
             <div className={cx('doing')} id="doing">
                 <div className={cx('doing-title')}>
                     <FontAwesomeIcon icon={faBell} />
-                    <span>Tuyến Xe Đang Thực Hiện</span>
+                    <span>{t('route_doing')}</span>
                 </div>
-                <h2>Hiện không có tuyến nào đang được thực hiện.</h2>
+                <h2>{t('no_active_route')}.</h2>
             </div>
         );
     }
@@ -208,14 +211,14 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
         <div className={cx('doing')} id="doing">
             <div className={cx('doing-title')}>
                 <FontAwesomeIcon icon={faBell} />
-                <span>Tuyến Xe Đang Thực Hiện</span>
+                <span>{t('route_doing')}</span>
                 <div className={cx('doing-realtime')}>
                     {endRoute === true && (
                         <button
                             className={cx('doing-realtime-details')}
                             onClick={() => handleEndRoute(currentAssignment.assignment_id)}
                         >
-                            Kết Thúc
+                            {t('finish')}
                         </button>
                     )}
                     {endRoute === false && (
@@ -223,13 +226,13 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                             className={cx('doing-realtime-details')}
                             onClick={() => handleChangeStop(currentAssignment.route_id)}
                         >
-                            Đến Trạm Dừng
+                            {t('arrive_stop')}
                         </button>
                     )}
                 </div>
             </div>
             <div className={cx('notification-realtime')}>
-                <p>{noti || 'Chưa có thông báo mới từ hệ thống '}</p>
+                <p>{noti || t('no_new_notifications')}</p>
                 <button
                     className={cx('notification-realtime-details')}
                     onClick={() => {
@@ -237,7 +240,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                         fetchNotifications(authContext?.auth?.user?.account_id);
                     }}
                 >
-                    Xem chi tiết
+                    {t('view_detail')}
                 </button>
             </div>
 
@@ -245,7 +248,9 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                 <div className={cx('route-num')}>
                     <div className={cx('route-num-title')}>
                         <FontAwesomeIcon icon={faBus} className={cx('route-num-title-icon')} />
-                        <span>Xe số {bus?.bus_id}</span>
+                        <span>
+                            {t('vehicle_number')} {bus?.bus_id}
+                        </span>
                     </div>
                     {/* Thay thế dữ liệu tĩnh bằng dữ liệu từ props */}
                     <div className={cx('route-num-name')}>{bus?.license_plate}</div>
@@ -253,7 +258,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                 <div className={cx('driver-infor')}>
                     <div className={cx('driver-infor-title')}>
                         <FontAwesomeIcon icon={faIdCard} className={cx('driver-infor-title-icon')} />
-                        <span>Tài xế </span>
+                        <span>{t('Driver')} </span>
                     </div>
                     <div className={cx('driver-infor-name')}>{driver?.driver_name}</div>
                 </div>
@@ -266,17 +271,17 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                                 done: currentAssignment?.status !== 'Running',
                             })}
                         />
-                        <span>Trạng thái</span>
+                        <span>{t('status')}</span>
                     </div>
                     <div className={cx('bus-active-name')}>
-                        {currentAssignment?.status === 'Running' ? 'Hoạt động' : 'Hoàn thành'}
+                        {currentAssignment?.status === 'Running' ? t('active') : t('completed')}
                     </div>
                 </div>
             </div>
             <div className={cx('doing-route')}>
                 <div className={cx('doing-route-title')}>
                     <FontAwesomeIcon icon={faMapLocationDot} className={cx('doing-route-title-icon')} />
-                    <span>Tuyến đường </span>
+                    <span>{t('route_name')} </span>
                 </div>
                 <div className={cx('doing-route-name')}>
                     {stops.map((stop, index) => (
@@ -289,13 +294,13 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                 <div className={cx('doing-route-location')}>
                     <FontAwesomeIcon icon={faMapPin} className={cx('doing-route-title-icon')} />
                     <span>
-                        Vị trí hiện tại : <p>{currentStop}</p>
+                        {t('current_location')} : <p>{currentStop}</p>
                     </span>
                 </div>
                 <div className={cx('doing-route-location')}>
                     <FontAwesomeIcon icon={faMapPin} className={cx('doing-route-title-icon')} />
                     <span>
-                        Điểm tiếp theo : <p>{nextStop}</p>
+                        {t('next_stop')} : <p>{nextStop}</p>
                     </span>
                 </div>
                 {/* Các phần vị trí hiện tại và điểm tiếp theo sẽ được cập nhật ở Tuần 6 (real-time) */}
@@ -306,13 +311,13 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
                             <button className={cx('modal-close')} onClick={handleCloseModal}>
                                 &times;
                             </button>
-                            <h3>Chi tiết thông báo</h3>
+                            <h3>{t('notification_detail')}</h3>
                             <div className={cx('table-wrapper')}>
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Nội dung</th>
-                                            <th>Thời gian gửi</th>
+                                            <th>{t('content')}</th>
+                                            <th>{t('sent_time')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

@@ -5,10 +5,14 @@ import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
 import io from 'socket.io-client';
 import { AuthContext } from '../../../context/auth.context';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function Report() {
+    const { t } = useTranslation();
+
     const socketRef = useRef(null);
 
     const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
@@ -51,7 +55,7 @@ function Report() {
         });
 
         if (!noti.trim() || toUserIds.length < 1) {
-            showToast('Vui lòng nhập thông báo hoặc chọn người nhận', false);
+            showToast('please_enter_notification_or_recipient', false);
             return;
         }
 
@@ -60,7 +64,7 @@ function Report() {
             message: noti,
         });
 
-        showToast('Gửi thông báo thành công');
+        showToast('send_notification_success');
         setNoti('');
         setSelectedDrivers([]);
         setSelectedParents([]);
@@ -92,7 +96,7 @@ function Report() {
             const response = await axios.get('http://localhost:5000/api/students/with-parent/list');
             setStudentParents(response.data);
         } catch (err) {
-            showToast('Không thể tải danh sách học sinh + phụ huynh', false);
+            showToast('load_student_parent_failed', false);
         }
     };
 
@@ -101,7 +105,7 @@ function Report() {
             const response = await axios.get('http://localhost:5000/api/parents');
             setParents(response.data);
         } catch (error) {
-            showToast('Không thể tải danh sách phụ huynh.', false);
+            showToast('load_parent_failed', false);
         }
     };
 
@@ -110,47 +114,41 @@ function Report() {
             const response = await axios.get('http://localhost:5000/api/drivers');
             setDrivers(response.data);
         } catch (error) {
-            showToast('Không thể tải danh sách tài xế.', false);
+            showToast('load_driver_failed', false);
         }
     };
 
     return (
         <div className={cx('wrapper')}>
-            <h2 className={cx('title')}>Báo cáo sự cố</h2>
+            <h2 className={cx('title')}>{t('report_issue')}</h2>
 
             <textarea
-                placeholder="Nhập nội dung báo cáo..."
+                placeholder={t('report_placeholder')}
                 className={cx('textarea')}
                 value={noti}
-                onChange={(e) => {
-                    setNoti(e.target.value);
-                }}
+                onChange={(e) => setNoti(e.target.value)}
             />
 
             <div className={cx('report-content')}>
-                <label>Người nhận:</label>
+                <label>{t('recipient')}:</label>
 
                 <select
                     className={cx('report-select')}
                     onChange={(e) => {
                         handleOpenModal(e.target.value);
-
                         setSelectAll(false);
                         setSelectedDrivers([]);
                         setSelectedParents([]);
                     }}
                 >
-                    <option value="">-- Chọn người nhận --</option>
-                    <option value="parent">Phụ huynh</option>
-                    <option value="driver">Tài xế</option>
+                    <option value="">{t('select')}</option>
+                    <option value="parent">{t('Parent')}</option>
+                    <option value="driver">{t('Driver')}</option>
                 </select>
-
-                {/* <input type="text" placeholder="tìm kiếm ..." className={cx('input')} /> */}
 
                 {isOpenModalOpen && (
                     <div className={cx('select-all')}>
-                        <label htmlFor="checkall">Chọn tất cả</label>
-
+                        <label htmlFor="checkall">{t('select_all')}</label>
                         <input
                             type="checkbox"
                             id="checkall"
@@ -181,14 +179,13 @@ function Report() {
                     <table className={cx('table')}>
                         <thead>
                             <tr>
-                                <th>Mã học sinh</th>
-                                <th>Tên học sinh</th>
-                                <th>Tên phụ huynh</th>
-                                <th>SDT</th>
-                                <th>Chọn</th>
+                                <th>{t('student_code')}</th>
+                                <th>{t('student_name')}</th>
+                                <th>{t('parent_name')}</th>
+                                <th>{t('phone')}</th>
+                                <th>{t('select')}</th>
                             </tr>
                         </thead>
-
                         <tbody>
                             {studentParents.map((sp) => (
                                 <tr key={sp.student_id}>
@@ -196,7 +193,6 @@ function Report() {
                                     <td>{sp.student_name}</td>
                                     <td>{sp.parent_name}</td>
                                     <td>{sp.phone}</td>
-
                                     <td>
                                         <input
                                             type="checkbox"
@@ -204,7 +200,6 @@ function Report() {
                                             checked={selectedParents.includes(sp.account_id)}
                                             onChange={() => {
                                                 const id = sp.account_id;
-
                                                 setSelectedParents((prev) =>
                                                     prev.includes(id)
                                                         ? prev.filter((item) => item !== id)
@@ -226,25 +221,22 @@ function Report() {
                         <table className={cx('table')}>
                             <thead>
                                 <tr>
-                                    <th>Mã tài xế</th>
-                                    <th>Tên tài xế</th>
-                                    <th>Chọn</th>
+                                    <th>{t('driver_id')}</th>
+                                    <th>{t('driver_name')}</th>
+                                    <th>{t('select')}</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {drivers.map((driver) => (
                                     <tr key={driver.driver_id}>
                                         <td>{driver.driver_id}</td>
                                         <td>{driver.driver_name}</td>
-
                                         <td>
                                             <input
                                                 type="checkbox"
                                                 checked={selectedDrivers.includes(driver.account_id)}
                                                 onChange={() => {
                                                     const id = driver.account_id;
-
                                                     setSelectedDrivers((prev) =>
                                                         prev.includes(id)
                                                             ? prev.filter((item) => item !== id)
@@ -262,13 +254,8 @@ function Report() {
             )}
 
             <div className={cx('send-btn')}>
-                <button
-                    className={cx('btn', 'danger')}
-                    onClick={() => {
-                        send();
-                    }}
-                >
-                    Gửi báo cáo
+                <button className={cx('btn', 'danger')} onClick={send}>
+                    {t('send')}
                 </button>
             </div>
         </div>

@@ -4,10 +4,14 @@ import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function ManageParent() {
+    const { t } = useTranslation();
+
     const [parents, setParents] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState('');
     const [selectedParent, setSelectedParent] = useState(null);
@@ -22,7 +26,7 @@ function ManageParent() {
             setParents(response.data);
         } catch (error) {
             console.error('Lỗi khi tải danh sách phụ huynh:', error);
-            showToast('Không thể tải danh sách phụ huynh.', false);
+            showToast('loading_parent_failed', false);
         }
     };
 
@@ -59,7 +63,7 @@ function ManageParent() {
     // Hàm xử lý thêm phụ huynh mới
     const handleAddParent = async () => {
         if (!parentName.trim() || !phone.trim() || !email.trim()) {
-            showToast('Vui lòng nhập đầy đủ thông tin!', false);
+            showToast('please_enter_full_info', false);
             return;
         }
         try {
@@ -70,19 +74,20 @@ function ManageParent() {
                 email: email,
             };
             await axios.post('http://localhost:5000/api/parents', payload);
-            showToast('Thêm phụ huynh thành công!', true);
+            showToast('add_parent_success');
+
             handleCloseModal();
             fetchParents(); // Tải lại danh sách để cập nhật
         } catch (error) {
             console.error('Lỗi khi thêm phụ huynh:', error);
-            showToast('Lỗi khi thêm phụ huynh.', false);
+            showToast('add_parent_failed', false);
         }
     };
 
     // Hàm xử lý sửa thông tin phụ huynh
     const handleEditParent = async () => {
         if (!parentName.trim() || !phone.trim() || !email.trim()) {
-            showToast('Vui lòng nhập đầy đủ thông tin!', false);
+            showToast('please_enter_full_info', false);
             return;
         }
         try {
@@ -93,12 +98,12 @@ function ManageParent() {
                 email: email,
             };
             await axios.put(`http://localhost:5000/api/parents/${selectedParent.parent_id}`, payload);
-            showToast('Cập nhật phụ huynh thành công!', true);
+            showToast('update_parent_success');
             handleCloseModal();
             fetchParents(); // Tải lại danh sách
         } catch (error) {
             console.error('Lỗi khi sửa phụ huynh:', error);
-            showToast('Lỗi khi sửa phụ huynh.', false);
+            showToast('update_parent_failed', false);
         }
     };
 
@@ -106,64 +111,69 @@ function ManageParent() {
     const handleDeleteParent = async () => {
         try {
             await axios.delete(`http://localhost:5000/api/parents/${selectedParent.parent_id}`);
-            showToast('Xóa phụ huynh thành công!', true);
+            showToast('delete_parent_success');
             handleCloseModal();
             fetchParents(); // Tải lại danh sách
         } catch (error) {
             console.error('Lỗi khi xóa phụ huynh:', error);
-            showToast('Lỗi khi xóa phụ huynh.', false);
+            showToast('delete_parent_failed', false);
         }
     };
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản lý phụ huynh</h2>
+                <h2 className={cx('title')}>{t('parent_management')}</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm phụ huynh
+                    {t('add_parent')}
                 </button>
             </div>
-            <table className={cx('table')}>
-                <thead>
-                    <tr>
-                        <th>Mã phụ huynh</th>
-                        <th>Tên phụ huynh</th>
-                        <th>SĐT</th>
-                        <th>Email</th>
-                        <th>Hành động</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {parents.map((parent) => (
-                        <tr key={parent.parent_id}>
-                            <td>{parent.parent_id}</td>
-                            <td>{parent.parent_name}</td>
-                            <td>{parent.phone}</td>
-                            <td>{parent.email}</td>
-                            <td>
-                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', parent)}>
-                                    Sửa
-                                </button>
-                                <button
-                                    className={cx('btn', 'danger')}
-                                    onClick={() => handleOpenModal('delete', parent)}
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                            <td>
-                                <button
-                                    className={cx('btn', 'details')}
-                                    onClick={() => handleOpenModal('details', parent)}
-                                >
-                                    ...
-                                </button>
-                            </td>
+            <div className={cx('table-wrapper')}>
+                <table className={cx('table')}>
+                    <thead>
+                        <tr>
+                            <th>{t('parent_id')}</th>
+                            <th>{t('Parent')}</th>
+                            <th>{t('phone')}</th>
+                            <th>{t('email')}</th>
+                            <th>{t('action')}</th>
+                            <th>{t('details')}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {parents.map((parent) => (
+                            <tr key={parent.parent_id}>
+                                <td>{parent.parent_id}</td>
+                                <td>{parent.parent_name}</td>
+                                <td>{parent.phone}</td>
+                                <td>{parent.email}</td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'change')}
+                                        onClick={() => handleOpenModal('edit', parent)}
+                                    >
+                                        {t('edit')}
+                                    </button>
+                                    <button
+                                        className={cx('btn', 'danger')}
+                                        onClick={() => handleOpenModal('delete', parent)}
+                                    >
+                                        {t('delete')}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'details')}
+                                        onClick={() => handleOpenModal('details', parent)}
+                                    >
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Modal Sửa */}
             {isOpenModal === 'edit' && (
@@ -174,33 +184,35 @@ function ManageParent() {
                                 X
                             </button>
                         </div>
-                        <h3>Sửa phụ huynh</h3>
+
+                        <h3>{t('edit_parent')}</h3>
+
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Tên: </label>
+                                <label>{t('Parent')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Tên phụ huynh"
+                                    placeholder={t('parent_name_placeholder')}
                                     className={cx('input')}
                                     value={parentName}
                                     onChange={(e) => setParentName(e.target.value)}
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Số điện thoại: </label>
+                                <label>{t('phone')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="SĐT"
+                                    placeholder={t('phone')}
                                     className={cx('input')}
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Email: </label>
+                                <label>{t('email')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Email"
+                                    placeholder={t('email')}
                                     className={cx('input')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -209,7 +221,7 @@ function ManageParent() {
 
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditParent}>
-                                    Cập nhật
+                                    {t('update')}
                                 </button>
                             </div>
                         </div>
@@ -226,32 +238,32 @@ function ManageParent() {
                                 X
                             </button>
                         </div>
-                        <h3>Thêm phụ huynh</h3>
+                        <h3>{t('add_parent')}</h3>
                         <div className={cx('form')}>
                             <input
                                 type="text"
-                                placeholder="Tên phụ huynh"
+                                placeholder={t('parent_name_placeholder')}
                                 className={cx('input')}
                                 value={parentName}
                                 onChange={(e) => setParentName(e.target.value)}
                             />
                             <input
                                 type="text"
-                                placeholder="SĐT"
+                                placeholder={t('phone')}
                                 className={cx('input')}
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                             />
                             <input
                                 type="text"
-                                placeholder="Email"
+                                placeholder={t('email')}
                                 className={cx('input')}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddParent}>
-                                    Thêm
+                                    {t('add')}
                                 </button>
                             </div>
                         </div>
@@ -268,14 +280,14 @@ function ManageParent() {
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết phụ huynh</h3>
+                        <h3>{t('parent_details_title')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Mã phụ huynh</label>
+                                <label>{t('parent_id')}: </label>
                                 <input type="text" value={selectedParent.parent_id} readOnly className={cx('input')} />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Tên: </label>
+                                <label>{t('Parent')}: </label>
                                 <input
                                     type="text"
                                     value={selectedParent.parent_name}
@@ -284,11 +296,11 @@ function ManageParent() {
                                 />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Số điện thoại: </label>
+                                <label>{t('phone')}: </label>
                                 <input type="text" value={selectedParent.phone} readOnly className={cx('input')} />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Email: </label>
+                                <label>{t('email')}: </label>
                                 <input type="text" value={selectedParent.email} readOnly className={cx('input')} />
                             </div>
                         </div>
@@ -305,9 +317,9 @@ function ManageParent() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa phụ huynh?</h3>
+                        <h3>{t('confirm_delete_parent_title')}</h3>
                         <button className={cx('btn', 'add')} onClick={handleDeleteParent}>
-                            Xác nhận
+                            {t('confirm_delete')}
                         </button>
                     </div>
                 </div>

@@ -15,15 +15,20 @@
     z-index: 1001;
 
     .header-logo-container {
+        min-width: 480px;
         height: 100%;
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: 10% 65% 25%;
         align-items: center;
         font-size: 25px;
         color: var(--primary);
         float: left;
-        gap: 18px;
+        gap: 5px;
         margin-left: 25px;
+        text-align: center;
+    }
+    .header-changeLG-btn {
+        float: right;
     }
 
     .header-login {

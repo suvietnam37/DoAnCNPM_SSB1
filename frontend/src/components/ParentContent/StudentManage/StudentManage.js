@@ -8,9 +8,13 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
 import showConfirm from '../../../untils/ShowConfirm/showConfirm';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 const cx = classNames.bind(styles);
 
 function StudentManage({ routeStatus, students, setStudents }) {
+    const { t } = useTranslation();
+
     // const authContext = useContext(AuthContext);
 
     // const socketRef = useRef(null);
@@ -36,9 +40,9 @@ function StudentManage({ routeStatus, students, setStudents }) {
                     prev.map((s) => (s.student_id === student_id ? { ...s, is_absent: newAbsent } : s)),
                 );
 
-                showToast('Xin vắng thành công');
+                showToast('absent_success');
             } catch (error) {
-                showToast('Lỗi hệ thống', false);
+                showToast('system_error', false);
             }
         });
     };
@@ -47,17 +51,17 @@ function StudentManage({ routeStatus, students, setStudents }) {
         <div className={cx('student-manage')} id="student-manage">
             <div className={cx('student-manage-title')}>
                 <FontAwesomeIcon icon={faGraduationCap} />
-                <span>Quản Lý Con Em</span>
+                <span>{t('student_management')}</span>
             </div>
             <div className={cx('student-manage-table')}>
                 <table>
                     <thead>
                         <tr>
-                            <th>Mã học sinh</th>
-                            <th>Họ tên</th>
-                            <th>Lớp</th>
-                            <th>Trạng thái</th>
-                            {!routeStatus && <th>Hành động</th>}
+                            <th>{t('student_id')}</th>
+                            <th>{t('full_name')}</th>
+                            <th>{t('class_name')}</th>
+                            <th>{t('status')}</th>
+                            {!routeStatus && <th>{t('action')}</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -72,9 +76,9 @@ function StudentManage({ routeStatus, students, setStudents }) {
                                         <span>
                                             {student.is_absent === 0
                                                 ? student.status === 0
-                                                    ? 'Chưa lên xe'
-                                                    : 'Đã lên xe'
-                                                : 'Vắng mặt'}
+                                                    ? t('not_boarded')
+                                                    : t('boarded')
+                                                : t('absent')}
                                         </span>
                                     </td>
                                     {!routeStatus && (
@@ -85,7 +89,7 @@ function StudentManage({ routeStatus, students, setStudents }) {
                                                     handleAbsent(student.student_id, student.student_name, 1);
                                                 }}
                                             >
-                                                Xin vắng
+                                                {t('excused')}
                                             </button>
                                         </td>
                                     )}
@@ -93,7 +97,7 @@ function StudentManage({ routeStatus, students, setStudents }) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4">Không có thông tin học sinh.</td>
+                                <td colSpan="4">{t('no_student_info')}</td>
                             </tr>
                         )}
                     </tbody>

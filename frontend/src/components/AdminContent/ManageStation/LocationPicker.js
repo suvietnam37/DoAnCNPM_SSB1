@@ -5,6 +5,8 @@ import L from 'leaflet';
 import axios from 'axios';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 // Marker icon mặc định
 const markerIcon = new L.Icon({
@@ -14,6 +16,8 @@ const markerIcon = new L.Icon({
 });
 
 function GeoSearchBox({ setPosition, setAddress }) {
+    const { t } = useTranslation();
+
     const map = useMap();
 
     useEffect(() => {
@@ -29,7 +33,7 @@ function GeoSearchBox({ setPosition, setAddress }) {
             autoClose: true,
             retainZoomLevel: false,
             animateZoom: true,
-            searchLabel: 'Tìm kiếm địa chỉ...',
+            searchLabel: t('search_address'),
             keepResult: true,
         });
 
@@ -54,6 +58,8 @@ function GeoSearchBox({ setPosition, setAddress }) {
 }
 
 function MapClickHandler({ setPosition, setAddress }) {
+    const { t } = useTranslation();
+
     useMapEvents({
         click: async (e) => {
             const { lat, lng } = e.latlng;
@@ -74,15 +80,11 @@ function MapClickHandler({ setPosition, setAddress }) {
 }
 
 export default function LocationPicker({ position, setPosition, address, setAddress }) {
+    const { t } = useTranslation();
     return (
         <>
-            {/* GeoSearch */}
             <GeoSearchBox setPosition={setPosition} setAddress={setAddress} />
-
-            {/* Click chọn vị trí */}
             <MapClickHandler setPosition={setPosition} setAddress={setAddress} />
-
-            {/* Marker */}
             {position && (
                 <Marker
                     position={position}
@@ -104,7 +106,7 @@ export default function LocationPicker({ position, setPosition, address, setAddr
                         },
                     }}
                 >
-                    <Popup>{address || 'Vị trí đã chọn'}</Popup>
+                    <Popup>{address || t('selected_location')}</Popup>
                 </Marker>
             )}
         </>

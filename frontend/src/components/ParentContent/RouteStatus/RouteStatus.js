@@ -4,11 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot, faRightLong, faRoute } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
+
 const cx = classNames.bind(styles);
 function RouteStatus({ routeStatus }) {
     const [stops, setStops] = useState([]);
     const [currentStop, setCurrentStop] = useState('');
     const [nextStop, setNextStop] = useState('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (routeStatus) {
@@ -52,7 +56,7 @@ function RouteStatus({ routeStatus }) {
         <div className={cx('route-status')} id="route-status">
             <div className={cx('route-status-title')}>
                 <FontAwesomeIcon icon={faRoute} />
-                <span>Trạng Thái Tuyến Xe</span>
+                <span>{t('route_status')}</span>
             </div>
             {routeStatus ? (
                 <div className={cx('route-status-container')}>
@@ -65,9 +69,11 @@ function RouteStatus({ routeStatus }) {
                                     { unactive: routeStatus?.status !== 'Running' },
                                 )}
                             ></div>
-                            <div className={cx('num')}>Tuyến xe {routeStatus?.route_name}</div>
+                            <div className={cx('num')}>
+                                {t('vehicle_route')} {routeStatus?.route_name}
+                            </div>
                             <div className={cx('active')}>
-                                {routeStatus?.status === 'Running' ? 'đang hoạt động' : 'chưa hoạt động'}
+                                {routeStatus?.status === 'Running' ? t('active') : t('unactive')}
                             </div>
                         </div>
                         <div className={cx('start-end')}>
@@ -75,24 +81,23 @@ function RouteStatus({ routeStatus }) {
                             {stops?.[stops.length - 1]?.stop_name}
                         </div>
                     </div>
-                    {/* Các thông tin vị trí sẽ được cập nhật ở tuần 6 */}
                     <div className={cx('route-location')}>
                         <div className={cx('location-title')}>
                             <FontAwesomeIcon icon={faLocationDot} className={cx('location-title-icon')} />
-                            <span> Vị trí hiện tại </span>
+                            <span> {t('current_location')} </span>
                         </div>
-                        <div className={cx('location-name')}>{currentStop || 'Đang cập nhật vị trí...'}</div>
+                        <div className={cx('location-name')}>{currentStop || t('updating_location') + ' ...'}</div>
                     </div>
                     <div className={cx('route-next-location')}>
                         <div className={cx('next-location-title')}>
                             <FontAwesomeIcon icon={faRightLong} className={cx('next-location-title-icon')} />
-                            <span> Điểm dừng tiếp theo </span>
+                            <span> {t('next_stop')} </span>
                         </div>
-                        <div className={cx('next-location-name')}>{nextStop || 'Đang cập nhật...'}</div>
+                        <div className={cx('next-location-name')}>{nextStop || t('updating') + ' ...'}</div>
                     </div>
                 </div>
             ) : (
-                <h2>Chưa có chuyến xe bắt đầu</h2>
+                <h2>{t('no_trip_started')}</h2>
             )}
         </div>
     );

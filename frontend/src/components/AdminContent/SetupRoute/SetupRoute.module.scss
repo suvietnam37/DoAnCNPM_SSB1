@@ -14,14 +14,21 @@
     margin-bottom: 20px;
 }
 
+.table-wrapper {
+    max-height: 480px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
 .table {
     width: 100%;
     border-collapse: collapse;
     background: #fff;
     border-radius: 10px;
-    overflow: hidden;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
 
     th,
     td {
@@ -33,6 +40,9 @@
     th {
         background: #f5f5f5;
         font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 1;
     }
 }
 

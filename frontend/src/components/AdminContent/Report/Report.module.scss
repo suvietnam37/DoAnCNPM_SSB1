@@ -28,7 +28,7 @@
 }
 
 .table-wrapper {
-    max-height: 200px; // chiều cao tối đa, table dài quá sẽ scroll
+    max-height: 480px; // chiều cao tối đa, table dài quá sẽ scroll
     overflow-y: auto; // scroll dọc
     border-radius: 8px;
     border: 1px solid #eee;
@@ -204,4 +204,8 @@
 .report-select:focus {
     border-color: #28a745;
     box-shadow: 0 0 5px rgba(40, 167, 69, 0.4);
+}
+.form-container {
+    max-height: 220px;
+    overflow-y: auto;
 }

@@ -11,6 +11,8 @@ import { AuthContext } from '../../../context/auth.context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Routing from '../../../untils/Routing/Routing';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
@@ -78,6 +80,8 @@ const busNumberIcon = (number) =>
     });
 
 function DashBoard() {
+    const { t } = useTranslation();
+
     const authContext = useContext(AuthContext);
     const ACCOUNT_ID = authContext.auth.user.account_id;
     const date = new Date().toISOString().split('T')[0];
@@ -98,13 +102,21 @@ function DashBoard() {
 
     const handleRoutingBus = (route_id) => {
         if (routingBus === route_id) {
+            // console.log('hihi');
+
             setRouting(false);
             setRoutingBus(null);
         } else {
+            // console.log('haha');
+
             setRouting(true);
             setRoutingBus(route_id);
         }
     };
+
+    useEffect(() => {
+        console.log(routingBus);
+    }, [routingBus]);
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
@@ -212,12 +224,20 @@ function DashBoard() {
 
     return (
         <div className={cx('wrapper')}>
-            <h2 className={cx('title')}>Tổng quan hệ thống</h2>
+            <h2 className={cx('title')}>{t('system_overview')}</h2>
             <div className={cx('stats')}>
-                <div className={cx('card')}>Tuyến xe: {numRoutes.length}</div>
-                <div className={cx('card')}>Xe bus: {numBuses.length}</div>
-                <div className={cx('card')}>Tài xế: {numDrivers.length}</div>
-                <div className={cx('card')}>Học sinh: {numStudents.length}</div>
+                <div className={cx('card')}>
+                    {t('route')}: {numRoutes.length}
+                </div>
+                <div className={cx('card')}>
+                    {t('bus')}: {numBuses.length}
+                </div>
+                <div className={cx('card')}>
+                    {t('driver')}: {numDrivers.length}
+                </div>
+                <div className={cx('card')}>
+                    {t('student')}: {numStudents.length}
+                </div>
             </div>
             <div className={cx('content')}>
                 <div className={cx('content-map')}>
@@ -245,14 +265,14 @@ function DashBoard() {
                             );
                         })}
 
-                        {routing && routingBus && waypoints && (
-                            <Routing waypoints={waypoints.find((w) => w.route_id === routingBus)?.waypoints || []} />
-                        )}
+                        <Routing
+                            waypoints={routing ? waypoints.find((w) => w.route_id === routingBus)?.waypoints || [] : []}
+                        />
                     </MapContainer>
                 </div>
                 <div></div>
                 <div className={cx('content-notification')}>
-                    <h1>Thông báo hệ thống</h1>
+                    <h1>{t('notification')}</h1>
                     <div className={cx('content-notification-content')}>
                         <ul ref={listRef}>
                             {noti.map((content, index) => (

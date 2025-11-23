@@ -4,10 +4,14 @@ import classNames from 'classnames/bind';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import showToast from '../../../untils/ShowToast/showToast';
+import { useTranslation } from 'react-i18next';
+import '../../../untils/ChangeLanguage/i18n';
 
 const cx = classNames.bind(styles);
 
 function ManageDriver() {
+    const { t } = useTranslation();
+
     const [drivers, setDrivers] = useState([]);
     const [isOpenModal, setIsOpenModal] = useState('');
     const [selectedDriver, setSelectedDriver] = useState(null);
@@ -20,7 +24,7 @@ function ManageDriver() {
             setDrivers(response.data);
         } catch (error) {
             console.error('Fetch error:', error);
-            showToast('Không thể tải danh sách tài xế.', false);
+            showToast('loading_driver_failed', false);
         }
     };
 
@@ -45,7 +49,7 @@ function ManageDriver() {
     // Thêm tài xế
     const handleAddDriver = async () => {
         if (!driverName.trim()) {
-            showToast('Vui lòng nhập tên tài xế!', false);
+            showToast('please_enter_driver_name', false);
             return;
         }
         try {
@@ -53,19 +57,19 @@ function ManageDriver() {
             await axios.post('http://localhost:5000/api/drivers', {
                 driver_name: driverName,
             });
-            showToast('Thêm tài xế thành công!', true);
+            showToast('add_driver_success');
             handleCloseModal();
             fetchDrivers(); // Tải lại danh sách
         } catch (error) {
             console.error('Add driver error:', error);
-            showToast('Lỗi khi thêm tài xế.', false);
+            showToast('add_driver_failed', false);
         }
     };
 
     // Sửa tài xế
     const handleEditDriver = async () => {
         if (!driverName.trim()) {
-            showToast('Vui lòng nhập tên tài xế!', false);
+            showToast('please_enter_driver_name', false);
             return;
         }
         try {
@@ -73,12 +77,12 @@ function ManageDriver() {
             await axios.put(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`, {
                 driver_name: driverName,
             });
-            showToast('Cập nhật tài xế thành công!', true);
+            showToast('update_driver_success');
             handleCloseModal();
             fetchDrivers(); // Tải lại danh sách
         } catch (error) {
             console.error('Edit driver error:', error);
-            showToast('Lỗi khi sửa tài xế.', false);
+            showToast('update_driver_failed', false);
         }
     };
 
@@ -87,60 +91,65 @@ function ManageDriver() {
         try {
             // Gọi đến API xóa mềm
             await axios.delete(`http://localhost:5000/api/drivers/${selectedDriver.driver_id}`);
-            showToast('Xóa tài xế thành công!', true);
+            showToast('delete_driver_success');
             handleCloseModal();
             fetchDrivers(); // Tải lại danh sách
         } catch (error) {
             console.error('Delete driver error:', error);
-            showToast('Lỗi khi xóa tài xế.', false);
+            showToast('delete_driver_failed', false);
         }
     };
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Quản lý tài xế</h2>
+                <h2 className={cx('title')}>{t('driver_management')}</h2>
                 <button className={cx('btn', 'add')} onClick={() => handleOpenModal('add')}>
-                    Thêm tài xế
+                    {t('add_driver')}
                 </button>
             </div>
-            <table className={cx('table')}>
-                <thead>
-                    <tr>
-                        <th>Mã tài xế</th>
-                        <th>Tên tài xế</th>
-                        <th>Hành động</th>
-                        <th>Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {drivers.map((driver) => (
-                        <tr key={driver.driver_id}>
-                            <td>{driver.driver_id}</td>
-                            <td>{driver.driver_name}</td>
-                            <td>
-                                <button className={cx('btn', 'change')} onClick={() => handleOpenModal('edit', driver)}>
-                                    Sửa
-                                </button>
-                                <button
-                                    className={cx('btn', 'danger')}
-                                    onClick={() => handleOpenModal('delete', driver)}
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                            <td>
-                                <button
-                                    className={cx('btn', 'details')}
-                                    onClick={() => handleOpenModal('details', driver)}
-                                >
-                                    ...
-                                </button>
-                            </td>
+            <div className={cx('table-wrapper')}>
+                <table className={cx('table')}>
+                    <thead>
+                        <tr>
+                            <th>{t('driver_id')}</th>
+                            <th>{t('driver_name')}</th>
+                            <th>{t('actions')}</th>
+                            <th>{t('details')}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {drivers.map((driver) => (
+                            <tr key={driver.driver_id}>
+                                <td>{driver.driver_id}</td>
+                                <td>{driver.driver_name}</td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'change')}
+                                        onClick={() => handleOpenModal('edit', driver)}
+                                    >
+                                        {t('edit')}
+                                    </button>
+                                    <button
+                                        className={cx('btn', 'danger')}
+                                        onClick={() => handleOpenModal('delete', driver)}
+                                    >
+                                        {t('delete')}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button
+                                        className={cx('btn', 'details')}
+                                        onClick={() => handleOpenModal('details', driver)}
+                                    >
+                                        ...
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Modal Sửa */}
             {isOpenModal === 'edit' && (
@@ -151,13 +160,13 @@ function ManageDriver() {
                                 X
                             </button>
                         </div>
-                        <h3>Sửa tài xế</h3>
+                        <h3>{t('edit_driver')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Tên tài xế: </label>
+                                <label>{t('driver_name')}: </label>
                                 <input
                                     type="text"
-                                    placeholder="Tên tài xế"
+                                    placeholder={t('driver_name')}
                                     className={cx('input')}
                                     value={driverName}
                                     onChange={(e) => setDriverName(e.target.value)}
@@ -165,7 +174,7 @@ function ManageDriver() {
                             </div>
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleEditDriver}>
-                                    Cập nhật
+                                    {t('update')}
                                 </button>
                             </div>
                         </div>
@@ -182,18 +191,18 @@ function ManageDriver() {
                                 X
                             </button>
                         </div>
-                        <h3>Thêm tài xế</h3>
+                        <h3>{t('add_driver')}</h3>
                         <div className={cx('form')}>
                             <input
                                 type="text"
-                                placeholder="Tên tài xế"
+                                placeholder={t('driver_name')}
                                 className={cx('input')}
                                 value={driverName}
                                 onChange={(e) => setDriverName(e.target.value)}
                             />
                             <div className={cx('buttons')}>
                                 <button className={cx('btn', 'add')} onClick={handleAddDriver}>
-                                    Thêm
+                                    {t('add')}
                                 </button>
                             </div>
                         </div>
@@ -210,14 +219,14 @@ function ManageDriver() {
                                 X
                             </button>
                         </div>
-                        <h3>Chi tiết tài xế</h3>
+                        <h3>{t('driver_detail')}</h3>
                         <div className={cx('form')}>
                             <div className={cx('flex-input')}>
-                                <label>Mã tài xế: </label>
+                                <label>{t('driver_id')}: </label>
                                 <input type="text" value={selectedDriver.driver_id} readOnly className={cx('input')} />
                             </div>
                             <div className={cx('flex-input')}>
-                                <label>Tên tài xế: </label>
+                                <label>{t('driver_name')}: </label>
                                 <input
                                     type="text"
                                     value={selectedDriver.driver_name}
@@ -239,9 +248,9 @@ function ManageDriver() {
                                 X
                             </button>
                         </div>
-                        <h3>Xác nhận xóa tài xế?</h3>
+                        <h3>{t('confirm_delete_driver')} ?</h3>
                         <button className={cx('btn', 'add')} onClick={handleDeleteDriver}>
-                            Xác nhận
+                            {t('confirm')}
                         </button>
                     </div>
                 </div>

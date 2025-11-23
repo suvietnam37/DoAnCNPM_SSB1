@@ -1,11 +1,12 @@
 import Swal from 'sweetalert2';
 import styles from './showToast.module.scss';
-function showToast(message, isSuccess = true, position = 'top-end') {
+import i18n from '../ChangeLanguage/i18n';
+
+function showToast(messageKey, isSuccess = true, position = 'top-end') {
     Swal.fire({
         icon: isSuccess ? 'success' : 'error',
-        title: 'Thông báo',
-        // title: isSuccess ? 'Thành công!' : 'Lỗi!',
-        text: message,
+        title: i18n.t('notification'), // tự dịch Notification / Thông báo
+        text: i18n.t(messageKey), // messageKey sẽ dịch theo languages
         toast: true,
         position: position,
         showConfirmButton: false,
