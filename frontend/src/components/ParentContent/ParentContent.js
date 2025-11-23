@@ -43,9 +43,9 @@ function ParentContent() {
         };
     }, []);
 
-    useEffect(() => {
-        console.log('busLocation: ', busLocation);
-    }, [busLocation]);
+    // useEffect(() => {
+    //     console.log('busLocation: ', busLocation);
+    // }, [busLocation]);
 
     // useEffect(() => {
     //     console.log('waypoints: ', waypoints);

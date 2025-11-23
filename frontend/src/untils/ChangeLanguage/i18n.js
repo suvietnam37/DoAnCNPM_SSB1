@@ -29,6 +29,7 @@ const resources = {
             // Arrive Stop
             arrive_stop_confirm: 'Do you confirm arrival?',
             arrive_stop_success: 'Arrived at the stop successfully',
+            arrived_at_stop_fail: "You haven't arrived at the stop yet",
             route_start_confirm: 'Are you sure you want to start this route?',
             start: 'Start',
             please_confirm: 'Please confirm?',
@@ -446,6 +447,7 @@ const resources = {
 
     vi: {
         translation: {
+            arrived_at_stop_fail: 'Chưa đến trạm dừng',
             please_confirm: 'Vui lòng xác nhận?',
             confirm: 'Xác nhận',
             cancel: 'Hủy',

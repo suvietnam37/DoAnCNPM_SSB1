@@ -18,10 +18,19 @@ import { AuthContext } from '../../../context/auth.context';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 import '../../../untils/ChangeLanguage/i18n';
+import getDistance from '../../../untils/getDistance/getDistance';
 
 const cx = classNames.bind(styles);
 
-function Doing({ currentAssignment, handleEndRoute, notifications, setNotifications }) {
+function Doing({
+    currentAssignment,
+    handleEndRoute,
+    notifications,
+    setNotifications,
+    waypoints,
+    stopIndexRef,
+    FragRef,
+}) {
     const socketRef = useRef(null);
     const { t } = useTranslation();
 
@@ -32,6 +41,7 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
     const [nextStop, setNextStop] = useState('');
     const [endRoute, setEndRoute] = useState(false);
     const [noti, setNoti] = useState('');
+    const [busLocation, setBusLocation] = useState(null);
 
     const authContext = useContext(AuthContext);
 
@@ -44,6 +54,10 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
     const handleOpenModal = () => {
         setModalOpen(true);
     };
+
+    // useEffect(() => {
+    //     console.log('dis: ', dis);
+    // }, [dis]);
 
     useEffect(() => {
         socketRef.current = io('http://localhost:5000');
@@ -61,6 +75,21 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
             socketRef.current.disconnect();
         };
     }, []);
+
+    useEffect(() => {
+        const handleGetLocation = (data) => {
+            // console.log('data.route_id: ', data.route_id);
+            // console.log('routeStatus?.route_id: ', routeStatus?.route_id);
+
+            if (data.route_id === currentAssignment?.route_id) {
+                setBusLocation(data.location);
+            }
+        };
+        socketRef.current.on('location', handleGetLocation);
+        return () => {
+            socketRef.current.off('location', handleGetLocation);
+        };
+    }, [currentAssignment]);
 
     const fetchNotifications = async (ACCOUNT_ID) => {
         const date = new Date().toISOString().split('T')[0];
@@ -116,8 +145,26 @@ function Doing({ currentAssignment, handleEndRoute, notifications, setNotificati
         }
     };
 
+    // useEffect(() => {
+    //     console.log(dis);
+    // }, [dis]);
+
     const handleChangeStop = async (route_id) => {
         showConfirm('arrive_stop_confirm', 'confirm', async () => {
+            let dis = getDistance(
+                busLocation.lat,
+                busLocation.lng,
+                waypoints[stopIndexRef.current].lat,
+                waypoints[stopIndexRef.current].lng,
+            );
+
+            if (dis > 150) {
+                showToast('arrived_at_stop_fail', false);
+                return;
+            }
+            stopIndexRef.current++;
+            FragRef.current = false;
+
             // Lấy vị trí của current stop trong mảng stops
             const currentIndex = stops.findIndex((s) => s.stop_name === currentStop);
 

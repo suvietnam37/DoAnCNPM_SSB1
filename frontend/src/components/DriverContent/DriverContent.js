@@ -40,6 +40,7 @@ function DriverContent() {
     const intervalRef = useRef(null);
     const currentIndexRef = useRef(0);
     const stopIndexRef = useRef(1);
+    const FragRef = useRef(false);
 
     // //lay vi tri bang geolocation
     // const [position, setPosition] = useState(null);
@@ -119,7 +120,7 @@ function DriverContent() {
             }
 
             const loc = routeCoords[currentIndexRef.current];
-            console.log(currentIndexRef.current + ':', loc);
+            // console.log(currentIndexRef.current + ':', loc);
 
             let dis;
             if (stopIndexRef.current < waypoints.length) {
@@ -129,6 +130,7 @@ function DriverContent() {
                     waypoints[stopIndexRef.current].lat,
                     waypoints[stopIndexRef.current].lng,
                 );
+                console.log('dis: ', dis);
             }
             if (currentAssignment) {
                 socketRef.current.emit('location', {
@@ -136,7 +138,8 @@ function DriverContent() {
                     route_id: currentAssignment.route_id,
                 });
 
-                if (dis < 500) {
+                if (dis < 500 && !FragRef.current) {
+                    FragRef.current = true;
                     socketRef.current.emit('nearStop', {
                         message: `Xe số ${currentAssignment.bus_id} còn cách trạm tiếp theo ` + Math.round(dis) + ' m',
                         route_id: route.route_id,
@@ -181,7 +184,7 @@ function DriverContent() {
                         });
                     })();
 
-                    stopIndexRef.current++;
+                    // stopIndexRef.current++;
                 }
             }
 
@@ -509,6 +512,9 @@ function DriverContent() {
                 />
                 <StudentManage students={studentsOnRoute} handleConfirmStudent={handleConfirmStudent} />
                 <Doing
+                    FragRef={FragRef}
+                    stopIndexRef={stopIndexRef}
+                    waypoints={waypoints}
                     notifications={notifications}
                     currentAssignment={currentAssignment}
                     handleEndRoute={handleEndRoute}
