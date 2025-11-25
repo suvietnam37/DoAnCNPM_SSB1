@@ -46,7 +46,6 @@ function initSocket(server) {
     });
 
     socket.on("location", ({ location, route_id }) => {
-      // console.log(location);
       io.emit("location", { location, route_id });
     });
 

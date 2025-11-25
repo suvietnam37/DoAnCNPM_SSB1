@@ -97,9 +97,6 @@ function ParentContent() {
         socketRef.current.on('endRoute', handleEndRoute);
 
         const handleGetLocation = (data) => {
-            // console.log('data.route_id: ', data.route_id);
-            // console.log('routeStatus?.route_id: ', routeStatus?.route_id);
-
             if (data.route_id === routeStatus?.route_id) {
                 setBusLocation(data.location);
             }
