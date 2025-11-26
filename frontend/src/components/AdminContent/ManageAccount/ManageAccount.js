@@ -122,7 +122,7 @@ function ManageAccount() {
                 status: newStatus,
             });
 
-            showToast(newStatus === 'Locked' ? 'Tài khoản đã bị khóa' : 'Tài khoản đã được mở khóa', true);
+            showToast(newStatus === 'Locked' ? t('update_status_locked') : t('update_status_unlocked'), true);
 
             fetchAccounts(); // Cập nhật lại danh sách
         } catch (error) {
