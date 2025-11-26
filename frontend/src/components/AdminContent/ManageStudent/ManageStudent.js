@@ -605,8 +605,7 @@ function ManageStudent() {
                 </div>
             )}
 
-            {/* MODAL XÓA */}
-            {isOpenModal === 'delete' && selectedStudent && (
+            {isOpenModal === 'delete' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
                         <div className={cx('modal-overlay-close')}>
@@ -614,18 +613,10 @@ function ManageStudent() {
                                 X
                             </button>
                         </div>
-
-                        <h3>{t('confirm_delete_title')}</h3>
-                        <p>{t('confirm_delete_message', { name: selectedStudent.student_name })}</p>
-
-                        <div className={cx('buttons')}>
-                            <button className={cx('btn', 'cancel')} onClick={handleCloseModal}>
-                                {t('cancel')}
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={handleDeleteStudent}>
-                                {t('confirm_delete')}
-                            </button>
-                        </div>
+                        <h3>{t('confirm_delete_student')} ?</h3>
+                        <button className={cx('btn', 'add')} onClick={handleDeleteStudent}>
+                            {t('confirm')}
+                        </button>
                     </div>
                 </div>
             )}

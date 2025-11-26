@@ -281,6 +281,7 @@ const resources = {
             edit_driver: 'Edit Driver',
             add_driver: 'Add Driver',
             confirm_delete_driver: 'Confirm Driver Deletion',
+            confirm_delete_student: 'Confirm Student Deletion',
 
             // Account
             account_management: 'Account Management',
@@ -661,6 +662,8 @@ const resources = {
             add_driver: 'Thêm tài xế',
             add: 'Thêm',
             confirm_delete_driver: 'Xác nhận xóa tài xế',
+            confirm_delete_student: 'Xác nhận xóa học sinh',
+
             confirm: 'Xác nhận',
             student_management_title: 'Quản lý học sinh',
             add_student: 'Thêm học sinh',

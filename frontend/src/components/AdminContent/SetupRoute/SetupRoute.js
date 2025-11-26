@@ -433,25 +433,18 @@ function SetupRoute() {
                 </div>
             )}
 
-            {/* MODAL XÓA */}
-            {isOpenModal === 'delete' && selectedAssignment && (
+            {isOpenModal === 'delete' && (
                 <div className={cx('modal-overlay')}>
                     <div className={cx('modal-content')}>
-                        <div className={cx('modal-header')}>
-                            <h3>{t('confirm_delete_title')}</h3>
+                        <div className={cx('modal-overlay-close')}>
                             <button className={cx('btn', 'danger', 'radius')} onClick={handleCloseModal}>
-                                {t('close')}
+                                X
                             </button>
                         </div>
-                        <p>{t('confirm_delete_message_assignment')}</p>
-                        <div className={cx('buttons')}>
-                            <button className={cx('btn', 'cancel')} onClick={handleCloseModal}>
-                                {t('cancel')}
-                            </button>
-                            <button className={cx('btn', 'danger')} onClick={handleDeleteAssignment}>
-                                {t('confirm_delete')}
-                            </button>
-                        </div>
+                        <h3>{t('confirm_delete_assignment')}</h3>
+                        <button className={cx('btn', 'add')} onClick={handleDeleteAssignment}>
+                            {t('confirm')}
+                        </button>
                     </div>
                 </div>
             )}
