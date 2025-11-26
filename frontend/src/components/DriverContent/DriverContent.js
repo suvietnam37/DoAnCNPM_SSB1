@@ -130,7 +130,7 @@ function DriverContent() {
                     waypoints[stopIndexRef.current].lat,
                     waypoints[stopIndexRef.current].lng,
                 );
-                console.log('dis: ', dis);
+                // console.log('dis: ', dis);
             }
             if (currentAssignment) {
                 socketRef.current.emit('location', {

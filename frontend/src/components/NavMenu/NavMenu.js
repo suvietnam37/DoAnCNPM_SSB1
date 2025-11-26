@@ -80,7 +80,9 @@ function NavMenu({ menus = [], role }) {
                     </div>
                 ))}
             </div>
-            <div className={cx('menu-role')}>{t(role)}</div>
+            <div className={cx('menu-role')}>
+                <span>{t(role)}</span>
+            </div>
         </div>
     );
 }

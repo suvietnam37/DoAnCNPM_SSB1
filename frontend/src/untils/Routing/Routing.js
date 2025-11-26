@@ -69,17 +69,45 @@ function Routing({ waypoints, setRouteCoords, setC = false }) {
                     return;
                 }
 
-                // Geoapify có thể trả nhiều segment nếu nhiều waypoint
-                const segments = data.features[0].geometry.coordinates.map((segment) =>
-                    segment.map(([lng, lat]) => ({ lat, lng })),
-                );
+                // // Geoapify có thể trả nhiều segment nếu nhiều waypoint
+                // const segments = data.features[0].geometry.coordinates.map((segment) =>
+                //     segment.map(([lng, lat]) => ({ lat, lng })),
+                // );
 
-                // Nối các segment thành 1 mảng duy nhất, bỏ trùng điểm đầu
+                // // Nối các segment thành 1 mảng duy nhất, bỏ trùng điểm đầu
+                // let fullRoute = [];
+                // segments.forEach((segment, index) => {
+                //     if (index > 0) segment.shift(); // bo cac diem dau cac moc giua
+                //     fullRoute = fullRoute.concat(segment); // ham noi mang
+                // });
+
                 let fullRoute = [];
-                segments.forEach((segment, index) => {
-                    if (index > 0) segment.shift(); // bo cac diem dau cac moc giua
-                    fullRoute = fullRoute.concat(segment); // ham noi mang
-                });
+
+                const geometry = data.features[0].geometry;
+
+                // {
+                // "geometry": {
+                //     "type": "LineString" // "MuntipleString",
+                //     "coordinates": [
+                //     [106.1234, 10.1234],
+                //     [106.2345, 10.2345]
+                //     ]
+                // }
+                // }
+
+                // Geoapify trả LineString
+                if (geometry.type === 'LineString') {
+                    fullRoute = geometry.coordinates.map(([lng, lat]) => ({ lat, lng }));
+                }
+
+                // Geoapify trả MultiLineString
+                else if (geometry.type === 'MultiLineString') {
+                    geometry.coordinates.forEach((segment, index) => {
+                        let pts = segment.map(([lng, lat]) => ({ lat, lng }));
+                        if (index > 0) pts.shift();
+                        fullRoute = fullRoute.concat(pts);
+                    });
+                }
 
                 // Gửi lên parent
                 if (setC) setRouteCoords(fullRoute);
